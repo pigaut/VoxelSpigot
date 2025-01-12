@@ -1,0 +1,84 @@
+
+
+func-list:
+  - if: { chance: 10, do: give_vault: 10000 }
+
+  - if:
+      has vault: 100
+    do:
+      give item: my_item
+  - if:
+      has vault: 200
+    do:
+      give item: another_item
+
+switch:
+  switch: has vault
+  cases:
+    - case: 100
+      do:
+        give vault: 1000
+        give item: my_item
+    - case: 200
+      do: {}
+      break: true
+  default:
+    give vault: 100
+
+
+functions: #type: simple, conditional, switch, input
+
+
+
+  basic:
+    type: simple
+    loops: 1
+    actions:
+      SET_FLIGHT: true
+
+  condition:
+    type: conditional
+    if:
+      has_vault: 100
+      has_permission: user.rank.slave
+    do:
+      give_items:
+        - my_item 1
+
+  looped:
+    repetitions: 10
+    if: {}
+    do: {}
+    else: {}
+
+  switch:
+    switch: HAS_VAULT
+    cases:
+      100:
+        action: value
+      200:
+        action: value
+        break: true
+      default: {}
+
+  input:  #sospended
+    input:
+      '%material%': MATERIAL_SELECTION
+      '%amount%': SIGN_INPUT
+      '%example%': CHAT_INPUT
+    output:
+      OP_COMMAND: 'give %player% %material% %amount%'
+    cancel:
+      MESSAGE: Invalid input
+
+  example:
+    click: [LEFT]
+    SIGN_INPUT: '%example%'
+
+  my_function:
+    click: [ LEFT, SHIFT_LEFT ]
+    conditions: { }
+    success: { }
+    failure: { }
+    ACTION1: arst
+    ACTION2: arst

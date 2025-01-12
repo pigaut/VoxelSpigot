@@ -1,0 +1,10 @@
+package io.github.pigaut.voxel.command.execution;
+
+import org.bukkit.command.*;
+
+@FunctionalInterface
+public interface CommandExecution {
+
+    void execute(CommandSender sender, String[] args);
+
+}

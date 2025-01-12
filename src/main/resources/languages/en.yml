@@ -1,0 +1,25 @@
+usage: '/%command% help'
+not-enough-args: "&4Not enough arguments"
+too-many-args: '&4Too many arguments'
+no-permission: '&4You don''t have the permission to run this command'
+player-only: '&4This command cannot be executed from console'
+loading-player-data: '&4Player data is still loading try again later'
+
+help-command: help
+help-description: 'View a list of all available commands'
+help-header: '&2------------     &r&l%command% Help     &2------------'
+help-line: '&a/%command%: &r%description%'
+help-footer: '&2---------------------------------------------'
+
+item-command: item
+file-path-parameter: file-path
+item-name-parameter: item-name
+add-item-command: add
+add-item-description: 'Save the item you''re holding to a yaml file'
+get-item-command: get
+get-item-description: 'Get an item saved in a yaml file'
+not-yaml-file: '&4The file must be a yaml file'
+not-holding-item: '&4You need to hold an item to add'
+item-not-found: '&4Item with given name not found'
+adding-item: '&aAdding item to yaml file...'
+received-item: '&aYou received x1 item'
