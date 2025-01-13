@@ -185,7 +185,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
-    public @NotNull Configurator getConfigurator() {
+    public @NotNull PluginConfigurator getConfigurator() {
         return new PluginConfigurator(this);
     }
 

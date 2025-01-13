@@ -3,17 +3,17 @@ package io.github.pigaut.voxel.function.action.player;
 import io.github.pigaut.voxel.player.*;
 import org.jetbrains.annotations.*;
 
-public class SetPlayerExp implements PlayerAction {
+public class SetPlayerFlight implements PlayerAction {
 
-    private final int amount;
+    private final boolean flight;
 
-    public SetPlayerExp(int amount) {
-        this.amount = amount;
+    public SetPlayerFlight(boolean flight) {
+        this.flight = flight;
     }
 
     @Override
     public void execute(@NotNull PluginPlayer player) {
-        player.setExp(amount);
+        player.asPlayer().setAllowFlight(flight);
     }
 
 }

@@ -29,27 +29,4 @@ public class PlayerHasPermission implements PlayerCondition {
         return true;
     }
 
-    public static ConfigLoader<PlayerHasPermission> newConfigLoader() {
-        return new ConfigLoader<PlayerHasPermission>() {
-            @Override
-            public @NotNull String getProblemDescription() {
-                return "Could not load condition 'HAS_PERMISSION'";
-            }
-
-            @Override
-            public String getKey() {
-                return "HAS_PERMISSION";
-            }
-
-            @Override
-            public @NotNull PlayerHasPermission loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
-                return new PlayerHasPermission(scalar.toString());
-            }
-
-            @Override
-            public @NotNull PlayerHasPermission loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
-                return new PlayerHasPermission(sequence.toStringList());
-            }
-        };
-    }
 }

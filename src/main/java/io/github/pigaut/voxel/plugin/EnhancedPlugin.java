@@ -1,6 +1,7 @@
 package io.github.pigaut.voxel.plugin;
 
 import io.github.pigaut.voxel.command.*;
+import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.item.*;
 import io.github.pigaut.voxel.language.*;
 import io.github.pigaut.voxel.message.*;
@@ -61,7 +62,7 @@ public interface EnhancedPlugin extends Plugin {
     RootSection getConfiguration();
 
     @NotNull
-    Configurator getConfigurator();
+    PluginConfigurator getConfigurator();
 
     @Nullable
     EnhancedCommand getCustomCommand(String name);

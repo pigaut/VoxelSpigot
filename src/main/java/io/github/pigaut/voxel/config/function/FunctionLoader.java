@@ -1,9 +1,11 @@
 package io.github.pigaut.voxel.config.function;
 
+import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.function.action.*;
 import io.github.pigaut.voxel.function.condition.*;
 import io.github.pigaut.voxel.function.condition.player.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.*;
 import io.github.pigaut.yaml.configurator.loader.*;
@@ -14,9 +16,9 @@ import java.util.*;
 
 public class FunctionLoader implements ConfigLoader<Function> {
 
-    private final Plugin plugin;
+    private final EnhancedPlugin plugin;
 
-    public FunctionLoader(Plugin plugin) {
+    public FunctionLoader(EnhancedPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -44,14 +46,10 @@ public class FunctionLoader implements ConfigLoader<Function> {
             return addFunctionOptions(config, function);
         }
 
-        final String switchType = config.getOptionalString("switch").orElse(null);
+        final ConfigScalar switchType = config.getOptionalScalar("switch").orElse(null);
         if (switchType != null) {
-            final Configurator configurator = config.getRoot().getConfigurator();
-            final ConfigLoader<? extends PlayerCondition> conditionLoader = configurator.getChildLoader(PlayerCondition.class, switchType);
-
-            if (conditionLoader == null) {
-                throw new InvalidConfigurationException(config, "switch", "'" + switchType + "' is not a valid condition");
-            }
+            final PluginConfigurator configurator = plugin.getConfigurator();
+            final ConfigLoader<? extends Condition> conditionLoader = configurator.getConditionLoader().getLoader(switchType, switchType.toString());
 
             final SwitchFunction function = new SwitchFunction();
 

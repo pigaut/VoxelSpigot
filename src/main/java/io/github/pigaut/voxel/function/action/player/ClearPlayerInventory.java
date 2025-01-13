@@ -1,8 +1,6 @@
 package io.github.pigaut.voxel.function.action.player;
 
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
@@ -26,26 +24,6 @@ public class ClearPlayerInventory implements PlayerAction {
             inventory.clear();
         }
         player.updateInventory();
-    }
-
-    public static ConfigLoader<ClearPlayerInventory> newConfigLoader() {
-        return new ConfigLoader<ClearPlayerInventory>() {
-            @Override
-            public @NotNull String getProblemDescription() {
-                return "Could not load action 'CLEAR_INVENTORY'";
-            }
-
-            @Override
-            public String getKey() {
-                return "CLEAR_INVENTORY";
-            }
-
-            @Override
-            public @NotNull ClearPlayerInventory loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
-                return new ClearPlayerInventory(scalar.toBoolean());
-            }
-
-        };
     }
 
 }

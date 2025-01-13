@@ -1,5 +1,16 @@
 
 
+test:
+  - if:
+      - [has permission, example.permission]
+      - {condition: has permission, value: example.permission}
+    do:
+      - {action: give item, value: example_item}
+    or:
+      - [chat message, 'Hello there']
+  - actions:
+      - [give item, dirt]
+
 func-list:
   - if: { chance: 10, do: give_vault: 10000 }
 
@@ -17,10 +28,10 @@ switch:
   cases:
     - case: 100
       do:
-        give vault: 1000
-        give item: my_item
+        - [give vault, 1000]
+        - [give item, my_item]
     - case: 200
-      do: {}
+      do: []
       break: true
   default:
     give vault: 100

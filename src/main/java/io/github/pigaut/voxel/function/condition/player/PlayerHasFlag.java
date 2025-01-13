@@ -29,27 +29,4 @@ public class PlayerHasFlag implements PlayerCondition {
         return true;
     }
 
-    public static ConfigLoader<PlayerHasFlag> newConfigLoader() {
-        return new ConfigLoader<PlayerHasFlag>() {
-            @Override
-            public @NotNull String getProblemDescription() {
-                return "Could not load condition 'HAS_FLAG'";
-            }
-
-            @Override
-            public @Nullable String getKey() {
-                return "HAS_FLAG";
-            }
-
-            @Override
-            public @NotNull PlayerHasFlag loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
-                return new PlayerHasFlag(scalar.toString());
-            }
-
-            @Override
-            public @NotNull PlayerHasFlag loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
-                return new PlayerHasFlag(sequence.toStringList());
-            }
-        };
-    }
 }
