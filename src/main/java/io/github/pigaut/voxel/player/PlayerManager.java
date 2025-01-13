@@ -9,7 +9,7 @@ import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-public class PlayerManager<P extends PluginPlayer> extends Manager implements Listener {
+public abstract class PlayerManager<P extends PluginPlayer> extends Manager implements Listener {
 
     private final PlayerFactory<P> playerFactory;
     private final Map<UUID, P> playersByUUID = new HashMap<>();

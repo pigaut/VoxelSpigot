@@ -14,7 +14,6 @@ import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.*;
 import io.github.pigaut.yaml.node.section.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
@@ -33,7 +32,7 @@ import java.util.regex.*;
 public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedPlugin {
 
     private final CommandManager commandManager = new CommandManager();
-    private final PlayerManager<PluginPlayer> playerManager = new PlayerManager<>(AbstractPluginPlayer::new);
+    private final PluginPlayerManager playerManager = new PluginPlayerManager();
     private final ItemManager itemManager = new PluginItemManager(this);
     private final MessageManager messageManager = new PluginMessageManager(this);
     private final LanguageManager languageManager = new PluginLanguageManager(this);
@@ -43,6 +42,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     protected final Logger logger = getLogger();
     private final List<Manager> loadedManagers = new ArrayList<>();
+    private final List<Class<?>> registeredListeners = new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -94,10 +94,14 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         for (Manager manager : loadedManagers) {
             manager.onEnable();
             for (Listener listener : manager.getListeners()) {
-                registerListener(listener);
+                final Class<?> listenerClass = listener.getClass();
+                if (!registeredListeners.contains(listenerClass)) {
+                    registerListener(listener);
+                    registeredListeners.add(listenerClass);
+                }
             }
 
-            getCommand(""); //initialize command manager I think, can't remember
+            getCommand("");
             for (EnhancedCommand command : manager.getCommands()) {
                 registerCommand(command);
             }

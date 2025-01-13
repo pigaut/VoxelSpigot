@@ -155,11 +155,16 @@ public class AbstractPluginPlayer implements PluginPlayer {
 
     @Override
     public void performCommandAsOp(String command) {
-        Player player = asPlayer();
+        final Player player = asPlayer();
 
-        player.setOp(true);
-        player.performCommand(command);
-        player.setOp(false);
+        if (player.isOp()) {
+            player.performCommand(command);
+        }
+        else {
+            player.setOp(true);
+            player.performCommand(command);
+            player.setOp(false);
+        }
     }
 
     @Override

@@ -30,19 +30,19 @@ public class FunctionLoader implements ConfigLoader<Function> {
     @Override
     public @NotNull Function loadFromSection(@NotNull ConfigSection config) throws InvalidConfigurationException {
 
-        final ConfigSection conditionSection = config.getOptionalSection("if").orElse(null);
-        if (conditionSection != null) {
+        final ConfigSequence conditionSequence = config.getOptionalSequence("if").orElse(null);
+        if (conditionSequence != null) {
             final Function function = new ConditionalFunction(
-                    conditionSection.getAll(Condition.class),
+                    conditionSequence.getAll(Condition.class),
                     config.getAll("do", Action.class),
                     config.getAll("or", Action.class)
             );
             return addFunctionOptions(config, function);
         }
 
-        final ConfigSection doSection = config.getOptionalSection("actions").orElse(null);
-        if (doSection != null) {
-            final Function function = new SimpleFunction(doSection.getAll(Action.class));
+        final ConfigSequence doSequence = config.getOptionalSequence("actions").orElse(null);
+        if (doSequence != null) {
+            final Function function = new SimpleFunction(doSequence.getAll(Action.class));
             return addFunctionOptions(config, function);
         }
 
@@ -76,7 +76,7 @@ public class FunctionLoader implements ConfigLoader<Function> {
             return addFunctionOptions(config, function);
         }
 
-        throw new InvalidConfigurationException(config, "Function doesn't contain a valid statement");
+        throw new InvalidConfigurationException(config, "Function doesn't contain any valid statement");
     }
 
     private Function addFunctionOptions(ConfigSection config, Function function) {
