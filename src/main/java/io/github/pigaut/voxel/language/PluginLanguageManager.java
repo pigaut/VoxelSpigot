@@ -19,6 +19,11 @@ public class PluginLanguageManager extends LanguageManager {
     }
 
     @Override
+    public void disable() {
+        clearDictionary();
+    }
+
+    @Override
     public void load() {
         for (File langFile : plugin.getFiles("languages")) {
             final RootSection config = new RootSection(langFile);

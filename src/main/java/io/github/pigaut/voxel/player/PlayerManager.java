@@ -28,14 +28,14 @@ public abstract class PlayerManager<P extends PluginPlayer> extends Manager impl
     }
 
     @Override
-    public void onEnable() {
+    public void enable() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             addPlayer(playerFactory.create(player));
         }
     }
 
     @Override
-    public void onDisable() {
+    public void disable() {
         clearPlayers();
     }
 

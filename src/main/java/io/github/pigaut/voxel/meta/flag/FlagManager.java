@@ -16,4 +16,8 @@ public class FlagManager extends Manager {
         flagsByName.put(flag.name(), flag);
     }
 
+    public void clearFlags() {
+        flagsByName.clear();
+    }
+
 }

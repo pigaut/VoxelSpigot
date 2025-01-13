@@ -15,6 +15,11 @@ public class PluginItemManager extends ItemManager {
     }
 
     @Override
+    public void disable() {
+        clearItems();
+    }
+
+    @Override
     public void load() {
         for (File itemFile : plugin.getFiles("items")) {
             final RootSection config = new RootSection(itemFile, plugin.getConfigurator());

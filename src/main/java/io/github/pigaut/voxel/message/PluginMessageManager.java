@@ -14,6 +14,11 @@ public class PluginMessageManager extends MessageManager {
     }
 
     @Override
+    public void disable() {
+        clearMessages();
+    }
+
+    @Override
     public void load() {
         for (File langFile : plugin.getFiles("messages")) {
             final RootSection config = new RootSection(langFile, plugin.getConfigurator());

@@ -7,15 +7,16 @@ import java.util.*;
 
 public abstract class Manager {
 
-    public void onEnable() {
+    public void enable() {
         load();
     }
 
-    public void onDisable() {
+    public void disable() {
         save();
     }
 
-    public void onReload() {
+    public void reload() {
+        disable();
         load();
     }
 

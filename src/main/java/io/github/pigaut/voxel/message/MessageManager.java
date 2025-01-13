@@ -20,4 +20,8 @@ public class MessageManager extends Manager {
         return messagesByName.remove(name);
     }
 
+    public void clearMessages() {
+        messagesByName.clear();
+    }
+
 }

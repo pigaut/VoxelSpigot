@@ -1,11 +1,7 @@
 package io.github.pigaut.voxel.language;
 
-import io.github.pigaut.voxel.meta.placeholder.*;
 import io.github.pigaut.voxel.plugin.manager.*;
-import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.util.collection.*;
-import org.bukkit.command.*;
-import org.bukkit.entity.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -50,6 +46,10 @@ public class LanguageManager extends Manager {
 
     public void addLang(Locale language, String name, String message) {
         dictionary.put(language, name, message);
+    }
+
+    public void clearDictionary() {
+        dictionary.clear();
     }
 
 }

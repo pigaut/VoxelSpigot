@@ -42,10 +42,37 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     protected final Logger logger = getLogger();
     private final List<Manager> loadedManagers = new ArrayList<>();
-    private final List<Class<?>> registeredListeners = new ArrayList<>();
 
     @Override
     public void onEnable() {
+        this.initialize();
+        this.loadManagers();
+    }
+
+    @Override
+    public void onDisable() {
+        loadedManagers.forEach(Manager::disable);
+        loadedManagers.clear();
+    }
+
+    @Override
+    public void reload() {
+        pluginScheduler.runTaskAsync(() -> {
+            initialize();
+            loadedManagers.forEach(manager -> {
+                manager.disable();
+                manager.enable();
+            });
+        });
+    }
+
+    private void initialize() {
+        checkVersion();
+        createHooks();
+        createFiles();
+    }
+
+    private void checkVersion() throws UnsupportedVersionException {
         SpigotVersion serverVersion = SpigotServer.getVersion();
         if (serverVersion == SpigotVersion.UNKNOWN) {
             logger.severe("Could not identify server version. Attempting to load.");
@@ -58,9 +85,11 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
                 logger.info("Found compatible server version: " + serverVersion);
             }
         }
+    }
 
-        createHooks();
+    public void createHooks() {}
 
+    public void createFiles() {
         for (String directory : getPluginDirectories()) {
             createDirectory(directory);
         }
@@ -76,14 +105,16 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
                 saveResource(exampleResource);
             }
         }
+    }
 
-        loadedManagers.clear();
+    private void loadManagers() {
         loadedManagers.add(commandManager);
         loadedManagers.add(playerManager);
         loadedManagers.add(itemManager);
         loadedManagers.add(messageManager);
         loadedManagers.add(languageManager);
         loadedManagers.add(flagManager);
+
         for (Field field : getClass().getDeclaredFields()) {
             final Manager manager = ReflectionUtil.accessField(field, Manager.class, this);
             if (manager != null) {
@@ -91,39 +122,16 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
             }
         }
 
+        getCommand("");
         for (Manager manager : loadedManagers) {
-            manager.onEnable();
-            for (Listener listener : manager.getListeners()) {
-                final Class<?> listenerClass = listener.getClass();
-                if (!registeredListeners.contains(listenerClass)) {
-                    registerListener(listener);
-                    registeredListeners.add(listenerClass);
-                }
-            }
-
-            getCommand("");
-            for (EnhancedCommand command : manager.getCommands()) {
-                registerCommand(command);
-            }
-
+            manager.enable();
+            manager.getListeners().forEach(this::registerListener);
+            manager.getCommands().forEach(this::registerCommand);
             final int autoSave = manager.getAutoSave();
             if (autoSave > 0) {
                 pluginScheduler.runTaskTimerAsync(autoSave, manager::save);
             }
         }
-
-    }
-
-    @Override
-    public void onDisable() {
-        loadedManagers.forEach(Manager::onDisable);
-    }
-
-    @Override
-    public void reload() {
-        pluginScheduler.runTaskAsync(() -> {
-            onEnable();
-        });
     }
 
     @Override
@@ -135,8 +143,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     public List<SpigotVersion> getCompatibleVersions() {
         return List.of(SpigotVersion.values());
     }
-
-    protected void createHooks() {}
 
     @Override
     public List<String> getPluginDirectories() {

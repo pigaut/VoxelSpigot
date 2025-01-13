@@ -3,9 +3,6 @@ package io.github.pigaut.voxel.meta.flag;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.section.*;
-import org.bukkit.inventory.*;
-
-import java.io.*;
 
 public class PluginFlagManager extends FlagManager {
 
@@ -13,6 +10,11 @@ public class PluginFlagManager extends FlagManager {
 
     public PluginFlagManager(EnhancedPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @Override
+    public void disable() {
+        clearFlags();
     }
 
     @Override

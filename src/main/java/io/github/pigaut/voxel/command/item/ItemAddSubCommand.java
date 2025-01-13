@@ -36,7 +36,7 @@ public class ItemAddSubCommand extends SubCommand {
                 config.load();
                 config.set(args[1], item);
                 config.save();
-                plugin.getItems().onReload();
+                plugin.getItems().reload();
             });
             plugin.sendMessage(player, "ADDING_ITEM");
         });
