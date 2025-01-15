@@ -1,15 +1,12 @@
-package io.github.pigaut.voxel.config.function;
+package io.github.pigaut.voxel.function.config;
 
 import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.function.action.*;
 import io.github.pigaut.voxel.function.condition.*;
-import io.github.pigaut.voxel.function.condition.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.*;
 import io.github.pigaut.yaml.configurator.loader.*;
-import org.bukkit.plugin.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;

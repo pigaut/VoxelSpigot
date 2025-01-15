@@ -7,6 +7,7 @@ import io.github.pigaut.voxel.language.*;
 import io.github.pigaut.voxel.message.*;
 import io.github.pigaut.voxel.meta.flag.*;
 import io.github.pigaut.voxel.meta.placeholder.*;
+import io.github.pigaut.voxel.particle.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.runnable.*;
 import io.github.pigaut.voxel.version.*;
@@ -59,6 +60,9 @@ public interface EnhancedPlugin extends Plugin {
     FlagManager getFlags();
 
     @NotNull
+    ParticleManager getParticles();
+
+    @NotNull
     RootSection getConfiguration();
 
     @NotNull
@@ -102,6 +106,9 @@ public interface EnhancedPlugin extends Plugin {
 
     @Nullable
     Flag getFlag(String name);
+
+    @Nullable
+    ParticleEffect getParticle(String name);
 
     void createDirectory();
 

@@ -1,4 +1,4 @@
-package io.github.pigaut.voxel.config.function;
+package io.github.pigaut.voxel.function.config;
 
 import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.yaml.*;

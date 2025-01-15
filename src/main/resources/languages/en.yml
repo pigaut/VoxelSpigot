@@ -23,3 +23,10 @@ not-holding-item: '&4You need to hold an item to add'
 item-not-found: '&4Item with given name not found'
 adding-item: '&aAdding item to yaml file...'
 received-item: '&aYou received x1 item'
+
+particle-command: particle
+spawn-particle-command: spawn
+spawn-particle-description: 'Spawn a particle effect in front of you'
+particle-name-parameter: particle-name
+particle-not-found: '&4Particle with given name not found'
+spawned-particle: '&aSpawned a particle effect'

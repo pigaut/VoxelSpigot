@@ -1,17 +1,14 @@
 package io.github.pigaut.voxel.config;
 
 import io.github.pigaut.voxel.*;
-import io.github.pigaut.voxel.config.function.*;
 import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.function.action.*;
-import io.github.pigaut.voxel.function.action.block.*;
-import io.github.pigaut.voxel.function.action.player.*;
-import io.github.pigaut.voxel.function.action.server.*;
 import io.github.pigaut.voxel.function.condition.*;
-import io.github.pigaut.voxel.function.condition.player.*;
-import io.github.pigaut.voxel.function.condition.server.*;
+import io.github.pigaut.voxel.function.config.*;
 import io.github.pigaut.voxel.message.*;
 import io.github.pigaut.voxel.meta.flag.*;
+import io.github.pigaut.voxel.particle.*;
+import io.github.pigaut.voxel.particle.config.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
@@ -34,6 +31,7 @@ public class PluginConfigurator extends SpigotConfigurator {
         addLoader(ItemStack.class, new PluginItemStackLoader());
         addLoader(Flag.class, new FlagLoader());
         addLoader(Message.class, new MessageLoader(plugin));
+        addLoader(ParticleEffect.class, new ParticleEffectLoader(plugin));
 
         addLoader(BlockClickFunction.class, new BlockClickFunctionLoader());
         addLoader(Function.class, new FunctionLoader(plugin));

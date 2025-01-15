@@ -1,12 +1,9 @@
-package io.github.pigaut.voxel.command;
+package io.github.pigaut.voxel.plugin.command;
 
 import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.util.*;
-import io.github.pigaut.yaml.parser.*;
 import org.jetbrains.annotations.*;
-
-import java.util.*;
 
 public class HelpSubCommand extends SubCommand {
 

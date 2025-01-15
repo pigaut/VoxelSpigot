@@ -1,9 +1,8 @@
-package io.github.pigaut.voxel.command.item;
+package io.github.pigaut.voxel.item.command;
 
 import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.util.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 

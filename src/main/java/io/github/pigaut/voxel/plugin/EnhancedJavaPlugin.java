@@ -7,6 +7,7 @@ import io.github.pigaut.voxel.language.*;
 import io.github.pigaut.voxel.message.*;
 import io.github.pigaut.voxel.meta.flag.*;
 import io.github.pigaut.voxel.meta.placeholder.*;
+import io.github.pigaut.voxel.particle.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.runnable.*;
@@ -37,6 +38,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final MessageManager messageManager = new PluginMessageManager(this);
     private final LanguageManager languageManager = new PluginLanguageManager(this);
     private final FlagManager flagManager = new PluginFlagManager(this);
+    private final ParticleManager particleManager = new PluginParticleManager(this);
     private final PluginScheduler pluginScheduler = new PluginScheduler(this);
     private RootSection config;
 
@@ -114,6 +116,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         loadedManagers.add(messageManager);
         loadedManagers.add(languageManager);
         loadedManagers.add(flagManager);
+        loadedManagers.add(particleManager);
 
         for (Field field : getClass().getDeclaredFields()) {
             final Manager manager = ReflectionUtil.accessField(field, Manager.class, this);
@@ -272,6 +275,16 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public @Nullable Flag getFlag(String name) {
         return flagManager.getFlag(name);
+    }
+
+    @Override
+    public @NotNull ParticleManager getParticles() {
+        return particleManager;
+    }
+
+    @Override
+    public @Nullable ParticleEffect getParticle(String name) {
+        return particleManager.getParticle(name);
     }
 
     @Override

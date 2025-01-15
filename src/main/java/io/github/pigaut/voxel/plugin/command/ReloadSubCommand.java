@@ -1,4 +1,4 @@
-package io.github.pigaut.voxel.command;
+package io.github.pigaut.voxel.plugin.command;
 
 import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.plugin.*;
