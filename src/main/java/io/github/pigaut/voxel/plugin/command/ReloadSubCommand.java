@@ -4,11 +4,10 @@ import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.jetbrains.annotations.*;
 
-public class ReloadSubCommand extends SubCommand {
+public class ReloadSubCommand extends LangSubCommand {
 
     public ReloadSubCommand(@NotNull EnhancedPlugin plugin) {
-        super(plugin.getLang("RELOAD_COMMAND", "reload"), plugin);
-        withDescription(plugin.getLang("RELOAD_DESCRIPTION"));
+        super("reload", plugin);
         withCommandExecution((sender, args, placeholders) -> {
             plugin.reload();
             plugin.sendMessage(sender, "RELOADING", placeholders);

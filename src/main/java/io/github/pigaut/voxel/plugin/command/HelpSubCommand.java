@@ -5,12 +5,10 @@ import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.util.*;
 import org.jetbrains.annotations.*;
 
-public class HelpSubCommand extends SubCommand {
+public class HelpSubCommand extends LangSubCommand {
 
     public HelpSubCommand(@NotNull EnhancedPlugin plugin) {
-        super(plugin.getLang("HELP_COMMAND", "help"), plugin);
-
-        withDescription(plugin.getLang("HELP_DESCRIPTION"));
+        super("help", plugin);
         withPlayerExecution((player, args, placeholders) -> {
             final String header = plugin.getLang("HELP_HEADER", "&2------------     &r&l%command% Help     &2------------");
             final String line = plugin.getLang("HELP_LINE", "&a/%command%: &r%description%");
