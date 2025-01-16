@@ -21,9 +21,12 @@ public class LanguageManager extends Manager {
     }
 
     @NotNull
-    public String getLang(String name) {
+    public String getLang(String name) throws LangNotFoundException {
         final String lang = dictionary.get(defaultLanguage, name);
-        return lang != null ? lang : "No message found for language: " + defaultLanguage + " (" + name + ")";
+        if (lang == null) {
+            throw new LangNotFoundException(defaultLanguage, name);
+        }
+        return lang;
     }
 
     @NotNull

@@ -11,11 +11,10 @@ import org.jetbrains.annotations.*;
 
 import java.io.*;
 
-public class ItemAddSubCommand extends SubCommand {
+public class ItemAddSubCommand extends LangSubCommand {
 
     public ItemAddSubCommand(@NotNull EnhancedPlugin plugin) {
-        super(plugin.getLang("ADD_ITEM_COMMAND", "add"), plugin);
-        withDescription(plugin.getLang("ADD_ITEM_DESCRIPTION"));
+        super("add-item", plugin);
         addParameter(new FilePathParameter(plugin, "items"));
         addParameter(new ItemNameParameter(plugin));
         withPlayerExecution((player, args, placeholders) -> {
@@ -24,13 +23,11 @@ public class ItemAddSubCommand extends SubCommand {
                 plugin.sendMessage(player, "NOT_HOLDING_ITEM", placeholders);
                 return;
             }
-
             final File file = plugin.getFile(args[0]);
             if (!YamlConfig.isYamlFile(file)) {
                 plugin.sendMessage(player, "NOT_YAML_FILE", placeholders);
                 return;
             }
-
             final RootSection config = new RootSection(file, plugin.getConfigurator());
             plugin.getScheduler().runTaskAsync(() -> {
                 config.load();

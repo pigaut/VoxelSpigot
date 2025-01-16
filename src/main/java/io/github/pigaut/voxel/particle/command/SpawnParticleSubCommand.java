@@ -8,10 +8,9 @@ import io.github.pigaut.yaml.parser.deserializer.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
 
-public class SpawnParticleSubCommand extends SubCommand {
+public class SpawnParticleSubCommand extends LangSubCommand {
     public SpawnParticleSubCommand(@NotNull EnhancedPlugin plugin) {
-        super(plugin.getLang("SPAWN_PARTICLE_COMMAND", "spawn"), plugin);
-        withDescription(plugin.getLang("SPAWN_PARTICLE_DESCRIPTION"));
+        super("spawn-particle", plugin);
         addParameter(new ParticleNameParameter(plugin));
         addParameter(new WorldNameParameter(plugin));
         addParameter(plugin.getLang("X_COORDINATE_PARAMETER", "x"));

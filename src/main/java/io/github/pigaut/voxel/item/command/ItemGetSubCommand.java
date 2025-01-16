@@ -6,12 +6,11 @@ import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
-public class ItemGetSubCommand extends SubCommand {
+public class ItemGetSubCommand extends LangSubCommand {
 
     public ItemGetSubCommand(@NotNull EnhancedPlugin plugin) {
-        super(plugin.getLang("GET_ITEM_COMMAND", "get"), plugin);
-        withDescription(plugin.getLang("GET_ITEM_DESCRIPTION"));
-        addParameter(plugin.getLang("ITEM_NAME_PARAMETER", "item-name"));
+        super("get-item", plugin);
+        addParameter(new ItemNameParameter(plugin));
         withPlayerExecution((player, args, placeholders) -> {
             final ItemStack item = plugin.getItemStack(args[0]);
             if (item == null) {
