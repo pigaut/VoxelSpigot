@@ -9,9 +9,9 @@ import io.github.pigaut.voxel.meta.flag.*;
 import io.github.pigaut.voxel.meta.placeholder.*;
 import io.github.pigaut.voxel.particle.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.runnable.*;
+import io.github.pigaut.voxel.plugin.runnable.*;
+import io.github.pigaut.voxel.sound.*;
 import io.github.pigaut.voxel.version.*;
-import io.github.pigaut.yaml.configurator.*;
 import io.github.pigaut.yaml.node.section.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
@@ -63,6 +63,9 @@ public interface EnhancedPlugin extends Plugin {
     ParticleManager getParticles();
 
     @NotNull
+    SoundManager getSounds();
+
+    @NotNull
     RootSection getConfiguration();
 
     @NotNull
@@ -110,6 +113,9 @@ public interface EnhancedPlugin extends Plugin {
     @Nullable
     ParticleEffect getParticle(String name);
 
+    @Nullable
+    SoundEffect getSound(String name);
+
     void createDirectory();
 
     void createDirectory(String path);
@@ -119,6 +125,8 @@ public interface EnhancedPlugin extends Plugin {
     File getFile(String path);
 
     List<File> getFiles(String path);
+
+    List<String> getFilePaths(String path);
 
     void registerListener(Listener listener);
 

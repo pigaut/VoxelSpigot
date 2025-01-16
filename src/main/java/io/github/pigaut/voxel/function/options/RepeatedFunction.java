@@ -1,15 +1,16 @@
-package io.github.pigaut.voxel.function;
+package io.github.pigaut.voxel.function.options;
 
+import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.player.*;
 import org.bukkit.block.*;
 import org.jetbrains.annotations.*;
 
-public class LoopedFunction implements Function {
+public class RepeatedFunction implements Function {
 
     private final Function function;
     private final int repetitions;
 
-    public LoopedFunction(Function function, int repetitions) {
+    public RepeatedFunction(Function function, int repetitions) {
         this.function = function;
         this.repetitions = repetitions;
     }

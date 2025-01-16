@@ -1,7 +1,6 @@
-package io.github.pigaut.voxel.function.config;
+package io.github.pigaut.voxel.function.condition;
 
 import io.github.pigaut.voxel.config.*;
-import io.github.pigaut.voxel.function.condition.*;
 import io.github.pigaut.voxel.function.condition.player.*;
 import io.github.pigaut.voxel.function.condition.server.*;
 import io.github.pigaut.yaml.*;

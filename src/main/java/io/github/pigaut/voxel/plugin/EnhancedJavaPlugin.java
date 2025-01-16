@@ -10,8 +10,9 @@ import io.github.pigaut.voxel.meta.placeholder.*;
 import io.github.pigaut.voxel.particle.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.manager.*;
-import io.github.pigaut.voxel.runnable.*;
+import io.github.pigaut.voxel.plugin.runnable.*;
 import io.github.pigaut.voxel.server.*;
+import io.github.pigaut.voxel.sound.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.*;
@@ -32,6 +33,8 @@ import java.util.regex.*;
 
 public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedPlugin {
 
+    private final static Pattern VERSION_PATTERN = Pattern.compile("(^[\\.\\d]*).+");
+    protected final Logger logger = getLogger();
     private final CommandManager commandManager = new CommandManager();
     private final PluginPlayerManager playerManager = new PluginPlayerManager();
     private final ItemManager itemManager = new PluginItemManager(this);
@@ -39,17 +42,10 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final LanguageManager languageManager = new PluginLanguageManager(this);
     private final FlagManager flagManager = new PluginFlagManager(this);
     private final ParticleManager particleManager = new PluginParticleManager(this);
+    private final SoundManager soundManager = new PluginSoundManager(this);
     private final PluginScheduler pluginScheduler = new PluginScheduler(this);
-    private RootSection config;
-
-    protected final Logger logger = getLogger();
     private final List<Manager> loadedManagers = new ArrayList<>();
-
-    @Override
-    public void onEnable() {
-        this.initialize();
-        this.loadManagers();
-    }
+    private RootSection config;
 
     @Override
     public void onDisable() {
@@ -58,14 +54,9 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
-    public void reload() {
-        pluginScheduler.runTaskAsync(() -> {
-            initialize();
-            loadedManagers.forEach(manager -> {
-                manager.disable();
-                manager.enable();
-            });
-        });
+    public void onEnable() {
+        this.initialize();
+        this.loadManagers();
     }
 
     private void initialize() {
@@ -78,18 +69,17 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         SpigotVersion serverVersion = SpigotServer.getVersion();
         if (serverVersion == SpigotVersion.UNKNOWN) {
             logger.severe("Could not identify server version. Attempting to load.");
-        }
-        else {
+        } else {
             if (!getCompatibleVersions().contains(serverVersion)) {
                 throw new UnsupportedVersionException(this);
-            }
-            else {
+            } else {
                 logger.info("Found compatible server version: " + serverVersion);
             }
         }
     }
 
-    public void createHooks() {}
+    public void createHooks() {
+    }
 
     public void createFiles() {
         for (String directory : getPluginDirectories()) {
@@ -117,6 +107,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         loadedManagers.add(languageManager);
         loadedManagers.add(flagManager);
         loadedManagers.add(particleManager);
+        loadedManagers.add(soundManager);
 
         for (Field field : getClass().getDeclaredFields()) {
             final Manager manager = ReflectionUtil.accessField(field, Manager.class, this);
@@ -140,6 +131,17 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public PluginScheduler getScheduler() {
         return pluginScheduler;
+    }
+
+    @Override
+    public void reload() {
+        pluginScheduler.runTaskAsync(() -> {
+            initialize();
+            loadedManagers.forEach(manager -> {
+                manager.disable();
+                manager.enable();
+            });
+        });
     }
 
     @Override
@@ -190,6 +192,16 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public @NotNull FlagManager getFlags() {
         return flagManager;
+    }
+
+    @Override
+    public @NotNull ParticleManager getParticles() {
+        return particleManager;
+    }
+
+    @Override
+    public @NotNull SoundManager getSounds() {
+        return soundManager;
     }
 
     @Override
@@ -278,13 +290,13 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
-    public @NotNull ParticleManager getParticles() {
-        return particleManager;
+    public @Nullable ParticleEffect getParticle(String name) {
+        return particleManager.getParticle(name);
     }
 
     @Override
-    public @Nullable ParticleEffect getParticle(String name) {
-        return particleManager.getParticle(name);
+    public @Nullable SoundEffect getSound(String name) {
+        return soundManager.getSound(name);
     }
 
     @Override
@@ -317,6 +329,18 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         return yamlFiles;
     }
 
+    @Override
+    public List<String> getFilePaths(String path) {
+        return getFiles("items").stream()
+                .map(file -> file.getPath().replaceAll("plugins\\\\[^\\\\]+\\\\", ""))
+                .toList();
+    }
+
+    @Override
+    public void registerListener(Listener listener) {
+        getServer().getPluginManager().registerEvents(listener, this);
+    }
+
     private void collectYamlFiles(File directory, List<File> yamlFiles) {
         if (directory == null || !directory.isDirectory()) {
             return;
@@ -335,13 +359,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
             }
         }
     }
-
-    @Override
-    public void registerListener(Listener listener) {
-        getServer().getPluginManager().registerEvents(listener, this);
-    }
-
-    private final static Pattern VERSION_PATTERN = Pattern.compile("(^[\\.\\d]*).+");
 
     protected boolean shouldCreateHook(String pluginName, String minVersion, String maxVersion) {
         final Plugin plugin = SpigotServer.getPlugin(pluginName);

@@ -16,7 +16,7 @@ public class ParticleManager extends Manager {
         return particlesByName.get(name);
     }
 
-    public void addParticleEffect(String name, ParticleEffect particle) {
+    public void addParticle(String name, ParticleEffect particle) {
         particlesByName.put(name, particle);
     }
 

@@ -24,9 +24,21 @@ item-not-found: '&4Item with given name not found'
 adding-item: '&aAdding item to yaml file...'
 received-item: '&aYou received x1 item'
 
+# Particle
 particle-command: particle
-spawn-particle-command: spawn
-spawn-particle-description: 'Spawn a particle effect in front of you'
 particle-name-parameter: particle-name
+player-name-parameter: player-name
+## Spawn particle
+spawn-particle-command: spawn
+spawn-particle-description: 'Spawn a particle at the specified location'
+## Spawn particle to player
+spawn-particle-to-command: spawn-to
+spawn-particle-to-description: 'Spawns a particle on the target player'
+## Show me particle
+show-me-particle-command: show-me
+show-me-particle-description: 'Spawns a particle 2 block in front of you'
+## Errors
 particle-not-found: '&4Particle with given name not found'
+player-not-found: '&4Player with given name not found'
+## Success
 spawned-particle: '&aSpawned a particle effect'

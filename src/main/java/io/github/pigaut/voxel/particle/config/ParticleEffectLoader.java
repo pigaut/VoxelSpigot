@@ -25,7 +25,7 @@ public class ParticleEffectLoader implements ConfigLoader<ParticleEffect> {
         final String particleName = scalar.toString();
         final ParticleEffect foundParticle = plugin.getParticle(particleName);
         if (foundParticle == null) {
-            throw new InvalidConfigurationException(scalar, "Could not find any particle called: '" + particleName + "'");
+            throw new InvalidConfigurationException(scalar, "Could not find any particle effect with name: '" + particleName + "'");
         }
         return foundParticle;
     }
@@ -39,8 +39,26 @@ public class ParticleEffectLoader implements ConfigLoader<ParticleEffect> {
         final double offsetZ = section.getOptionalDouble("offset.z").orElse(0d);
         final boolean force = section.getOptionalBoolean("force").orElse(false);
         final boolean playerOnly = section.getOptionalBoolean("player-only").orElse(false);
+        return addParticleOptions(section, new SimpleParticle(particle, count, offsetX, offsetY, offsetZ, force, playerOnly));
+    }
 
-        return new SimpleParticle(particle, count, offsetX, offsetY, offsetZ, force, playerOnly);
+    @Override
+    public @NotNull ParticleEffect loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
+        return new MultiParticleEffect(sequence.getAll(ParticleEffect.class));
+    }
+
+    private ParticleEffect addParticleOptions(ConfigSection section, ParticleEffect particle) {
+        final Integer repetitions = section.getOptionalInteger("repetitions|loops").orElse(null);
+        if (repetitions != null) {
+            particle = new RepeatedParticleEffect(particle, repetitions);
+        }
+
+        final Integer delay = section.getOptionalInteger("delay").orElse(null);
+        if (delay != null) {
+            particle = new DelayedParticleEffect(plugin, particle, delay);
+        }
+
+        return particle;
     }
 
 }

@@ -23,10 +23,4 @@ public interface Function {
         run(null, block);
     }
 
-    static void runAll(PluginPlayer player, Block block, Collection<? extends Function> functions) {
-        for (Function function : functions) {
-            function.run(player, block);
-        }
-    }
-
 }

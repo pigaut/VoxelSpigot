@@ -1,9 +1,9 @@
-package io.github.pigaut.voxel.function.config;
+package io.github.pigaut.voxel.function.interact.block;
 
 import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
-import org.bukkit.event.block.Action;
+import org.bukkit.event.block.*;
 import org.jetbrains.annotations.*;
 
 public class BlockClickFunctionLoader implements ConfigLoader<BlockClickFunction> {
@@ -19,7 +19,12 @@ public class BlockClickFunctionLoader implements ConfigLoader<BlockClickFunction
         final boolean sneaking = section.getOptionalBoolean("sneaking").orElse(false);
         final boolean shouldCancel = section.getOptionalBoolean("cancel").orElse(false);
         final Function function = section.load(Function.class);
-        return new BlockClickFunction(action, sneaking, shouldCancel, function);
+        return new SimpleBlockClickFunction(action, sneaking, shouldCancel, function);
+    }
+
+    @Override
+    public @NotNull BlockClickFunction loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
+        return new MultiBlockClickFunction(sequence.getAll(BlockClickFunction.class));
     }
 
 }

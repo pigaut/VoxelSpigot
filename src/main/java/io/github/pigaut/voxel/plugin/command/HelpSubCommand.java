@@ -11,19 +11,19 @@ public class HelpSubCommand extends SubCommand {
         super(plugin.getLang("HELP_COMMAND", "help"), plugin);
 
         withDescription(plugin.getLang("HELP_DESCRIPTION"));
-        withPlayerExecution((player, args) -> {
+        withPlayerExecution((player, args, placeholders) -> {
             final String header = plugin.getLang("HELP_HEADER", "&2------------     &r&l%command% Help     &2------------");
             final String line = plugin.getLang("HELP_LINE", "&a/%command%: &r%description%");
             final String footer = plugin.getLang("HELP_FOOTER", "&2---------------------------------------------");
 
-            Chat.send(player, header, this);
+            Chat.send(player, header, placeholders);
             for (SubCommand subCommand : getParent()) {
                 if (!subCommand.isExecutable()) {
                     continue;
                 }
                 Chat.send(player, line, subCommand);
             }
-            Chat.send(player, footer, this);
+            Chat.send(player, footer, placeholders);
         });
     }
 

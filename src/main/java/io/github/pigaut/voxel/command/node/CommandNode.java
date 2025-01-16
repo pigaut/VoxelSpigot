@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.command.node;
 
 import io.github.pigaut.voxel.command.completion.*;
 import io.github.pigaut.voxel.command.execution.*;
-import io.github.pigaut.voxel.command.util.*;
+import io.github.pigaut.voxel.command.parameter.*;
 import io.github.pigaut.voxel.meta.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
@@ -29,7 +29,7 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
 
     private @Nullable CommandExecution commandExecution = null;
     private @Nullable PlayerExecution playerExecution = null;
-    private @NotNull CommandCompletion tabCompleter = new SubCommandCompletion();
+    private @NotNull CommandCompletion commandCompletion = new SubCommandCompletion();
 
     protected CommandNode(@NotNull String name, @NotNull EnhancedPlugin plugin) {
         this.plugin = plugin;
@@ -166,6 +166,13 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
 
     public CommandNode withParameters(CommandParameter... parameters) {
         this.parameters = Arrays.asList(parameters);
+        updateParameterBounds();
+        return this;
+    }
+
+    public CommandNode addParameter(CommandParameter parameter) {
+        parameters.add(parameter);
+        updateParameterBounds();
         return this;
     }
 
@@ -195,7 +202,7 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
     private void updateParameterBounds() {
         maxArgs = parameters.size();
         for (int i = 0; i < parameters.size(); i++) {
-            if (!parameters.get(i).optional()) {
+            if (!parameters.get(i).isOptional()) {
                 minArgs = i + 1;
             }
             break;
@@ -237,27 +244,27 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
     }
 
     public CommandNode withPlayerStateExecution(@NotNull PlayerStateExecution playerExecution) {
-        return withPlayerExecution((player, args) -> {
+        return withPlayerExecution((player, args, placeholders) -> {
             final PluginPlayer pluginPlayer = plugin.getPlayer(player.getUniqueId());
             if (pluginPlayer == null) {
                 Chat.send(player, plugin.getLang("LOADING_PLAYER_DATA"));
                 return;
             }
-            playerExecution.execute(pluginPlayer, args);
+            playerExecution.execute(pluginPlayer, args, placeholders);
         });
     }
 
-    public CommandCompletion getTabCompleter() {
-        return tabCompleter;
+    public CommandCompletion getCommandCompletion() {
+        return commandCompletion;
     }
 
     public CommandNode withTabCompletion(@NotNull CommandCompletion tabCompleter) {
-        this.tabCompleter = tabCompleter;
+        this.commandCompletion = tabCompleter;
         return this;
     }
 
     public CommandNode withPlayerCompletion(@NotNull PlayerCompletion tabCompleter) {
-        this.tabCompleter = tabCompleter;
+        this.commandCompletion = tabCompleter;
         return this;
     }
 
@@ -273,7 +280,6 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
     }
 
     public final void execute(CommandSender sender, String[] args) {
-
         final int argsCount = args.length;
         if (argsCount < minArgs) {
             plugin.sendMessage(sender,"NOT_ENOUGH_ARGS", this);
@@ -290,22 +296,33 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
             return;
         }
 
+        final List<Placeholder> placeholders = new ArrayList<>();
+        placeholders.add(Placeholder.of("%command%", getCommand()));
+        placeholders.add(Placeholder.of("%full_command%", getFullCommand()));
+        placeholders.add(Placeholder.of("%description%", description));
+        placeholders.add(Placeholder.of("%permission%", permission));
+
         final String[] paramArgs = new String[this.parameters.size()];
         for (int i = 0; i < parameters.size(); i++) {
-            paramArgs[i] = args.length > i ? args[i] : parameters.get(i).defaultValue();
+            final CommandParameter parameter = parameters.get(i);
+            final String value = args.length > i ? args[i] : parameter.getDefaultValue();
+            paramArgs[i] = value;
+            placeholders.add(Placeholder.fromName(parameter.getName(), value));
         }
+
+        final PlaceholderSupplier placeholderSupplier = () -> placeholders.toArray(new Placeholder[0]);
 
         if (isPlayerOnly()) {
             if (sender instanceof Player player) {
-                playerExecution.execute(player, paramArgs);
+                playerExecution.execute(player, paramArgs, placeholderSupplier);
                 return;
             }
-            plugin.sendMessage(sender, "PLAYER_ONLY", this);
+            plugin.sendMessage(sender, "PLAYER_ONLY", placeholderSupplier);
             return;
         }
 
         if (commandExecution != null) {
-            commandExecution.execute(sender, paramArgs);
+            commandExecution.execute(sender, paramArgs, placeholderSupplier);
             return;
         }
 
@@ -313,12 +330,20 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
     }
 
     public final List<String> tabComplete(CommandSender sender, String[] args) {
-        final int parametersCount = parameters.size();
-        if (args.length != 0 && (parametersCount == 0 || args.length <= parametersCount)) {
-            final List<String> completions = new ArrayList<>(tabCompleter.tabComplete(sender, args));
-            children.values().forEach(subCommand -> completions.add(subCommand.getName()));
-            return completions;
+        final int argsLength = args.length;
+        if (argsLength < 1) {
+            return List.of();
         }
+
+        final int parametersCount = parameters.size();
+        if (parametersCount == 0) {
+            return commandCompletion.tabComplete(sender, args);
+        }
+        else if (args.length <= parametersCount) {
+            final CommandParameter parameter = parameters.get(argsLength - 1);
+            return parameter.tabComplete(sender, args);
+        }
+
         return List.of();
     }
 

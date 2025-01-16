@@ -1,5 +1,6 @@
-package io.github.pigaut.voxel.message;
+package io.github.pigaut.voxel.message.config;
 
+import io.github.pigaut.voxel.message.*;
 import io.github.pigaut.voxel.message.type.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.yaml.*;
@@ -24,9 +25,10 @@ public class MessageLoader implements ConfigLoader<Message> {
 
     @Override
     public @NotNull Message loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
-        final Message message = plugin.getMessage(scalar.toString());
+        final String messageName = scalar.toString();
+        final Message message = plugin.getMessage(messageName);
         if (message == null) {
-            throw new InvalidConfigurationException(scalar, "Could not find any message with name: '" + scalar + "'");
+            throw new InvalidConfigurationException(scalar, "Could not find any message with name: '" + messageName + "'");
         }
         return message;
     }
@@ -34,17 +36,18 @@ public class MessageLoader implements ConfigLoader<Message> {
     @Override
     public @NotNull Message loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
         final String type = section.getString("type", StringStyle.CONSTANT);
+        Message message;
         switch (type) {
             case "CHAT" -> {
-                return new ChatMessage(section.getString("message", StringColor.FORMATTER));
+                message = new ChatMessage(section.getString("message", StringColor.FORMATTER));
             }
 
             case "ACTIONBAR" -> {
-                return new ActionBarMessage(section.getString("message", StringColor.FORMATTER));
+                message = new ActionBarMessage(section.getString("message", StringColor.FORMATTER));
             }
 
             case "BOSSBAR" -> {
-                return new BossBarMessage(plugin,
+                message = new BossBarMessage(plugin,
                         section.getString("title"),
                         section.getOptional("style", BarStyle.class).orElse(BarStyle.SEGMENTED_6),
                         section.getOptional("color", BarColor.class).orElse(BarColor.RED),
@@ -54,7 +57,7 @@ public class MessageLoader implements ConfigLoader<Message> {
             }
 
             case "TITLE" -> {
-                return new TitleMessage(
+                message = new TitleMessage(
                         section.getString("title"),
                         section.getOptionalString("subtitle").orElse(""),
                         section.getOptionalInteger("fade-in").orElse(20),
@@ -67,6 +70,27 @@ public class MessageLoader implements ConfigLoader<Message> {
                 throw new InvalidConfigurationException(section, "type", "'" + type + "' is not valid message type");
             }
         }
+
+        return addMessageOptions(section, message);
+    }
+
+    @Override
+    public @NotNull Message loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
+        return new MultiMessage(sequence.getAll(Message.class));
+    }
+
+    private Message addMessageOptions(ConfigSection section, Message message) {
+        final Integer repetitions = section.getOptionalInteger("repetitions|loops").orElse(null);
+        if (repetitions != null) {
+            message = new RepeatedMessage(message, repetitions);
+        }
+
+        final Integer delay = section.getOptionalInteger("delay").orElse(null);
+        if (delay != null) {
+            message = new DelayedMessage(plugin, message, delay);
+        }
+
+        return message;
     }
 
 }

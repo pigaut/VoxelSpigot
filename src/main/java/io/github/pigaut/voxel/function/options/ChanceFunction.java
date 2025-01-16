@@ -1,5 +1,6 @@
-package io.github.pigaut.voxel.function;
+package io.github.pigaut.voxel.function.options;
 
+import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.util.*;
 import org.bukkit.block.*;

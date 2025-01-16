@@ -1,4 +1,4 @@
-package io.github.pigaut.voxel.runnable;
+package io.github.pigaut.voxel.plugin.runnable;
 
 import org.bukkit.plugin.*;
 import org.bukkit.scheduler.*;

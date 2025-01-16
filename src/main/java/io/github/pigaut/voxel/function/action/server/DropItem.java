@@ -7,12 +7,12 @@ import org.bukkit.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
-public class DropItemOnGround implements ServerAction {
+public class DropItem implements ServerAction {
 
     private final ItemStack item;
     private final Location location;
 
-    public DropItemOnGround(ItemStack item, Location location) {
+    public DropItem(ItemStack item, Location location) {
         this.item = item;
         this.location = location;
     }
@@ -26,13 +26,13 @@ public class DropItemOnGround implements ServerAction {
         world.dropItemNaturally(location, item);
     }
 
-    public static ConfigLoader<DropItemOnGround> newConfigLoader() {
+    public static ConfigLoader<DropItem> newConfigLoader() {
         return new BranchLoader<>() {
             @Override
-            public @NotNull DropItemOnGround loadFromBranch(ConfigBranch branch) throws InvalidConfigurationException {
+            public @NotNull DropItem loadFromBranch(ConfigBranch branch) throws InvalidConfigurationException {
                 final ItemStack item = branch.getField("item|value", 1).load(ItemStack.class);
                 final Location location = branch.getField("location", 2).load(Location.class);
-                return new DropItemOnGround(item, location);
+                return new DropItem(item, location);
             }
         };
     }

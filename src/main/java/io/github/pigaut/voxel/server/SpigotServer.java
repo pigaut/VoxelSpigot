@@ -4,9 +4,12 @@ import io.github.pigaut.voxel.hook.*;
 import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.parser.deserializer.*;
 import org.bukkit.*;
+import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.plugin.*;
 import org.jetbrains.annotations.*;
+
+import java.util.*;
 
 public class SpigotServer {
 
@@ -49,6 +52,17 @@ public class SpigotServer {
 
     public static World getDefaultWorld() {
         return getServer().defaultWorld;
+    }
+
+    public static List<String> getOnlinePlayerNames() {
+        return Bukkit.getOnlinePlayers().stream()
+                .map(Player::getName).toList();
+    }
+
+    public static List<String> getWorldNames() {
+        return Bukkit.getWorlds().stream()
+                .map(World::getName)
+                .toList();
     }
 
     public static @Nullable EconomyHook getEconomy() {

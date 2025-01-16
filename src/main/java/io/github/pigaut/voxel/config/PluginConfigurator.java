@@ -4,12 +4,15 @@ import io.github.pigaut.voxel.*;
 import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.function.action.*;
 import io.github.pigaut.voxel.function.condition.*;
-import io.github.pigaut.voxel.function.config.*;
+import io.github.pigaut.voxel.function.interact.block.*;
 import io.github.pigaut.voxel.message.*;
+import io.github.pigaut.voxel.message.config.*;
 import io.github.pigaut.voxel.meta.flag.*;
 import io.github.pigaut.voxel.particle.*;
 import io.github.pigaut.voxel.particle.config.*;
 import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.sound.*;
+import io.github.pigaut.voxel.sound.config.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
 import io.github.pigaut.yaml.itemstack.*;
@@ -32,11 +35,12 @@ public class PluginConfigurator extends SpigotConfigurator {
         addLoader(Flag.class, new FlagLoader());
         addLoader(Message.class, new MessageLoader(plugin));
         addLoader(ParticleEffect.class, new ParticleEffectLoader(plugin));
+        addLoader(SoundEffect.class, new SoundEffectLoader(plugin));
 
-        addLoader(BlockClickFunction.class, new BlockClickFunctionLoader());
-        addLoader(Function.class, new FunctionLoader(plugin));
         addLoader(Condition.class, conditionLoader);
         addLoader(Action.class, actionLoader);
+        addLoader(Function.class, new FunctionLoader(plugin));
+        addLoader(BlockClickFunction.class, new BlockClickFunctionLoader());
     }
 
     public ConditionLoader getConditionLoader() {

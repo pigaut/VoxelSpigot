@@ -38,6 +38,18 @@ public class Placeholder implements StringFormatter {
     }
 
     @NotNull
+    public static Placeholder fromName(@NotNull String name, @Nullable Object object) {
+        if (!StringUtil.isParenthesized(name, "%", "%")) {
+            return of(name, object);
+        }
+        name = StringUtil.addParentheses(name, "%", "%");
+        if (object == null) {
+            return new Placeholder(name);
+        }
+        return new Placeholder(name, object.toString());
+    }
+
+    @NotNull
     public static Placeholder of(@NotNull String id, @Nullable Object object, @NotNull String def) {
         if (!StringUtil.isParenthesized(id, "%", "%")) {
             throw new IllegalArgumentException("Placeholder id must start and end with '%'");

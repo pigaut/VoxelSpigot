@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.particle;
 
+import io.github.pigaut.voxel.server.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.*;
@@ -32,10 +33,11 @@ public class SimpleParticle implements ParticleEffect {
             return;
         }
 
-        final World world = location.getWorld();
-        if (world != null) {
-            world.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ, 0, null, force);
+        World world = location.getWorld();
+        if (world == null) {
+            world = SpigotServer.getDefaultWorld();
         }
+        world.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ, 0, null, force);
     }
 
 }

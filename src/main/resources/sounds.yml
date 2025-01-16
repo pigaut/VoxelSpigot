@@ -1,0 +1,9 @@
+simple-sound:
+  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+  volume: 1.0
+  pitch: 1.0
+  offset: { x: 0, y: 0, z: 0 }
+
+multiple:
+  - { sound: ENTITY_EXPERIENCE_ORB_PICKUP }
+  - { sound: ENTITY_EXPERIENCE_ORB_PICKUP }

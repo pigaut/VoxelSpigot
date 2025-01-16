@@ -1,9 +1,9 @@
-package io.github.pigaut.voxel.function.config;
+package io.github.pigaut.voxel.function;
 
 import io.github.pigaut.voxel.config.*;
-import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.function.action.*;
 import io.github.pigaut.voxel.function.condition.*;
+import io.github.pigaut.voxel.function.options.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
@@ -76,21 +76,24 @@ public class FunctionLoader implements ConfigLoader<Function> {
         throw new InvalidConfigurationException(config, "Function doesn't contain any valid statement");
     }
 
-    private Function addFunctionOptions(ConfigSection config, Function function) {
-        // add other delay between repetitions
+    @Override
+    public @NotNull Function loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
+        return new MultiFunction(sequence.getAll(Function.class));
+    }
 
-        int repetitions = config.getOptionalInteger("repetitions|loops").orElse(1);
-        if (repetitions > 1) {
-            function = new LoopedFunction(function, repetitions);
+    private Function addFunctionOptions(ConfigSection config, Function function) {
+        final Integer repetitions = config.getOptionalInteger("repetitions|loops").orElse(null);
+        if (repetitions != null) {
+            function = new RepeatedFunction(function, repetitions);
         }
 
-        int delay = config.getOptionalInteger("delay").orElse(0);
-        if (delay > 0) {
+        final Integer delay = config.getOptionalInteger("delay").orElse(null);
+        if (delay != null) {
             function = new DelayedFunction(plugin, function, delay);
         }
 
-        double chance = config.getOptionalDouble("chance").orElse(-1.0);
-        if (chance > -1) {
+        final Double chance = config.getOptionalDouble("chance").orElse(null);
+        if (chance != null) {
             if (chance < 0 || chance > 1) {
                 throw new InvalidConfigurationException(config, "chance", "Value must be a percentage from 0 to 1");
             }

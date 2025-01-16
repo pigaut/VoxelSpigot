@@ -9,9 +9,9 @@ public class ReloadSubCommand extends SubCommand {
     public ReloadSubCommand(@NotNull EnhancedPlugin plugin) {
         super(plugin.getLang("RELOAD_COMMAND", "reload"), plugin);
         withDescription(plugin.getLang("RELOAD_DESCRIPTION"));
-        withCommandExecution((sender, args) -> {
+        withCommandExecution((sender, args, placeholders) -> {
             plugin.reload();
-            plugin.sendMessage(sender, "RELOADING", this);
+            plugin.sendMessage(sender, "RELOADING", placeholders);
         });
     }
 
