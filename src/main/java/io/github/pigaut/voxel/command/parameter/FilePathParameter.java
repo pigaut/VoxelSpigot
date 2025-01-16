@@ -7,8 +7,6 @@ public class FilePathParameter extends CommandParameter {
 
     public FilePathParameter(@NotNull EnhancedPlugin plugin, String path) {
         super(plugin.getLang("FILE_PATH_PARAMETER", "file-path"),
-                false,
-                null,
                 (sender, args) -> plugin.getFilePaths(path));
     }
 

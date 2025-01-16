@@ -8,8 +8,6 @@ public class OnlinePlayerParameter extends CommandParameter {
 
     public OnlinePlayerParameter(@NotNull EnhancedPlugin plugin) {
         super(plugin.getLang("ONLINE_PLAYER_PARAMETER", "online-player"),
-                false,
-                null,
                 (sender, args) -> SpigotServer.getOnlinePlayerNames());
     }
 

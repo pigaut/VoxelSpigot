@@ -8,8 +8,6 @@ public class ItemNameParameter extends CommandParameter {
 
     public ItemNameParameter(@NotNull EnhancedPlugin plugin) {
         super(plugin.getLang("ITEM_NAME_PARAMETER", "item-name"),
-                   false,
-                null,
                 (sender, args) -> plugin.getItems().getItemNames());
     }
 

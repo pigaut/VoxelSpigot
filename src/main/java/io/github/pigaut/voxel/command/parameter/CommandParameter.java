@@ -14,6 +14,14 @@ public class CommandParameter implements CommandCompletion {
     private final String defaultValue;
     private final CommandCompletion parameterCompletions;
 
+    public CommandParameter(@NotNull String name) {
+        this(name, false, null, null);
+    }
+
+    public CommandParameter(@NotNull String name, CommandCompletion parameterCompletions) {
+        this(name, false, null, parameterCompletions);
+    }
+
     public CommandParameter(@NotNull String name, boolean optional) {
         this(name, optional, null, null);
     }

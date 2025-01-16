@@ -8,8 +8,6 @@ public class ParticleNameParameter extends CommandParameter {
 
     public ParticleNameParameter(@NotNull EnhancedPlugin plugin) {
         super(plugin.getLang("PARTICLE_NAME_PARAMETER", "particle-name"),
-                false,
-                null,
                 (sender, args) -> plugin.getParticles().getParticleNames());
     }
 

@@ -8,8 +8,6 @@ public class WorldNameParameter extends CommandParameter {
 
     public WorldNameParameter(@NotNull EnhancedPlugin plugin) {
         super(plugin.getLang("WORLD_NAME_PARAMETER", "world-name"),
-                false,
-                null,
                 (sender, args) -> SpigotServer.getWorldNames());
     }
 
