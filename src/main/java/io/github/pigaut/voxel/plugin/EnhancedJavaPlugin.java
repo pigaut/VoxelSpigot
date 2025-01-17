@@ -35,11 +35,11 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     private final static Pattern VERSION_PATTERN = Pattern.compile("(^[\\.\\d]*).+");
     protected final Logger logger = getLogger();
+    private final LanguageManager languageManager = new PluginLanguageManager(this);
     private final CommandManager commandManager = new CommandManager();
     private final PluginPlayerManager playerManager = new PluginPlayerManager();
     private final ItemManager itemManager = new PluginItemManager(this);
     private final MessageManager messageManager = new PluginMessageManager(this);
-    private final LanguageManager languageManager = new PluginLanguageManager(this);
     private final FlagManager flagManager = new PluginFlagManager(this);
     private final ParticleManager particleManager = new PluginParticleManager(this);
     private final SoundManager soundManager = new PluginSoundManager(this);
@@ -100,11 +100,11 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     private void loadManagers() {
+        loadedManagers.add(languageManager);
         loadedManagers.add(commandManager);
         loadedManagers.add(playerManager);
         loadedManagers.add(itemManager);
         loadedManagers.add(messageManager);
-        loadedManagers.add(languageManager);
         loadedManagers.add(flagManager);
         loadedManagers.add(particleManager);
         loadedManagers.add(soundManager);
@@ -317,22 +317,27 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
-    public File getFile(String path) {
-        return new File(getDataFolder(), path);
+    public File getFile(String file) {
+        return new File(getDataFolder(), file);
     }
 
     @Override
-    public List<File> getFiles(String path) {
-        File directory = getFile(path);
+    public File getFile(String parent, String child) {
+        return new File(getDataFolder(), parent + "/" + child);
+    }
+
+    @Override
+    public List<File> getFiles(String directoryPath) {
+        File directory = getFile(directoryPath);
         List<File> yamlFiles = new ArrayList<>();
         collectYamlFiles(directory, yamlFiles);
         return yamlFiles;
     }
 
     @Override
-    public List<String> getFilePaths(String path) {
-        return getFiles("items").stream()
-                .map(file -> file.getPath().replaceAll("plugins\\\\[^\\\\]+\\\\", ""))
+    public List<String> getFilePaths(String directory) {
+        return getFiles(directory).stream()
+                .map(file -> file.getPath().replaceAll("plugins\\\\" + getName() + "\\\\" + directory + "\\\\", ""))
                 .toList();
     }
 

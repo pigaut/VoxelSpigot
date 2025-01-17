@@ -37,7 +37,7 @@ public class PluginLanguageManager extends LanguageManager {
 
             for (String key : config.getKeys()) {
                 final String value = config.getString(key, StringColor.FORMATTER);
-                addLang(locale, StringFormatter.toConstantCase(key), value);
+                addLang(locale, StringFormatter.toKebabCase(key), value);
             }
         }
     }

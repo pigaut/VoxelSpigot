@@ -7,8 +7,7 @@ import org.jetbrains.annotations.*;
 public class OnlinePlayerParameter extends CommandParameter {
 
     public OnlinePlayerParameter(@NotNull EnhancedPlugin plugin) {
-        super(plugin.getLang("ONLINE_PLAYER_PARAMETER", "online-player"),
-                (sender, args) -> SpigotServer.getOnlinePlayerNames());
+        super(plugin.getLang("online-player-parameter"), (sender, args) -> SpigotServer.getOnlinePlayerNames());
     }
 
 }

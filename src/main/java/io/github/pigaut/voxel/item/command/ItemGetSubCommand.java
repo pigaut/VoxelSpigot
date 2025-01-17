@@ -14,11 +14,11 @@ public class ItemGetSubCommand extends LangSubCommand {
         withPlayerExecution((player, args, placeholders) -> {
             final ItemStack item = plugin.getItemStack(args[0]);
             if (item == null) {
-                plugin.sendMessage(player, "ITEM_NOT_FOUND", placeholders);
+                plugin.sendMessage(player, "item-not-found", placeholders);
                 return;
             }
             PlayerUtil.giveItemsOrDrop(player, item);
-            plugin.sendMessage(player, "RECEIVED_ITEM", placeholders);
+            plugin.sendMessage(player, "received-item", placeholders);
         });
         withPlayerCompletion((player, args) -> plugin.getItems().getItemNames());
     }

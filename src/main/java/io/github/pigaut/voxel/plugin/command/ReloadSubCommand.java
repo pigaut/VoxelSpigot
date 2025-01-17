@@ -10,7 +10,7 @@ public class ReloadSubCommand extends LangSubCommand {
         super("reload", plugin);
         withCommandExecution((sender, args, placeholders) -> {
             plugin.reload();
-            plugin.sendMessage(sender, "RELOADING", placeholders);
+            plugin.sendMessage(sender, "reloading", placeholders);
         });
     }
 

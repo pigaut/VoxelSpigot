@@ -24,7 +24,7 @@ public class PluginSoundManager extends SoundManager {
             final RootSection config = new RootSection(itemFile, plugin.getConfigurator());
             config.load();
             for (String key : config.getKeys()) {
-                final SimpleSoundEffect sound = config.get(key, SimpleSoundEffect.class);
+                final SoundEffect sound = config.get(key, SoundEffect.class);
                 addSound(key, sound);
             }
         }

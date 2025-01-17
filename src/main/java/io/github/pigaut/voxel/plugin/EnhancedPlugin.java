@@ -122,11 +122,13 @@ public interface EnhancedPlugin extends Plugin {
 
     void saveResource(String path);
 
-    File getFile(String path);
+    File getFile(String file);
+
+    File getFile(String directory, String file);
 
     List<File> getFiles(String path);
 
-    List<String> getFilePaths(String path);
+    List<String> getFilePaths(String directory);
 
     void registerListener(Listener listener);
 

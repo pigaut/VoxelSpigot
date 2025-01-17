@@ -37,7 +37,7 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
     }
 
     public Placeholder[] getPlaceholders() {
-        return new Placeholder[]{
+        return new Placeholder[] {
                 Placeholder.of("%command%", getCommand()),
                 Placeholder.of("%full_command%", getFullCommand()),
                 Placeholder.of("%description%", description),
@@ -204,6 +204,7 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
         for (int i = 0; i < parameters.size(); i++) {
             if (!parameters.get(i).isOptional()) {
                 minArgs = i + 1;
+                continue;
             }
             break;
         }
@@ -247,7 +248,7 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
         return withPlayerExecution((player, args, placeholders) -> {
             final PluginPlayer pluginPlayer = plugin.getPlayer(player.getUniqueId());
             if (pluginPlayer == null) {
-                Chat.send(player, plugin.getLang("LOADING_PLAYER_DATA"));
+                Chat.send(player, plugin.getLang("loading-player-data"));
                 return;
             }
             playerExecution.execute(pluginPlayer, args, placeholders);
@@ -282,17 +283,17 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
     public final void execute(CommandSender sender, String[] args) {
         final int argsCount = args.length;
         if (argsCount < minArgs) {
-            plugin.sendMessage(sender,"NOT_ENOUGH_ARGS", this);
+            plugin.sendMessage(sender,"not-enough-args", this);
             return;
         }
 
         if (argsCount > maxArgs) {
-            plugin.sendMessage(sender, "TOO_MANY_ARGS", this);
+            plugin.sendMessage(sender, "too-many-args", this);
             return;
         }
 
         if (!hasPermission(sender)) {
-            plugin.sendMessage(sender, "NO_PERMISSION", this);
+            plugin.sendMessage(sender, "no-permission", this);
             return;
         }
 
@@ -317,7 +318,7 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
                 playerExecution.execute(player, paramArgs, placeholderSupplier);
                 return;
             }
-            plugin.sendMessage(sender, "PLAYER_ONLY", placeholderSupplier);
+            plugin.sendMessage(sender, "player-only", placeholderSupplier);
             return;
         }
 
@@ -326,7 +327,7 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
             return;
         }
 
-        plugin.sendMessage(sender, "USAGE", this);
+        plugin.sendMessage(sender, "usage", this);
     }
 
     public final List<String> tabComplete(CommandSender sender, String[] args) {

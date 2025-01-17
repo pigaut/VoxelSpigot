@@ -1,7 +1,6 @@
 package io.github.pigaut.voxel.particle;
 
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.sound.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.*;

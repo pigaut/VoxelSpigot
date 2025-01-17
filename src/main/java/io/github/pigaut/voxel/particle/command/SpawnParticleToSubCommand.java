@@ -12,20 +12,21 @@ public class SpawnParticleToSubCommand extends LangSubCommand {
 
     public SpawnParticleToSubCommand(@NotNull EnhancedPlugin plugin) {
         super("spawn-particle-to", plugin);
-        addParameter(new ParticleNameParameter(plugin));
         addParameter(new OnlinePlayerParameter(plugin));
+        addParameter(new ParticleNameParameter(plugin));
         withCommandExecution((sender, args, placeholders) -> {
-           final ParticleEffect particle = plugin.getParticle(args[0]);
+            final Player player = Bukkit.getPlayer(args[0]);
+            if (player == null) {
+                plugin.sendMessage(sender, "player-not-online", placeholders);
+                return;
+            }
+           final ParticleEffect particle = plugin.getParticle(args[1]);
            if (particle == null) {
-               plugin.sendMessage(sender, "PARTICLE_NOT_FOUND", placeholders);
-               return;
-           }
-           final Player player = Bukkit.getPlayer(args[1]);
-           if (player == null) {
-               plugin.sendMessage(sender, "PLAYER_NOT_FOUND", placeholders);
+               plugin.sendMessage(sender, "particle-not-found", placeholders);
                return;
            }
            particle.spawn(player, player.getLocation());
+           plugin.sendMessage(sender, "spawned-particle-at-player", placeholders);
         });
     }
 

@@ -6,8 +6,7 @@ import org.jetbrains.annotations.*;
 public class FilePathParameter extends CommandParameter {
 
     public FilePathParameter(@NotNull EnhancedPlugin plugin, String path) {
-        super(plugin.getLang("FILE_PATH_PARAMETER", "file-path"),
-                (sender, args) -> plugin.getFilePaths(path));
+        super(plugin.getLang("file-path-parameter"), (sender, args) -> plugin.getFilePaths(path));
     }
 
 }

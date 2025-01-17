@@ -5,6 +5,7 @@ import io.github.pigaut.yaml.parser.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
+import java.util.regex.*;
 
 public class Placeholder implements StringFormatter {
 
@@ -19,7 +20,7 @@ public class Placeholder implements StringFormatter {
 
     private Placeholder(@NotNull String id, @NotNull String value) {
         this.id = id;
-        this.value = value;
+        this.value = Matcher.quoteReplacement(value);
         final String idName = StringUtil.removeParentheses(id);
         for (StringStyle style : StringStyle.values()) {
             formatIds.put(StringUtil.buildString("%", idName, "_", style.getTagName(), "%"), style);
@@ -39,7 +40,7 @@ public class Placeholder implements StringFormatter {
 
     @NotNull
     public static Placeholder fromName(@NotNull String name, @Nullable Object object) {
-        if (!StringUtil.isParenthesized(name, "%", "%")) {
+        if (StringUtil.isParenthesized(name, "%", "%")) {
             return of(name, object);
         }
         name = StringUtil.addParentheses(name, "%", "%");
@@ -67,6 +68,14 @@ public class Placeholder implements StringFormatter {
             str = str.replaceAll(entry.getKey(), entry.getValue().format(value));
         }
         return str;
+    }
+
+    @Override
+    public String toString() {
+        return "Placeholder{" +
+                "id='" + id + '\'' +
+                ", value='" + value + '\'' +
+                '}';
     }
 
 }

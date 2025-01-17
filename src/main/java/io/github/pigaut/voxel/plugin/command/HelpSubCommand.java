@@ -10,9 +10,9 @@ public class HelpSubCommand extends LangSubCommand {
     public HelpSubCommand(@NotNull EnhancedPlugin plugin) {
         super("help", plugin);
         withPlayerExecution((player, args, placeholders) -> {
-            final String header = plugin.getLang("HELP_HEADER", "&2------------     &r&l%command% Help     &2------------");
-            final String line = plugin.getLang("HELP_LINE", "&a/%command%: &r%description%");
-            final String footer = plugin.getLang("HELP_FOOTER", "&2---------------------------------------------");
+            final String header = plugin.getLang("help-header", "------------     %command% Help     ------------");
+            final String line = plugin.getLang("help-line", "/%full_command%: %description%");
+            final String footer = plugin.getLang("help-footer", "---------------------------------------------");
 
             Chat.send(player, header, placeholders);
             for (SubCommand subCommand : getParent()) {

@@ -20,14 +20,20 @@ public class ItemAddSubCommand extends LangSubCommand {
         withPlayerExecution((player, args, placeholders) -> {
             final ItemStack item = player.getInventory().getItemInMainHand();
             if (item.getType() == Material.AIR) {
-                plugin.sendMessage(player, "NOT_HOLDING_ITEM", placeholders);
+                plugin.sendMessage(player, "not-holding-item", placeholders);
                 return;
             }
-            final File file = plugin.getFile(args[0]);
+            final File file = plugin.getFile("items", args[0]);
+            if (!file.exists()) {
+                plugin.sendMessage(player, "file-not-found", placeholders);
+                return;
+            }
+
             if (!YamlConfig.isYamlFile(file)) {
-                plugin.sendMessage(player, "NOT_YAML_FILE", placeholders);
+                plugin.sendMessage(player, "not-yaml-file", placeholders);
                 return;
             }
+
             final RootSection config = new RootSection(file, plugin.getConfigurator());
             plugin.getScheduler().runTaskAsync(() -> {
                 config.load();
@@ -35,7 +41,7 @@ public class ItemAddSubCommand extends LangSubCommand {
                 config.save();
                 plugin.getItems().reload();
             });
-            plugin.sendMessage(player, "ADDING_ITEM", placeholders);
+            plugin.sendMessage(player, "adding-item", placeholders);
         });
     }
 

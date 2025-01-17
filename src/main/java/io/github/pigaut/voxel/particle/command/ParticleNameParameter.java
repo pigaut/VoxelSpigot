@@ -7,8 +7,7 @@ import org.jetbrains.annotations.*;
 public class ParticleNameParameter extends CommandParameter {
 
     public ParticleNameParameter(@NotNull EnhancedPlugin plugin) {
-        super(plugin.getLang("PARTICLE_NAME_PARAMETER", "particle-name"),
-                (sender, args) -> plugin.getParticles().getParticleNames());
+        super(plugin.getLang("particle-name-parameter"), (sender, args) -> plugin.getParticles().getParticleNames());
     }
 
 }
