@@ -5,6 +5,7 @@ import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.function.action.*;
 import io.github.pigaut.voxel.function.condition.*;
 import io.github.pigaut.voxel.function.interact.block.*;
+import io.github.pigaut.voxel.function.interact.inventory.*;
 import io.github.pigaut.voxel.message.*;
 import io.github.pigaut.voxel.message.config.*;
 import io.github.pigaut.voxel.meta.flag.*;
@@ -41,6 +42,8 @@ public class PluginConfigurator extends SpigotConfigurator {
         addLoader(Action.class, actionLoader);
         addLoader(Function.class, new FunctionLoader(plugin));
         addLoader(BlockClickFunction.class, new BlockClickFunctionLoader());
+        addLoader(InventoryClickFunction.class, new InventoryClickFunctionLoader());
+
     }
 
     public ConditionLoader getConditionLoader() {

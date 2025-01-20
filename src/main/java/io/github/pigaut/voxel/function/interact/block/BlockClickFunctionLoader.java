@@ -14,11 +14,11 @@ public class BlockClickFunctionLoader implements ConfigLoader<BlockClickFunction
     }
 
     @Override
-    public @NotNull BlockClickFunction loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        final Action action = section.get("click", Action.class);
-        final boolean sneaking = section.getOptionalBoolean("sneaking").orElse(false);
-        final boolean shouldCancel = section.getOptionalBoolean("cancel").orElse(false);
-        final Function function = section.load(Function.class);
+    public @NotNull BlockClickFunction loadFromSection(@NotNull ConfigSection config) throws InvalidConfigurationException {
+        final Action action = config.get("click", Action.class);
+        final boolean sneaking = config.getOptionalBoolean("sneaking").orElse(false);
+        final boolean shouldCancel = config.getOptionalBoolean("cancel").orElse(false);
+        final Function function = config.load(Function.class);
         return new SimpleBlockClickFunction(action, sneaking, shouldCancel, function);
     }
 

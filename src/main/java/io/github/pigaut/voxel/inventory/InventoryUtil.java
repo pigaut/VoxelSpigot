@@ -17,33 +17,28 @@ public class InventoryUtil {
         return storage.getDefaultSize();
     }
 
-    public static InventoryWindow getInventoryWindow(InventoryType storage) {
-        return getInventoryWindow(storage, storage.getDefaultSize());
+    public static int getInventoryLength(InventoryType storage, int size) {
+        switch (storage) {
+            case CHEST, PLAYER, ENDER_CHEST, SHULKER_BOX, BARREL:
+                return 9;
+            case DISPENSER, DROPPER, WORKBENCH:
+                return 3;
+            default:
+                return storage.getDefaultSize();
+        }
     }
 
-    public static InventoryWindow getInventoryWindow(InventoryType storage, int size) {
-        size = getValidSizeOrDefault(storage, size);
-
+    public static int getInventoryHeight(InventoryType storage, int size) {
         switch (storage) {
+            case ENDER_CHEST, SHULKER_BOX, BARREL, DISPENSER, DROPPER, WORKBENCH:
+                return 3;
+            case PLAYER:
+                return 4;
             case CHEST:
-                return new InventoryWindow(storage, size, 9, size/9);
-            case DISPENSER, DROPPER, WORKBENCH, CRAFTING:
-                return new InventoryWindow(storage, size, 3, 3);
-            case FURNACE, MERCHANT, ANVIL:
-                return new InventoryWindow(storage, size, 1, 3);
-            case ENCHANTING:
-                return new InventoryWindow(storage, size, 1, 2);
-            case BREWING, HOPPER:
-                return new InventoryWindow(storage, size, 1, 5);
-            case PLAYER, CREATIVE:
-                return new InventoryWindow(storage, size, 9, 4);
-            case ENDER_CHEST, SHULKER_BOX:
-                return new InventoryWindow(storage, size, 9, 3);
-            case BEACON:
-                return new InventoryWindow(storage, size, 1, 1);
+                return size/9;
+            default:
+                return 1;
         }
-
-        return null;
     }
 
     public static Inventory createInventory(InventoryType storage) {

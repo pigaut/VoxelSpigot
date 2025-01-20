@@ -19,12 +19,12 @@ public class ActionLoader extends AbstractLoader<Action> {
 
     public ActionLoader() {
         //server
+        addLoader("BROADCAST", ConstructorLoader.fromString(ServerBroadcast::new));
         addLoader("LIGHTNING", ConstructorLoader.from(Location.class, StrikeLightning::new));
+        addLoader("CONSOLE_COMMAND", ConstructorLoader.fromString(ExecuteConsoleCommand::new));
         addLoader("DROP_ITEM", DropItem.newConfigLoader());
         addLoader("SPAWN_PARTICLE", SpawnParticle.newConfigLoader());
         addLoader("PLAY_SOUND", PlaySound.newConfigLoader());
-        addLoader("BROADCAST", ConstructorLoader.fromString(ServerBroadcast::new));
-        addLoader("CONSOLE_COMMAND", ConstructorLoader.fromString(ExecuteConsoleCommand::new));
 
         //Block Actions
         addLoader("STRIKE_BLOCK", ConstructorLoader.fromBoolean(StrikeBlockWithLightning::new));
@@ -33,11 +33,6 @@ public class ActionLoader extends AbstractLoader<Action> {
         addLoader("BLOCK_SOUND", ConstructorLoader.from(SoundEffect.class, PlaySoundOnBlock::new));
 
         //player
-        addLoader("STRIKE_PLAYER", ConstructorLoader.fromBoolean(StrikePlayerWithLightning::new));
-        addLoader("PLAYER_DROP", ConstructorLoader.from(ItemStack.class, DropItemOnPlayer::new));
-        addLoader("PLAYER_PARTICLE", ConstructorLoader.from(ParticleEffect.class, SpawnParticleOnPlayer::new));
-        addLoader("PLAYER_SOUND", ConstructorLoader.from(SoundEffect.class, PlaySoundOnPlayer::new));
-
         addLoader("ADD_EXP", ConstructorLoader.fromInteger(AddPlayerExp::new));
         addLoader("REMOVE_EXP", ConstructorLoader.fromInteger(RemovePlayerExp::new));
         addLoader("SET_EXP", ConstructorLoader.fromInteger(SetPlayerExp::new));
@@ -54,12 +49,17 @@ public class ActionLoader extends AbstractLoader<Action> {
         addLoader("ADD_FLAG", ConstructorLoader.from(Flag.class, AddPlayerFlag::new));
         addLoader("REMOVE_FLAG", ConstructorLoader.fromString(RemovePlayerFlag::new));
 
+        addLoader("STRIKE_PLAYER", ConstructorLoader.fromBoolean(StrikePlayerWithLightning::new));
         addLoader("SET_FLIGHT", ConstructorLoader.fromBoolean(SetPlayerFlight::new));
         addLoader("TELEPORT", ConstructorLoader.from(Location.class, TeleportPlayer::new));
-        addLoader("GIVE_ITEM", ConstructorLoader.from(ItemStack.class, GiveItemToPlayer::new));
         addLoader("SET_CURSOR_ITEM", ConstructorLoader.from(ItemStack.class, SetPlayerCursorItem::new));
         addLoader("CLEAR_INVENTORY", ConstructorLoader.fromBoolean(ClearPlayerInventory::new));
         addLoader("OPEN_ENDER_CHEST", ConstructorLoader.from(OpenEnderChest::new));
+
+        addLoader("GIVE_ITEM", ConstructorLoader.from(ItemStack.class, GiveItemToPlayer::new));
+        addLoader("PLAYER_DROP", ConstructorLoader.from(ItemStack.class, DropItemOnPlayer::new));
+        addLoader("PLAYER_PARTICLE", ConstructorLoader.from(ParticleEffect.class, SpawnParticleOnPlayer::new));
+        addLoader("PLAYER_SOUND", ConstructorLoader.from(SoundEffect.class, PlaySoundOnPlayer::new));
 
         addLoader("PLAYER_CACHE", ConstructorLoader.fromSection(section -> {
             final String id = section.getString("id");
@@ -73,7 +73,7 @@ public class ActionLoader extends AbstractLoader<Action> {
         return "Could not load action";
     }
 
-    public ConfigLoader<? extends Action> getLoader(ConfigField field, String id) {
+    public ConfigLoader<? extends Action> getLoader(ConfigField field, String id) throws InvalidConfigurationException {
         final ConfigLoader<? extends Action> loader = getLoader(id);
         if (loader == null) {
             throw new InvalidConfigurationException(field,

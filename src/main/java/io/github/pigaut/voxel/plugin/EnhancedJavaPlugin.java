@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.plugin;
 
+import com.jeff_media.updatechecker.*;
 import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.item.*;
@@ -17,6 +18,7 @@ import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.section.*;
+import org.bstats.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -46,6 +48,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final PluginScheduler pluginScheduler = new PluginScheduler(this);
     private final List<Manager> loadedManagers = new ArrayList<>();
     private RootSection config;
+    private UpdateChecker updateChecker = null;
 
     @Override
     public void onDisable() {
@@ -60,15 +63,17 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     private void initialize() {
-        checkVersion();
+        checkSpigotVersion();
+        createMetrics();
         createHooks();
         createFiles();
+        checkForUpdates();
     }
 
-    private void checkVersion() throws UnsupportedVersionException {
-        SpigotVersion serverVersion = SpigotServer.getVersion();
+    private void checkSpigotVersion() throws UnsupportedVersionException {
+        final SpigotVersion serverVersion = SpigotServer.getVersion();
         if (serverVersion == SpigotVersion.UNKNOWN) {
-            logger.severe("Could not identify server version. Attempting to load.");
+            logger.severe("Found unknown server version");
         } else {
             if (!getCompatibleVersions().contains(serverVersion)) {
                 throw new UnsupportedVersionException(this);
@@ -78,8 +83,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
     }
 
-    public void createHooks() {
-    }
+    public void createHooks() {}
 
     public void createFiles() {
         for (String directory : getPluginDirectories()) {
@@ -97,6 +101,38 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
                 saveResource(exampleResource);
             }
         }
+    }
+
+    private void createMetrics() {
+        final Integer metricsId = getMetricsId();
+        if (metricsId != null) {
+            new Metrics(this, metricsId);
+            logger.info("Created bStats metrics with id: " + metricsId);
+        }
+    }
+
+    private void checkForUpdates() {
+        if (!config.getOptionalBoolean("check-for-updates").orElse(true)) {
+            return;
+        }
+
+        if (updateChecker != null) {
+            updateChecker.checkNow();
+            return;
+        }
+
+        final Integer spigotId = getResourceId();
+        if (spigotId == null) {
+            return;
+        }
+
+        updateChecker = new UpdateChecker(this, UpdateCheckSource.SPIGET, Integer.toString(spigotId))
+                .setDownloadLink("https://www.spigotmc.org/resources/" + spigotId)
+                .setChangelogLink("https://www.spigotmc.org/resources/" + spigotId + "/updates")
+                .setDonationLink(getDonationLink())
+                .setNotifyOpsOnJoin(true)
+                .checkEveryXHours(24)
+                .checkNow();
     }
 
     private void loadManagers() {
@@ -134,7 +170,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
-    public void reload() {
+    public void reloadAsync() {
         pluginScheduler.runTaskAsync(() -> {
             initialize();
             loadedManagers.forEach(manager -> {
@@ -145,8 +181,29 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
+    public void reload() {
+        initialize();
+        loadedManagers.forEach(manager -> {
+            manager.disable();
+            manager.enable();
+        });
+    }
+
+    @Override
     public List<SpigotVersion> getCompatibleVersions() {
         return List.of(SpigotVersion.values());
+    }
+
+    public @Nullable Integer getMetricsId() {
+        return null;
+    }
+
+    public @Nullable Integer getResourceId() {
+        return null;
+    }
+
+    public @Nullable String getDonationLink() {
+        return null;
     }
 
     @Override
