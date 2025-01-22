@@ -43,6 +43,10 @@ public interface ConstructorLoader<T> extends FieldLoader<T> {
         return field -> function.apply(field.toScalar().toInteger());
     }
 
+    static <T> ConstructorLoader<T> fromDouble(Function<Double, T> function) {
+        return field -> function.apply(field.toScalar().toDouble());
+    }
+
     static <T> ConstructorLoader<T> fromBoolean(Function<Boolean, T> function) {
         return field -> function.apply(field.toScalar().toBoolean());
     }

@@ -4,9 +4,12 @@ import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.function.action.block.*;
 import io.github.pigaut.voxel.function.action.player.*;
 import io.github.pigaut.voxel.function.action.server.*;
+import io.github.pigaut.voxel.hook.*;
 import io.github.pigaut.voxel.message.*;
 import io.github.pigaut.voxel.meta.flag.*;
 import io.github.pigaut.voxel.particle.*;
+import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.sound.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
@@ -17,7 +20,7 @@ import org.jetbrains.annotations.*;
 
 public class ActionLoader extends AbstractLoader<Action> {
 
-    public ActionLoader() {
+    public ActionLoader(EnhancedPlugin plugin) {
         //server
         addLoader("BROADCAST", ConstructorLoader.fromString(ServerBroadcast::new));
         addLoader("LIGHTNING", ConstructorLoader.from(Location.class, StrikeLightning::new));
@@ -66,6 +69,13 @@ public class ActionLoader extends AbstractLoader<Action> {
             final Object value = section.getScalar("value").getValue();
             return new CachePlayerValue(id, value);
         }));
+
+        final EconomyHook economy = SpigotServer.getEconomyHook();
+        if (economy != null) {
+            addLoader("GIVE_MONEY", ConstructorLoader.fromDouble(amount -> new GivePlayerMoney(plugin, economy, amount)));
+            addLoader("TAKE_MONEY", ConstructorLoader.fromDouble(amount -> new TakePlayerMoney(plugin, economy, amount)));
+        }
+
     }
 
     @Override

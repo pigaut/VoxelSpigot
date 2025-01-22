@@ -17,7 +17,7 @@ public class StringPlaceholders {
 
     public static String parseAll(@Nullable OfflinePlayer player, @NotNull String text,
                                   @NotNull PlaceholderSupplier... placeholderSuppliers) {
-        final PlaceholderAPIHook placeholderAPI = SpigotServer.getPlaceholderAPI();
+        final PlaceholderAPIHook placeholderAPI = SpigotServer.getPlaceholderAPIHook();
         if (placeholderAPI != null) {
             text = placeholderAPI.setPlaceholders(player, text);
         }

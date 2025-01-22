@@ -39,7 +39,7 @@ public class Placeholder implements StringFormatter {
     }
 
     @NotNull
-    public static Placeholder fromName(@NotNull String name, @Nullable Object object) {
+    public static Placeholder from(@NotNull String name, @Nullable Object object) {
         if (StringUtil.isParenthesized(name, "%", "%")) {
             return of(name, object);
         }

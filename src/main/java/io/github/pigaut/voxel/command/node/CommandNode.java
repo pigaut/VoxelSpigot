@@ -308,7 +308,7 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
             final CommandParameter parameter = parameters.get(i);
             final String value = args.length > i ? args[i] : parameter.getDefaultValue();
             paramArgs[i] = value;
-            placeholders.add(Placeholder.fromName(parameter.getName(), value));
+            placeholders.add(Placeholder.from(parameter.getName(), value));
         }
 
         final PlaceholderSupplier placeholderSupplier = () -> placeholders.toArray(new Placeholder[0]);

@@ -9,6 +9,7 @@ import io.github.pigaut.voxel.function.interact.inventory.*;
 import io.github.pigaut.voxel.message.*;
 import io.github.pigaut.voxel.message.config.*;
 import io.github.pigaut.voxel.meta.flag.*;
+import io.github.pigaut.voxel.meta.placeholder.*;
 import io.github.pigaut.voxel.particle.*;
 import io.github.pigaut.voxel.particle.config.*;
 import io.github.pigaut.voxel.plugin.*;
@@ -26,11 +27,16 @@ import org.jetbrains.annotations.*;
 public class PluginConfigurator extends SpigotConfigurator {
 
     private final EnhancedPlugin plugin;
-    private final ConditionLoader conditionLoader = new ConditionLoader();
-    private final ActionLoader actionLoader = new ActionLoader();
+    private final ConditionLoader conditionLoader;
+    private final ActionLoader actionLoader;
 
     public PluginConfigurator(@NotNull EnhancedPlugin plugin) {
         this.plugin = plugin;
+        this.conditionLoader = new ConditionLoader(plugin);
+        this.actionLoader = new ActionLoader(plugin);
+
+        addLoader(Placeholder.class, new PlaceholderLoader());
+        addLoader(Placeholder[].class, new PlaceholdersLoader());
 
         addLoader(ItemStack.class, new PluginItemStackLoader());
         addLoader(Flag.class, new FlagLoader());

@@ -16,11 +16,7 @@ public class SpigotServer {
     private static SpigotServer server;
 
     private final SpigotVersion version;
-
     private final World defaultWorld;
-
-    private final PlaceholderAPIHook placeholderAPI;
-    private final EconomyHook economyHook;
 
     private SpigotServer() {
         {
@@ -28,10 +24,7 @@ public class SpigotServer {
             SpigotVersion foundVersion = EnumDeserializer.deserializeOrNull(SpigotVersion.class, version);
             this.version = foundVersion != null ? foundVersion : SpigotVersion.UNKNOWN;
         }
-
         defaultWorld = Bukkit.getWorlds().get(0);
-        placeholderAPI = isPluginLoaded("PlaceholderAPI") ? new PlaceholderAPIHook() : null;
-        economyHook = isPluginLoaded("Vault") ? EconomyHook.newInstance() : null;
     }
 
     private static SpigotServer getServer() {
@@ -65,12 +58,12 @@ public class SpigotServer {
                 .toList();
     }
 
-    public static @Nullable EconomyHook getEconomy() {
-        return getServer().economyHook;
+    public static @Nullable EconomyHook getEconomyHook() {
+        return isPluginLoaded("Vault") ? EconomyHook.newInstance() : null;
     }
 
-    public static @Nullable PlaceholderAPIHook getPlaceholderAPI() {
-        return getServer().placeholderAPI;
+    public static @Nullable PlaceholderAPIHook getPlaceholderAPIHook() {
+        return isPluginLoaded("PlaceholderAPI") ? new PlaceholderAPIHook() : null;
     }
 
     public static @Nullable Plugin getPlugin(String name) {

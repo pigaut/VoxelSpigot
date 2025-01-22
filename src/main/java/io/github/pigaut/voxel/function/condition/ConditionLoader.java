@@ -3,6 +3,9 @@ package io.github.pigaut.voxel.function.condition;
 import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.function.condition.player.*;
 import io.github.pigaut.voxel.function.condition.server.*;
+import io.github.pigaut.voxel.hook.*;
+import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
 import io.github.pigaut.yaml.parser.*;
@@ -11,7 +14,9 @@ import org.jetbrains.annotations.*;
 
 public class ConditionLoader extends AbstractLoader<Condition> {
 
-    public ConditionLoader() {
+    private final @Nullable EconomyHook economy = EconomyHook.newInstance();
+
+    public ConditionLoader(@NotNull EnhancedPlugin plugin) {
         addLoader("ONLINE_PLAYERS", ConstructorLoader.fromInteger(OnlinePlayersCondition::new));
         addLoader("MIN_ONLINE_PLAYERS", ConstructorLoader.fromInteger(MinOnlinePlayersCondition::new));
         addLoader("MAX_ONLINE_PLAYERS", ConstructorLoader.fromInteger(MaxOnlinePlayersCondition::new));
@@ -20,6 +25,11 @@ public class ConditionLoader extends AbstractLoader<Condition> {
         addLoader("HAS_FLAG", ConstructorLoader.fromString(PlayerHasFlag::new));
 
         addLoader("TOOL_HAS_ENCHANT", ConstructorLoader.from(Enchantment.class, PlayerToolHasEnchant::new));
+
+        final EconomyHook economy = SpigotServer.getEconomyHook();
+        if (economy != null) {
+            addLoader("HAS_MONEY", ConstructorLoader.fromDouble(amount -> new PlayerHasMoney(plugin, economy, amount)));
+        }
     }
 
     @Override
