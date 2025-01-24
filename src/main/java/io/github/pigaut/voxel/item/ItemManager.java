@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.item;
 
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
@@ -9,6 +10,10 @@ import java.util.*;
 public class ItemManager extends Manager {
 
     private final Map<String, ItemStack> itemsByName = new HashMap<>();
+
+    public ItemManager(EnhancedPlugin plugin) {
+        super(plugin);
+    }
 
     public void addItemStack(String name, ItemStack item) {
         itemsByName.put(name, item);

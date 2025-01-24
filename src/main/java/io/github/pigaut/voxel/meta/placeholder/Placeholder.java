@@ -61,6 +61,14 @@ public class Placeholder implements StringFormatter {
         return new Placeholder(id, object.toString());
     }
 
+    @NotNull
+    public static Placeholder[] mergeAll(Placeholder[] placeholdersA, Placeholder... placeholdersB) {
+        final Placeholder[] mergedPlaceholders = new Placeholder[placeholdersA.length + placeholdersB.length];
+        System.arraycopy(placeholdersA, 0, mergedPlaceholders, 0, placeholdersA.length);
+        System.arraycopy(placeholdersB, 0, mergedPlaceholders, placeholdersA.length, placeholdersB.length);
+        return mergedPlaceholders;
+    }
+
     @Override
     public @NotNull String format(@NotNull String str) {
         str = str.replaceAll(id, value);

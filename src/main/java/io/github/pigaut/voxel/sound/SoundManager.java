@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.sound;
 
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 
 import java.util.*;
@@ -7,6 +8,10 @@ import java.util.*;
 public class SoundManager extends Manager {
 
     private final Map<String, SoundEffect> soundsByName = new HashMap<>();
+
+    public SoundManager(EnhancedPlugin plugin) {
+        super(plugin);
+    }
 
     public List<String> getSoundNames() {
         return new ArrayList<>(soundsByName.keySet());

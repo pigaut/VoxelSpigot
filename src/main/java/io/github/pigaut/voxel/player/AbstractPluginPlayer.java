@@ -1,6 +1,5 @@
 package io.github.pigaut.voxel.player;
 
-import io.github.pigaut.voxel.*;
 import io.github.pigaut.voxel.message.*;
 import io.github.pigaut.voxel.meta.flag.*;
 import io.github.pigaut.voxel.meta.placeholder.*;

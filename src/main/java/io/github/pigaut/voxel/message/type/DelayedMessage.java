@@ -18,13 +18,6 @@ public class DelayedMessage implements Message {
     }
 
     @Override
-    public void send(Player player) {
-        plugin.getScheduler().runTaskLater(delay, () -> {
-            message.send(player);
-        });
-    }
-
-    @Override
     public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
         plugin.getScheduler().runTaskLater(delay, () -> {
             message.send(player, placeholderSuppliers);

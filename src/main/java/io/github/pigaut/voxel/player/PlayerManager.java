@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.player;
 
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.Manager;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -15,7 +16,8 @@ public abstract class PlayerManager<P extends PluginPlayer> extends Manager impl
     private final Map<UUID, P> playersByUUID = new HashMap<>();
     private final Map<String, P> playersByName = new HashMap<>();
 
-    public PlayerManager(@NotNull PlayerFactory<P> playerFactory) {
+    public PlayerManager(@NotNull EnhancedPlugin plugin, @NotNull PlayerFactory<P> playerFactory) {
+        super(plugin);
         this.playerFactory = playerFactory;
     }
 

@@ -38,28 +38,44 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final static Pattern VERSION_PATTERN = Pattern.compile("(^[\\.\\d]*).+");
     protected final Logger logger = getLogger();
     private final LanguageManager languageManager = new PluginLanguageManager(this);
-    private final CommandManager commandManager = new CommandManager();
-    private final PluginPlayerManager playerManager = new PluginPlayerManager();
+    private final CommandManager commandManager = new CommandManager(this);
+    private final PluginPlayerManager playerManager = new PluginPlayerManager(this);
     private final ItemManager itemManager = new PluginItemManager(this);
     private final MessageManager messageManager = new PluginMessageManager(this);
     private final FlagManager flagManager = new PluginFlagManager(this);
     private final ParticleManager particleManager = new PluginParticleManager(this);
     private final SoundManager soundManager = new PluginSoundManager(this);
-    private final PluginScheduler pluginScheduler = new PluginScheduler(this);
+    private final PluginScheduler scheduler = new PluginScheduler(this);
     private final List<Manager> loadedManagers = new ArrayList<>();
     private RootSection config;
     private UpdateChecker updateChecker = null;
 
     @Override
+    public void onEnable() {
+        this.initialize();
+        this.loadManagers();
+    }
+
+    @Override
     public void onDisable() {
-        loadedManagers.forEach(Manager::disable);
+        for (Manager manager : loadedManagers) {
+            manager.disable();
+            manager.saveData();
+        }
         loadedManagers.clear();
     }
 
     @Override
-    public void onEnable() {
-        this.initialize();
-        this.loadManagers();
+    public void reload() {
+        initialize();
+        for (Manager manager : loadedManagers) {
+            manager.disable();
+            manager.enable();
+            scheduler.runTaskAsync(() -> {
+                manager.saveData();
+                manager.loadData();
+            });
+        }
     }
 
     private void initialize() {
@@ -155,38 +171,19 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         getCommand("");
         for (Manager manager : loadedManagers) {
             manager.enable();
+            manager.loadData();
             manager.getListeners().forEach(this::registerListener);
             manager.getCommands().forEach(this::registerCommand);
             final int autoSave = manager.getAutoSave();
             if (autoSave > 0) {
-                pluginScheduler.runTaskTimerAsync(autoSave, manager::save);
+                scheduler.runTaskTimerAsync(autoSave, manager::saveData);
             }
         }
     }
 
     @Override
     public PluginScheduler getScheduler() {
-        return pluginScheduler;
-    }
-
-    @Override
-    public void reloadAsync() {
-        pluginScheduler.runTaskAsync(() -> {
-            initialize();
-            loadedManagers.forEach(manager -> {
-                manager.disable();
-                manager.enable();
-            });
-        });
-    }
-
-    @Override
-    public void reload() {
-        initialize();
-        loadedManagers.forEach(manager -> {
-            manager.disable();
-            manager.enable();
-        });
+        return scheduler;
     }
 
     @Override

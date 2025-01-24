@@ -16,13 +16,6 @@ public class MultiMessage implements Message {
     }
 
     @Override
-    public void send(Player player) {
-        for (Message message : messages) {
-            message.send(player);
-        }
-    }
-
-    @Override
     public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
         for (Message message : messages) {
             message.send(player, placeholderSuppliers);

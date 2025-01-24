@@ -34,10 +34,6 @@ public class BossBarMessage implements Message {
 		this.progress = progress;
 	}
 
-	public void send(Player player) {
-		send(player, new PlaceholderSupplier[0]);
-	}
-
 	@Override
 	public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
 		final String parsedTitle = StringPlaceholders.parseAll(player, title, placeholderSuppliers);

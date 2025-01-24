@@ -2,26 +2,17 @@ package io.github.pigaut.voxel.meta.flag;
 
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.node.section.*;
 
 public class PluginFlagManager extends FlagManager {
 
-    private final EnhancedPlugin plugin;
-
     public PluginFlagManager(EnhancedPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @Override
-    public void disable() {
+    public void loadData() {
         clearFlags();
-    }
-
-    @Override
-    public void load() {
-        final RootSection config = new RootSection(plugin.getFile("flags.yml"));
-        config.load();
-
+        final ConfigSection config = ConfigSection.loadConfiguration(plugin.getFile("flags.yml"));
         for (ConfigSection section : config.getNestedSections()) {
             addFlag(new Flag(section.getKey(),
                     section.getOptionalString("group").orElse("default"),

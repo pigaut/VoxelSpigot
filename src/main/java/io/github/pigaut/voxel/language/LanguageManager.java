@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.language;
 
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.util.collection.*;
 import org.jetbrains.annotations.*;
@@ -10,6 +11,10 @@ public class LanguageManager extends Manager {
 
     private Locale defaultLanguage = Locale.ENGLISH;
     protected final Table<Locale, String, String> dictionary = new Table();
+
+    public LanguageManager(EnhancedPlugin plugin) {
+        super(plugin);
+    }
 
     @NotNull
     public Locale getDefaultLanguage() {

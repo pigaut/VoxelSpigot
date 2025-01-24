@@ -2,6 +2,7 @@ package io.github.pigaut.voxel.command;
 
 import com.google.common.base.*;
 import io.github.pigaut.voxel.command.util.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import org.bukkit.command.defaults.*;
 
@@ -10,6 +11,10 @@ import java.util.*;
 public class CommandManager extends Manager {
 
     private final Map<String, EnhancedCommand> customCommands = new HashMap<>();
+
+    public CommandManager(EnhancedPlugin plugin) {
+        super(plugin);
+    }
 
     public EnhancedCommand getCustomCommand(String name) {
         return customCommands.get(name);

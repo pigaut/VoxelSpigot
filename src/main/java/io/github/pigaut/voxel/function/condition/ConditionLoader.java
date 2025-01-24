@@ -14,9 +14,7 @@ import org.jetbrains.annotations.*;
 
 public class ConditionLoader extends AbstractLoader<Condition> {
 
-    private final @Nullable EconomyHook economy = EconomyHook.newInstance();
-
-    public ConditionLoader(@NotNull EnhancedPlugin plugin) {
+    public ConditionLoader() {
         addLoader("ONLINE_PLAYERS", ConstructorLoader.fromInteger(OnlinePlayersCondition::new));
         addLoader("MIN_ONLINE_PLAYERS", ConstructorLoader.fromInteger(MinOnlinePlayersCondition::new));
         addLoader("MAX_ONLINE_PLAYERS", ConstructorLoader.fromInteger(MaxOnlinePlayersCondition::new));
@@ -28,7 +26,7 @@ public class ConditionLoader extends AbstractLoader<Condition> {
 
         final EconomyHook economy = SpigotServer.getEconomyHook();
         if (economy != null) {
-            addLoader("HAS_MONEY", ConstructorLoader.fromDouble(amount -> new PlayerHasMoney(plugin, economy, amount)));
+            addLoader("HAS_MONEY", ConstructorLoader.fromDouble(amount -> new PlayerHasMoney(economy, amount)));
         }
     }
 

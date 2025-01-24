@@ -10,14 +10,12 @@ public class ReloadSubCommand extends LangSubCommand {
     public ReloadSubCommand(@NotNull EnhancedPlugin plugin) {
         super("reload", plugin);
         withCommandExecution((sender, args, placeholders) -> {
-            plugin.getScheduler().runTaskAsync(() -> {
-                try {
-                    plugin.reload();
-                } catch (InvalidConfigurationException e) {
-                    plugin.sendMessage(sender, "config-error-on-reload", placeholders);
-                    throw e;
-                }
-            });
+            try {
+                plugin.reload();
+            } catch (InvalidConfigurationException e) {
+                plugin.sendMessage(sender, "config-error-on-reload", placeholders);
+                throw e;
+            }
             plugin.sendMessage(sender, "reloading", placeholders);
         });
     }

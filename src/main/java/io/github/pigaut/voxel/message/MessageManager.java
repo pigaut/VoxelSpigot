@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.message;
 
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 
 import java.util.*;
@@ -7,6 +8,10 @@ import java.util.*;
 public class MessageManager extends Manager {
 
     private final Map<String, Message> messagesByName = new HashMap<>();
+
+    public MessageManager(EnhancedPlugin plugin) {
+        super(plugin);
+    }
 
     public Message getMessage(String name) {
         return messagesByName.get(name);

@@ -1,28 +1,22 @@
 package io.github.pigaut.voxel.particle;
 
 import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.section.*;
 
 import java.io.*;
 
 public class PluginParticleManager extends ParticleManager {
 
-    private final EnhancedPlugin plugin;
-
     public PluginParticleManager(EnhancedPlugin plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @Override
-    public void disable() {
+    public void loadData() {
         clearParticles();
-    }
-
-    @Override
-    public void load() {
         for (File itemFile : plugin.getFiles("effects/particles")) {
-            final RootSection config = new RootSection(itemFile, plugin.getConfigurator());
-            config.load();
+            final ConfigSection config = ConfigSection.loadConfiguration(itemFile, plugin.getConfigurator());
             for (String key : config.getKeys()) {
                 final ParticleEffect particle = config.get(key, ParticleEffect.class);
                 addParticle(key, particle);

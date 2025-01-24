@@ -6,6 +6,7 @@ import io.github.pigaut.voxel.function.action.*;
 import io.github.pigaut.voxel.function.condition.*;
 import io.github.pigaut.voxel.function.interact.block.*;
 import io.github.pigaut.voxel.function.interact.inventory.*;
+import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.message.*;
 import io.github.pigaut.voxel.message.config.*;
 import io.github.pigaut.voxel.meta.flag.*;
@@ -27,20 +28,18 @@ import org.jetbrains.annotations.*;
 public class PluginConfigurator extends SpigotConfigurator {
 
     private final EnhancedPlugin plugin;
-    private final ConditionLoader conditionLoader;
-    private final ActionLoader actionLoader;
+    private final ConditionLoader conditionLoader = new ConditionLoader();
+    private final ActionLoader actionLoader = new ActionLoader();
 
     public PluginConfigurator(@NotNull EnhancedPlugin plugin) {
         this.plugin = plugin;
-        this.conditionLoader = new ConditionLoader(plugin);
-        this.actionLoader = new ActionLoader(plugin);
-
         addLoader(Placeholder.class, new PlaceholderLoader());
         addLoader(Placeholder[].class, new PlaceholdersLoader());
 
         addLoader(ItemStack.class, new PluginItemStackLoader());
         addLoader(Flag.class, new FlagLoader());
         addLoader(Message.class, new MessageLoader(plugin));
+        addLoader(Hologram.class, new HologramLoader(plugin));
         addLoader(ParticleEffect.class, new ParticleEffectLoader(plugin));
         addLoader(SoundEffect.class, new SoundEffectLoader(plugin));
 

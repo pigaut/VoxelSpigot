@@ -17,11 +17,6 @@ public class TitleMessage implements Message {
     }
 
     @Override
-    public void send(Player player) {
-        title.send(player);
-    }
-
-    @Override
     public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
         title.send(player, placeholderSuppliers);
     }

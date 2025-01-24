@@ -15,12 +15,6 @@ public class ActionBarMessage implements Message {
     }
 
     @Override
-    public void send(Player player) {
-        final String formattedMessage = StringPlaceholders.parseAll(player, message);
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(formattedMessage));
-    }
-
-    @Override
     public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
         final String formattedMessage = StringPlaceholders.parseAll(player, message, placeholderSuppliers);
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(formattedMessage));

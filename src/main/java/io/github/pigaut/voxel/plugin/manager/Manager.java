@@ -1,28 +1,35 @@
 package io.github.pigaut.voxel.plugin.manager;
 
 import io.github.pigaut.voxel.command.*;
+import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.event.*;
 
 import java.util.*;
 
 public abstract class Manager {
 
-    public void enable() {
-        load();
+    protected final EnhancedPlugin plugin;
+
+    protected Manager(EnhancedPlugin plugin) {
+        this.plugin = plugin;
     }
 
-    public void disable() {
-        save();
-    }
+    public void enable() {}
+
+    public void disable() {}
 
     public void reload() {
         disable();
-        load();
+        enable();
+        plugin.getScheduler().runTaskAsync(() -> {
+            saveData();
+            loadData();
+        });
     }
 
-    public void load() { }
+    public void loadData() { }
 
-    public void save() { }
+    public void saveData() { }
 
     public int getAutoSave() { return -1; }
 

@@ -14,11 +14,6 @@ public class ChatMessage implements Message {
     }
 
     @Override
-    public void send(Player player) {
-        Chat.send(player, message);
-    }
-
-    @Override
     public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
         Chat.send(player, message, placeholderSuppliers);
     }

@@ -20,7 +20,7 @@ import org.jetbrains.annotations.*;
 
 public class ActionLoader extends AbstractLoader<Action> {
 
-    public ActionLoader(EnhancedPlugin plugin) {
+    public ActionLoader() {
         //server
         addLoader("BROADCAST", ConstructorLoader.fromString(ServerBroadcast::new));
         addLoader("LIGHTNING", ConstructorLoader.from(Location.class, StrikeLightning::new));
@@ -72,8 +72,8 @@ public class ActionLoader extends AbstractLoader<Action> {
 
         final EconomyHook economy = SpigotServer.getEconomyHook();
         if (economy != null) {
-            addLoader("GIVE_MONEY", ConstructorLoader.fromDouble(amount -> new GivePlayerMoney(plugin, economy, amount)));
-            addLoader("TAKE_MONEY", ConstructorLoader.fromDouble(amount -> new TakePlayerMoney(plugin, economy, amount)));
+            addLoader("GIVE_MONEY", ConstructorLoader.fromDouble(amount -> new GivePlayerMoney(economy, amount)));
+            addLoader("TAKE_MONEY", ConstructorLoader.fromDouble(amount -> new TakePlayerMoney(economy, amount)));
         }
 
     }

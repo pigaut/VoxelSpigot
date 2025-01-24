@@ -1,8 +1,11 @@
 package io.github.pigaut.voxel;
 
+import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.yaml.parser.*;
 import io.github.pigaut.yaml.parser.deserializer.*;
 import org.bukkit.*;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.*;
 import org.bukkit.util.*;
 import org.jetbrains.annotations.*;
 
@@ -31,6 +34,40 @@ public class SpigotLibs {
                 .add(direction.multiply(front));
 
         return location.add(offset);
+    }
+
+    public static boolean areChunksEqual(Chunk chunk, Chunk chunkToCompare) {
+        return chunk.getX() == chunkToCompare.getX() && chunk.getZ() == chunkToCompare.getZ();
+    }
+
+    public static @NotNull World getWorldOrDefault(@NotNull Location location) {
+        final World world = location.getWorld();
+        return world != null ? world : SpigotServer.getDefaultWorld();
+    }
+
+    public static @NotNull ArmorStand createHologram(@NotNull String displayName, @NotNull Location location, boolean persistent) {
+        ArmorStand hologram = (ArmorStand) location.getWorld().spawnEntity(
+                new Location(null, location.getBlockX(), 0, location.getBlockY()),
+                EntityType.ARMOR_STAND
+        );
+        hologram.setVisible(false);
+        hologram.setGravity(false);
+        hologram.setMarker(true);
+        hologram.setArms(false);
+        hologram.setBasePlate(false);
+        hologram.setCanPickupItems(false);
+        for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
+            hologram.addEquipmentLock(equipmentSlot, ArmorStand.LockType.REMOVING_OR_CHANGING);
+        }
+        hologram.setCustomNameVisible(true);
+        hologram.setCustomName(displayName);
+        hologram.teleport(location);
+        hologram.setPersistent(persistent);
+        return hologram;
+    }
+
+    public static @NotNull ArmorStand createHologram(@NotNull Location location, boolean persistent) {
+        return createHologram(ChatColor.GRAY.toString(), location, persistent);
     }
 
 }

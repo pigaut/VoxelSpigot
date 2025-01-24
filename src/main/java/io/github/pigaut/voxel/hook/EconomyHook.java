@@ -32,16 +32,10 @@ public class EconomyHook extends PluginHook {
     }
 
     public EconomyResponse depositMoney(OfflinePlayer player, double amount) {
-        if (!plugin.isEnabled()) {
-            throw new IllegalStateException("Vault plugin is disabled");
-        }
         return economy.depositPlayer(player, amount);
     }
 
     public EconomyResponse withdrawMoney(OfflinePlayer player, double amount) {
-        if (!plugin.isEnabled()) {
-            throw new IllegalStateException("Vault plugin is disabled");
-        }
         return economy.withdrawPlayer(player, amount);
     }
 

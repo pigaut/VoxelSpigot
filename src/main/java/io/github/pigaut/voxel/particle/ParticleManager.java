@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.particle;
 
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 
 import java.util.*;
@@ -7,6 +8,10 @@ import java.util.*;
 public class ParticleManager extends Manager {
 
     private final Map<String, ParticleEffect> particlesByName = new HashMap<>();
+
+    public ParticleManager(EnhancedPlugin plugin) {
+        super(plugin);
+    }
 
     public List<String> getParticleNames() {
         return new ArrayList<>(particlesByName.keySet());

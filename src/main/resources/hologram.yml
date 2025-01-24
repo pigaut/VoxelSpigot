@@ -1,0 +1,30 @@
+
+simple:
+  update: 3
+  offset: { x: 0, y: 0, z: 0}
+  text: Hologram!
+
+multi:
+  - text: Hologram
+    offset: { x: 0, y: 1, z: 0}
+    update: 3
+  - frames:
+      - []
+      - [][]
+      - [][][]
+    offset: { x: 0, y: 1, z: 0}
+    update: 3
+
+
+ready:
+  offset: { x: 0, y: 0, z: 0}
+  lines:
+    -
+  title: "Wheat &7(Ripe)"
+  subtitle:
+    - "Duration: 5s"
+preparing:
+  offset: { x: 0, y: 1, z: 0 }
+  title: "Wheat &7(Growing)"
+  subtitle:
+    - "Time left: {time}"

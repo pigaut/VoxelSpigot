@@ -27,8 +27,6 @@ public interface EnhancedPlugin extends Plugin {
 
     PluginScheduler getScheduler();
 
-    void reloadAsync();
-
     void reload();
 
     @NotNull
