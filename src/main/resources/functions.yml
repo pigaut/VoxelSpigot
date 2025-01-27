@@ -2,6 +2,7 @@
 
 test:
   - if:
+      - has permission example.permission
       - [has permission, example.permission]
       - {condition: has permission, value: example.permission}
     do:

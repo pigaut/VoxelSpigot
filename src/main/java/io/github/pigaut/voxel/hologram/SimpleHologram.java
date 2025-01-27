@@ -58,8 +58,10 @@ public class SimpleHologram implements Hologram {
         @Override
         public void spawn() {
             despawn();
+            if (!location.getChunk().isLoaded()) {
+                return;
+            }
             display = SpigotLibs.createHologram(StringPlaceholders.parseAll(displayName, placeholders), location, persistent);
-
             if (update > 0) {
                 updateTask = new BukkitRunnable() {
                     @Override

@@ -47,7 +47,7 @@ public class SpigotLibs {
 
     public static @NotNull ArmorStand createHologram(@NotNull String displayName, @NotNull Location location, boolean persistent) {
         ArmorStand hologram = (ArmorStand) location.getWorld().spawnEntity(
-                new Location(null, location.getBlockX(), 0, location.getBlockY()),
+                new Location(null, location.getBlockX(), 3, location.getBlockY()),
                 EntityType.ARMOR_STAND
         );
         hologram.setVisible(false);
@@ -59,15 +59,15 @@ public class SpigotLibs {
         for (EquipmentSlot equipmentSlot : EquipmentSlot.values()) {
             hologram.addEquipmentLock(equipmentSlot, ArmorStand.LockType.REMOVING_OR_CHANGING);
         }
-        hologram.setCustomNameVisible(true);
-        hologram.setCustomName(displayName);
         hologram.teleport(location);
         hologram.setPersistent(persistent);
+        hologram.setCustomNameVisible(true);
+        hologram.setCustomName(displayName);
         return hologram;
     }
 
     public static @NotNull ArmorStand createHologram(@NotNull Location location, boolean persistent) {
-        return createHologram(ChatColor.GRAY.toString(), location, persistent);
+        return createHologram("&7", location, persistent);
     }
 
 }

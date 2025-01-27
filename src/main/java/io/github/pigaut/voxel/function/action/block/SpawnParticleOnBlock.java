@@ -17,7 +17,7 @@ public class SpawnParticleOnBlock implements Action {
     @Override
     public void execute(@Nullable PluginPlayer player, @Nullable Block block) {
         if (block != null) {
-            particle.spawn(player != null ? player.asPlayer() : null, block.getLocation());
+            particle.spawn(player != null ? player.asPlayer() : null, block.getLocation().add(0.5, 0.5, 0.5));
         }
     }
 

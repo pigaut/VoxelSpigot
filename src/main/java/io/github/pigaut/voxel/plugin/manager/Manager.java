@@ -31,13 +31,9 @@ public abstract class Manager {
 
     public void saveData() { }
 
-    public int getAutoSave() { return -1; }
+    public boolean isAutoSave() { return false; }
 
     public List<Listener> getListeners() {
-        return List.of();
-    }
-
-    public List<EnhancedCommand> getCommands() {
         return List.of();
     }
 

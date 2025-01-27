@@ -16,6 +16,7 @@ import io.github.pigaut.voxel.particle.config.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.sound.*;
 import io.github.pigaut.voxel.sound.config.*;
+import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
 import io.github.pigaut.yaml.itemstack.*;
@@ -36,6 +37,7 @@ public class PluginConfigurator extends SpigotConfigurator {
         addLoader(Placeholder.class, new PlaceholderLoader());
         addLoader(Placeholder[].class, new PlaceholdersLoader());
 
+        addLoader(Amount.class, new AmountLoader());
         addLoader(ItemStack.class, new PluginItemStackLoader());
         addLoader(Flag.class, new FlagLoader());
         addLoader(Message.class, new MessageLoader(plugin));
@@ -57,6 +59,35 @@ public class PluginConfigurator extends SpigotConfigurator {
 
     public ActionLoader getActionLoader() {
         return actionLoader;
+    }
+
+    protected class AmountLoader implements ConfigLoader<Amount> {
+        @Override
+        public @NotNull String getProblemDescription() {
+            return "Could not load amount";
+        }
+
+        @Override
+        public @NotNull Amount loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
+            final Double amount = scalar.asDouble().orElse(null);
+            if (amount != null) {
+                return new Amount.Single(amount);
+            }
+            final String[] range = scalar.toString().split("-");
+            if (range.length != 2) {
+                throw new InvalidConfigurationException(scalar, "Expected a number or range");
+            }
+            try {
+                final double min = Deserializers.deserializeDouble(range[0]);
+                final double max = Deserializers.deserializeDouble(range[1]);
+                if (min >= max) {
+                    throw new InvalidConfigurationException(scalar, "Range minimum must be greater than the maximum");
+                }
+                return new Amount.Range(min, max);
+            } catch (DeserializationException e) {
+                throw new InvalidConfigurationException(scalar, e.getMessage());
+            }
+        }
     }
 
     protected class PluginItemStackLoader extends ItemStackLoader {

@@ -65,6 +65,9 @@ public class AnimatedHologram implements Hologram {
         @Override
         public void spawn() {
             despawn();
+            if (!location.getChunk().isLoaded()) {
+                return;
+            }
             display = SpigotLibs.createHologram(location, persistent);
             updateTask = new BukkitRunnable() {
                 int interval = 0;

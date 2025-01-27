@@ -4,11 +4,11 @@ import io.github.pigaut.voxel.meta.flag.*;
 import io.github.pigaut.voxel.player.*;
 import org.jetbrains.annotations.*;
 
-public class AddPlayerFlag implements PlayerAction {
+public class GiveFlagToPlayer implements PlayerAction {
 
     private final Flag flag;
 
-    public AddPlayerFlag(Flag flag) {
+    public GiveFlagToPlayer(Flag flag) {
         this.flag = flag;
     }
 

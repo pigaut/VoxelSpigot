@@ -49,6 +49,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final List<Manager> loadedManagers = new ArrayList<>();
     private RootSection config;
     private UpdateChecker updateChecker = null;
+    private Metrics metrics = null;
 
     @Override
     public void onEnable() {
@@ -65,28 +66,15 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         loadedManagers.clear();
     }
 
-    @Override
-    public void reload() {
-        initialize();
-        for (Manager manager : loadedManagers) {
-            manager.disable();
-            manager.enable();
-            scheduler.runTaskAsync(() -> {
-                manager.saveData();
-                manager.loadData();
-            });
-        }
-    }
-
-    private void initialize() {
+    public void initialize() {
         checkSpigotVersion();
         createMetrics();
         createHooks();
         createFiles();
-        checkForUpdates();
+        createUpdateChecker();
     }
 
-    private void checkSpigotVersion() throws UnsupportedVersionException {
+    public void checkSpigotVersion() throws UnsupportedVersionException {
         final SpigotVersion serverVersion = SpigotServer.getVersion();
         if (serverVersion == SpigotVersion.UNKNOWN) {
             logger.severe("Found unknown server version");
@@ -105,11 +93,9 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         for (String directory : getPluginDirectories()) {
             createDirectory(directory);
         }
-
         for (String resource : getPluginResources()) {
             saveResource(resource);
         }
-
         config = new RootSection(getFile("config.yml"), getConfigurator());
         config.load();
         if (config.getOptionalBoolean("generate-examples").orElse(true)) {
@@ -119,29 +105,26 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
     }
 
-    private void createMetrics() {
+    public void createMetrics() {
         final Integer metricsId = getMetricsId();
-        if (metricsId != null) {
-            new Metrics(this, metricsId);
+        if (metricsId != null && metrics != null) {
+            metrics = new Metrics(this, metricsId);
             logger.info("Created bStats metrics with id: " + metricsId);
         }
     }
 
-    private void checkForUpdates() {
+    public void createUpdateChecker() {
         if (!config.getOptionalBoolean("check-for-updates").orElse(true)) {
             return;
         }
-
         if (updateChecker != null) {
             updateChecker.checkNow();
             return;
         }
-
         final Integer spigotId = getResourceId();
         if (spigotId == null) {
             return;
         }
-
         updateChecker = new UpdateChecker(this, UpdateCheckSource.SPIGET, Integer.toString(spigotId))
                 .setDownloadLink("https://www.spigotmc.org/resources/" + spigotId)
                 .setChangelogLink("https://www.spigotmc.org/resources/" + spigotId + "/updates")
@@ -169,16 +152,18 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
 
         getCommand("");
+        final int autoSave = config.getOptionalInteger("auto-save").orElse(0);
         for (Manager manager : loadedManagers) {
             manager.enable();
             manager.loadData();
             manager.getListeners().forEach(this::registerListener);
-            manager.getCommands().forEach(this::registerCommand);
-            final int autoSave = manager.getAutoSave();
-            if (autoSave > 0) {
+            if (manager.isAutoSave() && autoSave > 0) {
                 scheduler.runTaskTimerAsync(autoSave, manager::saveData);
             }
         }
+
+        getPluginCommands().forEach(this::registerCommand);
+        getPluginListeners().forEach(this::registerListener);
     }
 
     @Override
@@ -203,19 +188,29 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         return null;
     }
 
-    @Override
     public List<String> getPluginDirectories() {
-        return Collections.emptyList();
+        return List.of();
     }
 
-    @Override
     public List<String> getPluginResources() {
-        return Collections.emptyList();
+        return List.of();
+    }
+
+    public List<String> getExampleResources() {
+        return List.of();
+    }
+
+    public List<EnhancedCommand> getPluginCommands() {
+        return List.of();
+    }
+
+    public List<Listener> getPluginListeners() {
+        return List.of();
     }
 
     @Override
-    public List<String> getExampleResources() {
-        return Collections.emptyList();
+    public List<Manager> getLoadedManagers() {
+        return new ArrayList<>(loadedManagers);
     }
 
     @Override

@@ -29,8 +29,8 @@ help-footer: '&2---------------------------------------------'
 reload-command: reload
 reload-permission: orestack.reload
 reload-description: 'Reload configuration and data'
-reloading: '&aReloading Orestack plugin...'
-config-error-on-reload: '&4Found a config error, check console for more information'
+reloading: '&aReloading Orestack plugin... &c(Wait)'
+reload-complete: '&aReload completed successfully'
 
 # Item Command
 item-command: item
@@ -55,6 +55,44 @@ item-not-found: '&4Could not find an item with name: %item-name%'
 adding-item: '&aAdding %item-name% item to "%file-path%" file...'
 received-item: '&aYou received x1 %item-name% item'
 
+# Message
+message-command: message
+message-permission: orestack.message
+## Parameters
+message-name-parameter: message-name
+## Send message
+send-message-command: send
+send-message-permission: orestack.message.send
+send-message-description: 'Send a message to the target player'
+## Broadcast message
+broadcast-message-command: broadcast
+broadcast-message-permission: orestack.message.broadcast
+broadcast-message-description: 'Send a message to all online players'
+## Success
+sent-message-to-player: '&aMessage sent successfully to %online-player%'
+sent-message-to-all: '&aMessage sent successfully to all online players'
+## Errors
+message-not-found: '&4Could not find a message with name: %message-name%'
+
+# Sound
+sound-command: sound
+sound-permission: orestack.sound
+## Parameters
+sound-name-parameter: sound-name
+## Play sound
+play-sound-command: play
+play-sound-permission: orestack.sound.play
+play-sound-description: 'Plays a sound at the specified location'
+## Play sound to
+play-sound-to-command: play-to
+play-sound-to-permission: orestack.sound.play-to
+play-sound-to-description: "Plays a sound at the target player's location"
+## Success
+played-sound: '&aPlayed sound successfully at %world-name%, %x%, %y%, %z%'
+played-sound-at-player: '&aPlayed sound at %online-player%''s location'
+## Errors
+sound-not-found: '&4Could not find a sound with name: %sound-name%'
+
 # Particle
 particle-command: particle
 particle-permission: orestack.particle
@@ -78,3 +116,5 @@ particle-not-found: '&4Could not find a particle with name: %particle-name%'
 spawned-particle: '&aSpawned a particle effect in %world-name% at x: %x%, y: %y%, z: %z%'
 spawned-particle-at-player: '&aSpawned a particle at %online-player%''s location'
 showed-me-particle: '&aParticle spawned two blocks in front of you'
+
+

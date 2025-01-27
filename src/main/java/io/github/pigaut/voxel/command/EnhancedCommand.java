@@ -68,7 +68,6 @@ public abstract class EnhancedCommand extends BukkitCommand {
             subArgs = Arrays.copyOfRange(args, i, args.length);
             break;
         }
-
         return currentCommand.tabComplete(sender, subArgs);
     }
 

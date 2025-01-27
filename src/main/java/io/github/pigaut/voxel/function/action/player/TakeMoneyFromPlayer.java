@@ -2,22 +2,22 @@ package io.github.pigaut.voxel.function.action.player;
 
 import io.github.pigaut.voxel.hook.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.util.*;
 import org.jetbrains.annotations.*;
 
-public class TakePlayerMoney implements PlayerAction {
+public class TakeMoneyFromPlayer implements PlayerAction {
 
     private final EconomyHook economy;
-    private final double amount;
+    private final Amount amount;
 
-    public TakePlayerMoney(@NotNull EconomyHook economy, double amount) {
+    public TakeMoneyFromPlayer(@NotNull EconomyHook economy, Amount amount) {
         this.economy = economy;
         this.amount = amount;
     }
 
     @Override
     public void execute(@NotNull PluginPlayer player) {
-        economy.withdrawMoney(player.asPlayer(), amount);
+        economy.withdrawMoney(player.asPlayer(), amount.getDouble());
     }
 
 }

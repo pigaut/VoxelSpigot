@@ -48,7 +48,7 @@ public class MessageLoader implements ConfigLoader<Message> {
 
             case "BOSSBAR" -> {
                 message = new BossBarMessage(plugin,
-                        section.getString("title"),
+                        section.getString("title", StringColor.FORMATTER),
                         section.getOptional("style", BarStyle.class).orElse(BarStyle.SEGMENTED_6),
                         section.getOptional("color", BarColor.class).orElse(BarColor.RED),
                         section.getOptionalInteger("duration").orElse(100),
@@ -58,8 +58,8 @@ public class MessageLoader implements ConfigLoader<Message> {
 
             case "TITLE" -> {
                 message = new TitleMessage(
-                        section.getString("title"),
-                        section.getOptionalString("subtitle").orElse(""),
+                        section.getString("title", StringColor.FORMATTER),
+                        section.getOptionalString("subtitle", StringColor.FORMATTER).orElse(""),
                         section.getOptionalInteger("fade-in").orElse(20),
                         section.getOptionalInteger("stay").orElse(60),
                         section.getOptionalInteger("fade-out").orElse(20)

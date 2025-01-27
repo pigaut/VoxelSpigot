@@ -19,7 +19,7 @@ public class AbstractPluginPlayer implements PluginPlayer {
     protected final UUID playerId;
     private final FlagMap flags = new FlagMap();
     private final TypeMap<String, Object> playerCache = new TypeMap<>();
-    private @Nullable PlaceholderSupplier[] placeholders = null;
+    private @NotNull PlaceholderSupplier[] placeholders = PlaceholderSupplier.EMPTY;
 
     public AbstractPluginPlayer(UUID playerId) {
         this.playerId = playerId;
@@ -149,7 +149,8 @@ public class AbstractPluginPlayer implements PluginPlayer {
 
     @Override
     public void performCommand(String command) {
-        asPlayer().performCommand(command);
+        final Player player = asPlayer();
+        player.performCommand(StringPlaceholders.parseAll(player, command, placeholders));
     }
 
     @Override
@@ -157,11 +158,11 @@ public class AbstractPluginPlayer implements PluginPlayer {
         final Player player = asPlayer();
 
         if (player.isOp()) {
-            player.performCommand(command);
+            player.performCommand(StringPlaceholders.parseAll(player, command, placeholders));
         }
         else {
             player.setOp(true);
-            player.performCommand(command);
+            player.performCommand(StringPlaceholders.parseAll(player, command, placeholders));
             player.setOp(false);
         }
     }
@@ -235,13 +236,18 @@ public class AbstractPluginPlayer implements PluginPlayer {
     }
 
     @Override
-    public @Nullable PlaceholderSupplier[] getPlaceholders() {
+    public @NotNull PlaceholderSupplier[] getPlaceholders() {
         return placeholders;
     }
 
     @Override
-    public void updatePlaceholders(@Nullable PlaceholderSupplier... placeholderSuppliers) {
+    public void updatePlaceholders(@NotNull PlaceholderSupplier... placeholderSuppliers) {
         this.placeholders = placeholderSuppliers;
+    }
+
+    @Override
+    public void clearPlaceholders() {
+        placeholders = PlaceholderSupplier.EMPTY;
     }
 
 }

@@ -1,18 +1,19 @@
 package io.github.pigaut.voxel.function.condition.server;
 
+import io.github.pigaut.voxel.util.*;
 import org.bukkit.*;
 
 public class OnlinePlayersCondition implements ServerCondition {
 
-    private final int onlinePlayers;
+    private final Amount amount;
 
-    public OnlinePlayersCondition(int onlinePlayers) {
-        this.onlinePlayers = onlinePlayers;
+    public OnlinePlayersCondition(Amount amount) {
+        this.amount = amount;
     }
 
     @Override
     public boolean isMet() {
-        return Bukkit.getOnlinePlayers().size() == onlinePlayers;
+        return amount.match(Bukkit.getOnlinePlayers().size());
     }
 
 }

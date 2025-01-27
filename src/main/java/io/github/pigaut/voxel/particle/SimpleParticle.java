@@ -9,17 +9,17 @@ public class SimpleParticle implements ParticleEffect {
 
     private final Particle particle;
     private final int count;
-    private final double offsetX, offsetY, offsetZ;
+    private final double rangeX, rangeY, rangeZ;
     private final boolean force;
     private final boolean playerOnly;
 
-    public SimpleParticle(Particle particle, int count, double offsetX, double offsetY, double offsetZ,
+    public SimpleParticle(Particle particle, int count, double rangeX, double rangeY, double rangeZ,
                           boolean force, boolean playerOnly) {
         this.particle = particle;
         this.count = count;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.offsetZ = offsetZ;
+        this.rangeX = rangeX;
+        this.rangeY = rangeY;
+        this.rangeZ = rangeZ;
         this.force = force;
         this.playerOnly = playerOnly;
     }
@@ -28,7 +28,7 @@ public class SimpleParticle implements ParticleEffect {
     public void spawn(@Nullable Player player, @NotNull Location location) {
         if (playerOnly) {
             if (player != null) {
-                player.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ);
+                player.spawnParticle(particle, location, count, rangeX, rangeY, rangeZ);
             }
             return;
         }
@@ -37,7 +37,7 @@ public class SimpleParticle implements ParticleEffect {
         if (world == null) {
             world = SpigotServer.getDefaultWorld();
         }
-        world.spawnParticle(particle, location, count, offsetX, offsetY, offsetZ, 0, null, force);
+        world.spawnParticle(particle, location, count, rangeX, rangeY, rangeZ, 0, null, force);
     }
 
 }

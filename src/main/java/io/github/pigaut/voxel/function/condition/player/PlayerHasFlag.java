@@ -9,24 +9,15 @@ import java.util.*;
 
 public class PlayerHasFlag implements PlayerCondition {
 
-    private final List<String> flags;
+    private final String flag;
 
     public PlayerHasFlag(String flag) {
-        this.flags = List.of(flag);
-    }
-
-    public PlayerHasFlag(List<String> flags) {
-        this.flags = flags;
+        this.flag = flag;
     }
 
     @Override
     public boolean isMet(@NotNull PluginPlayer player) {
-        for (String flag : flags) {
-            if (!player.hasFlag(flag)) {
-                return false;
-            }
-        }
-        return true;
+        return player.hasFlag(flag);
     }
 
 }

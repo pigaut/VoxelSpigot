@@ -9,6 +9,7 @@ import io.github.pigaut.voxel.meta.flag.*;
 import io.github.pigaut.voxel.meta.placeholder.*;
 import io.github.pigaut.voxel.particle.*;
 import io.github.pigaut.voxel.player.*;
+import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
 import io.github.pigaut.voxel.sound.*;
 import io.github.pigaut.voxel.version.*;
@@ -27,19 +28,10 @@ public interface EnhancedPlugin extends Plugin {
 
     PluginScheduler getScheduler();
 
-    void reload();
-
     @NotNull
     List<SpigotVersion> getCompatibleVersions();
 
-    @NotNull
-    List<String> getPluginDirectories();
-
-    @NotNull
-    List<String> getPluginResources();
-
-    @NotNull
-    List<String> getExampleResources();
+    List<Manager> getLoadedManagers();
 
     @NotNull
     CommandManager getCommands();

@@ -227,8 +227,9 @@ public interface PluginPlayer {
 
     void flushCache(String id, Class<?> type);
 
-    @Nullable PlaceholderSupplier[] getPlaceholders();
+    @NotNull PlaceholderSupplier[] getPlaceholders();
 
-    void updatePlaceholders(@Nullable PlaceholderSupplier... placeholderSuppliers);
+    void updatePlaceholders(@NotNull PlaceholderSupplier... placeholderSuppliers);
 
+    void clearPlaceholders();
 }

@@ -13,6 +13,10 @@ public class MessageManager extends Manager {
         super(plugin);
     }
 
+    public List<String> getMessageNames() {
+        return new ArrayList<>(messagesByName.keySet());
+    }
+
     public Message getMessage(String name) {
         return messagesByName.get(name);
     }

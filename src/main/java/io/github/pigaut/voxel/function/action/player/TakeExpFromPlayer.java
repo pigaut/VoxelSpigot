@@ -1,19 +1,20 @@
 package io.github.pigaut.voxel.function.action.player;
 
 import io.github.pigaut.voxel.player.*;
+import io.github.pigaut.voxel.util.*;
 import org.jetbrains.annotations.*;
 
-public class RemovePlayerExp implements PlayerAction {
+public class TakeExpFromPlayer implements PlayerAction {
 
-    private final int amount;
+    private final Amount amount;
 
-    public RemovePlayerExp(int amount) {
+    public TakeExpFromPlayer(Amount amount) {
         this.amount = amount;
     }
 
     @Override
     public void execute(@NotNull PluginPlayer player) {
-        player.addExp(amount);
+        player.addExp(-amount.getInt());
     }
 
 }
