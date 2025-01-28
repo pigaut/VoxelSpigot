@@ -13,7 +13,9 @@ import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
 import io.github.pigaut.voxel.sound.*;
 import io.github.pigaut.voxel.version.*;
+import io.github.pigaut.yaml.node.scalar.*;
 import io.github.pigaut.yaml.node.section.*;
+import io.github.pigaut.yaml.node.sequence.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -25,6 +27,14 @@ import java.io.*;
 import java.util.*;
 
 public interface EnhancedPlugin extends Plugin {
+
+    boolean isDebug();
+
+    RootSection loadConfigSection(@NotNull File file);
+
+    RootSequence loadConfigSequence(@NotNull File file);
+
+    RootScalar loadConfigScalar(@NotNull File file);
 
     PluginScheduler getScheduler();
 
@@ -83,13 +93,10 @@ public interface EnhancedPlugin extends Plugin {
     Message getMessage(String name);
 
     @NotNull
-    String getLang(String name);
+    String getLang(String name) throws LangNotFoundException;
 
     @NotNull
     String getLang(String name, String def);
-
-    @NotNull
-    String getLang(Locale locale, String name);
 
     void sendMessage(Player player, String messageId);
 

@@ -12,7 +12,7 @@ public class PluginFlagManager extends FlagManager {
     @Override
     public void loadData() {
         clearFlags();
-        final ConfigSection config = ConfigSection.loadConfiguration(plugin.getFile("flags.yml"));
+        final ConfigSection config = plugin.loadConfigSection(plugin.getFile("flags.yml"));
         for (ConfigSection section : config.getNestedSections()) {
             addFlag(new Flag(section.getKey(),
                     section.getOptionalString("group").orElse("default"),

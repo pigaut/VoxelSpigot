@@ -18,7 +18,8 @@ public class ReloadSubCommand extends LangSubCommand {
         super("reload", plugin);
         withCommandExecution((sender, args, placeholders) -> {
             plugin.sendMessage(sender, "reloading", placeholders);
-            plugin.initialize();
+            plugin.createHooks();
+            plugin.createFiles();
             final List<Manager> loadedManagers = plugin.getLoadedManagers();
             for (Manager manager : loadedManagers) {
                 manager.disable();

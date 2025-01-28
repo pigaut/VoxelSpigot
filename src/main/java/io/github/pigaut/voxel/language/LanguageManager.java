@@ -10,7 +10,7 @@ import java.util.*;
 public class LanguageManager extends Manager {
 
     private Locale defaultLanguage = Locale.ENGLISH;
-    protected final Table<Locale, String, String> dictionary = new Table();
+    private final Map<String, String> dictionary = new HashMap<>();
 
     public LanguageManager(EnhancedPlugin plugin) {
         super(plugin);
@@ -27,7 +27,7 @@ public class LanguageManager extends Manager {
 
     @NotNull
     public String getLang(String name) throws LangNotFoundException {
-        final String lang = dictionary.get(defaultLanguage, name);
+        final String lang = dictionary.get(name);
         if (lang == null) {
             throw new LangNotFoundException(defaultLanguage, name);
         }
@@ -36,24 +36,11 @@ public class LanguageManager extends Manager {
 
     @NotNull
     public String getLang(String name, String def) {
-        final String lang = dictionary.get(defaultLanguage, name);
-        return lang != null ? lang : def;
+        return dictionary.getOrDefault(name, def);
     }
 
-    @NotNull
-    public String getLang(Locale language, String name) {
-        final String lang = dictionary.get(defaultLanguage, name);
-        return lang != null ? lang : "No message found for language: " + language + " (" + name + ")";
-    }
-
-    @NotNull
-    public String getLang(Locale language, String name, String def) {
-        final String lang = dictionary.get(language, name);
-        return lang != null ? lang : def;
-    }
-
-    public void addLang(Locale language, String name, String message) {
-        dictionary.put(language, name, message);
+    public void addLang(String name, String message) {
+        dictionary.put(name, message);
     }
 
     public void clearDictionary() {

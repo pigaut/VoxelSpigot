@@ -16,7 +16,7 @@ public class PluginSoundManager extends SoundManager {
     public void loadData() {
         clearSounds();
         for (File itemFile : plugin.getFiles("effects/sounds")) {
-            final ConfigSection config = ConfigSection.loadConfiguration(itemFile, plugin.getConfigurator());
+            final ConfigSection config = plugin.loadConfigSection(itemFile);
             for (String key : config.getKeys()) {
                 final SoundEffect sound = config.get(key, SoundEffect.class);
                 addSound(key, sound);

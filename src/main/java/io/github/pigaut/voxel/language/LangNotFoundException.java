@@ -5,7 +5,7 @@ import java.util.*;
 public class LangNotFoundException extends RuntimeException {
 
     public LangNotFoundException(Locale locale, String id) {
-        super("No message found for language '" + locale + "' with id '" + id + "'. Please fix your language file.");
+        super("Message with id: " + id + " not found for language: " + locale + ". Please fix your language file.");
     }
 
 }

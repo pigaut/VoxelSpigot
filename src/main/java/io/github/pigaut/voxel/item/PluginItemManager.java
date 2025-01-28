@@ -17,7 +17,7 @@ public class PluginItemManager extends ItemManager {
     public void loadData() {
         clearItems();
         for (File itemFile : plugin.getFiles("items")) {
-            final ConfigSection config = ConfigSection.loadConfiguration(itemFile, plugin.getConfigurator());
+            final ConfigSection config = plugin.loadConfigSection(itemFile);
             for (String key : config.getKeys()) {
                 final ItemStack item = config.get(key, ItemStack.class);
                 addItemStack(key, item);

@@ -16,7 +16,7 @@ public class PluginParticleManager extends ParticleManager {
     public void loadData() {
         clearParticles();
         for (File itemFile : plugin.getFiles("effects/particles")) {
-            final ConfigSection config = ConfigSection.loadConfiguration(itemFile, plugin.getConfigurator());
+            final ConfigSection config = plugin.loadConfigSection(itemFile);
             for (String key : config.getKeys()) {
                 final ParticleEffect particle = config.get(key, ParticleEffect.class);
                 addParticle(key, particle);

@@ -16,7 +16,7 @@ public class PluginMessageManager extends MessageManager {
     public void loadData() {
         clearMessages();
         for (File langFile : plugin.getFiles("messages")) {
-            final ConfigSection config = ConfigSection.loadConfiguration(langFile, plugin.getConfigurator());
+            final ConfigSection config = plugin.loadConfigSection(langFile);
             for (String key : config.getKeys()) {
                 final Message message = config.get(key, Message.class);
                 addMessage(key, message);

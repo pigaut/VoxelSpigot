@@ -17,7 +17,9 @@ import io.github.pigaut.voxel.sound.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.*;
+import io.github.pigaut.yaml.node.scalar.*;
 import io.github.pigaut.yaml.node.section.*;
+import io.github.pigaut.yaml.node.sequence.*;
 import org.bstats.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
@@ -50,6 +52,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private RootSection config;
     private UpdateChecker updateChecker = null;
     private Metrics metrics = null;
+    private boolean debug = true;
 
     @Override
     public void onDisable() {
@@ -62,15 +65,11 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     @Override
     public void onEnable() {
-        this.initialize();
-        this.loadManagers();
-    }
-
-    public void initialize() {
         checkSpigotVersion();
-        createMetrics();
         createHooks();
         createFiles();
+        loadManagers();
+        createMetrics();
         createUpdateChecker();
     }
 
@@ -91,6 +90,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     public void createFiles() {
+        logger.info("Generating directories and files...");
         for (String directory : getPluginDirectories()) {
             createDirectory(directory);
         }
@@ -100,6 +100,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         config = new RootSection(getFile("config.yml"), getConfigurator());
         config.load();
         if (config.getOptionalBoolean("generate-examples").orElse(true)) {
+            logger.info("Generating example files...");
             for (String exampleResource : getExampleResources()) {
                 saveResource(exampleResource);
             }
@@ -136,6 +137,8 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     private void loadManagers() {
+        debug = config.getOptionalBoolean("debug").orElse(true);
+
         loadedManagers.add(languageManager);
         loadedManagers.add(commandManager);
         loadedManagers.add(playerManager);
@@ -174,6 +177,38 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
         getPluginCommands().forEach(this::registerCommand);
         getPluginListeners().forEach(this::registerListener);
+    }
+
+    @Override
+    public boolean isDebug() {
+        return false;
+    }
+
+    @Override
+    public RootSection loadConfigSection(@NotNull File file) {
+        final RootSection config = new RootSection(file, this.getConfigurator());
+        config.setDebug(debug);
+        config.setPrefix("Orestack");
+        config.load();
+        return config;
+    }
+
+    @Override
+    public RootSequence loadConfigSequence(@NotNull File file) {
+        final RootSequence config = new RootSequence(file, this.getConfigurator());
+        config.setDebug(debug);
+        config.setPrefix("Orestack");
+        config.load();
+        return config;
+    }
+
+    @Override
+    public RootScalar loadConfigScalar(@NotNull File file) {
+        final RootScalar config = new RootScalar(file, this.getConfigurator());
+        config.setDebug(debug);
+        config.setPrefix("Orestack");
+        config.load();
+        return config;
     }
 
     @Override
@@ -284,11 +319,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public @NotNull String getLang(String name, String def) {
         return languageManager.getLang(name, def);
-    }
-
-    @Override
-    public @NotNull String getLang(Locale locale, String name) {
-        return languageManager.getLang(locale, name);
     }
 
     @Override

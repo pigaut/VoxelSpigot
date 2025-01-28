@@ -18,19 +18,36 @@ public class PluginLanguageManager extends LanguageManager {
 
     @Override
     public void loadData() {
-        setDefaultLanguage(plugin.getConfiguration().getOptional("language", Locale.class).orElse(Locale.ENGLISH));
-        clearDictionary();
-        for (File langFile : plugin.getFiles("languages")) {
-            final RootSection config = ConfigSection.loadConfiguration(langFile);
-            final String name = config.getName();
-            final Locale locale = Locale.forLanguageTag(name);
-            if (locale == null) {
-                throw new ConfigurationLoadException(config, "'" + name + "' is not a valid language tag.");
+        final ConfigSection config = plugin.getConfiguration();
+        final Locale defaultLanguage = config.get("language", Locale.class);
+        setDefaultLanguage(defaultLanguage);
+
+        final String languageFilePath = "languages/" + defaultLanguage.getLanguage() + ".yml";
+        final File languageFile = plugin.getFile(languageFilePath);
+        if (!languageFile.exists()) {
+            throw new InvalidConfigurationException(config, "language", "Could not find language file at path: " + languageFilePath);
+        }
+
+        final RootSection languageConfig = plugin.loadConfigSection(languageFile);
+        final RootSection languageDefaults = new RootSection();
+        try (InputStream inputStream = plugin.getClass().getClassLoader().getResourceAsStream("languages/" + languageConfig.getFile().getName())) {
+            if (inputStream != null) {
+                languageDefaults.load(inputStream);
             }
-            for (String key : config.getKeys()) {
-                final String value = config.getString(key, StringColor.FORMATTER);
-                addLang(locale, StringFormatter.toKebabCase(key), value);
+        } catch (IOException ignored) {}
+
+        final Set<String> languageIds = languageConfig.getKeys();
+        for (String langId : languageDefaults.getKeys()) {
+            if (!languageIds.contains(langId)) {
+                final String value = languageDefaults.getString(langId, StringColor.FORMATTER);
+                addLang(StringFormatter.toKebabCase(langId), value);
+                plugin.getLogger().warning("Message with id " + langId + " not found in " + languageFilePath + ". Please fix your language file.");
             }
+        }
+
+        for (String key : languageConfig.getKeys()) {
+            final String value = languageConfig.getString(key, StringColor.FORMATTER);
+            addLang(StringFormatter.toKebabCase(key), value);
         }
     }
 
