@@ -52,18 +52,18 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private Metrics metrics = null;
 
     @Override
-    public void onEnable() {
-        this.initialize();
-        this.loadManagers();
-    }
-
-    @Override
     public void onDisable() {
         for (Manager manager : loadedManagers) {
             manager.disable();
             manager.saveData();
         }
         loadedManagers.clear();
+    }
+
+    @Override
+    public void onEnable() {
+        this.initialize();
+        this.loadManagers();
     }
 
     public void initialize() {
@@ -87,7 +87,8 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
     }
 
-    public void createHooks() {}
+    public void createHooks() {
+    }
 
     public void createFiles() {
         for (String directory : getPluginDirectories()) {
@@ -152,14 +153,23 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
 
         getCommand("");
-        final int autoSave = config.getOptionalInteger("auto-save").orElse(0);
         for (Manager manager : loadedManagers) {
             manager.enable();
             manager.loadData();
             manager.getListeners().forEach(this::registerListener);
-            if (manager.isAutoSave() && autoSave > 0) {
-                scheduler.runTaskTimerAsync(autoSave, manager::saveData);
-            }
+        }
+
+        final int autoSave = config.getOptionalInteger("auto-save").orElse(0);
+        if (autoSave > 0) {
+            scheduler.runTaskTimerAsync(autoSave, () -> {
+                logger.info("Saving data to database...");
+                for (Manager manager : loadedManagers) {
+                    if (manager.isAutoSave()) {
+                        manager.saveData();
+                    }
+                }
+                logger.info("Data saved successfully to database.");
+            });
         }
 
         getPluginCommands().forEach(this::registerCommand);
@@ -174,38 +184,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public List<SpigotVersion> getCompatibleVersions() {
         return List.of(SpigotVersion.values());
-    }
-
-    public @Nullable Integer getMetricsId() {
-        return null;
-    }
-
-    public @Nullable Integer getResourceId() {
-        return null;
-    }
-
-    public @Nullable String getDonationLink() {
-        return null;
-    }
-
-    public List<String> getPluginDirectories() {
-        return List.of();
-    }
-
-    public List<String> getPluginResources() {
-        return List.of();
-    }
-
-    public List<String> getExampleResources() {
-        return List.of();
-    }
-
-    public List<EnhancedCommand> getPluginCommands() {
-        return List.of();
-    }
-
-    public List<Listener> getPluginListeners() {
-        return List.of();
     }
 
     @Override
@@ -393,6 +371,38 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public void registerListener(Listener listener) {
         getServer().getPluginManager().registerEvents(listener, this);
+    }
+
+    public @Nullable Integer getMetricsId() {
+        return null;
+    }
+
+    public @Nullable Integer getResourceId() {
+        return null;
+    }
+
+    public @Nullable String getDonationLink() {
+        return null;
+    }
+
+    public List<String> getPluginDirectories() {
+        return List.of();
+    }
+
+    public List<String> getPluginResources() {
+        return List.of();
+    }
+
+    public List<String> getExampleResources() {
+        return List.of();
+    }
+
+    public List<EnhancedCommand> getPluginCommands() {
+        return List.of();
+    }
+
+    public List<Listener> getPluginListeners() {
+        return List.of();
     }
 
     private void collectYamlFiles(File directory, List<File> yamlFiles) {

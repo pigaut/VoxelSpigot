@@ -18,6 +18,7 @@ public class PluginLanguageManager extends LanguageManager {
 
     @Override
     public void loadData() {
+        setDefaultLanguage(plugin.getConfiguration().getOptional("language", Locale.class).orElse(Locale.ENGLISH));
         clearDictionary();
         for (File langFile : plugin.getFiles("languages")) {
             final RootSection config = ConfigSection.loadConfiguration(langFile);
