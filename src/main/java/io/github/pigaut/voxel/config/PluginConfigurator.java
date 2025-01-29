@@ -64,7 +64,7 @@ public class PluginConfigurator extends SpigotConfigurator {
     protected class AmountLoader implements ConfigLoader<Amount> {
         @Override
         public @NotNull String getProblemDescription() {
-            return "Could not load amount";
+            return "invalid amount";
         }
 
         @Override
@@ -119,6 +119,11 @@ public class PluginConfigurator extends SpigotConfigurator {
     }
 
     protected class FlagLoader implements ScalarLoader<Flag> {
+        @Override
+        public @Nullable String getProblemDescription() {
+            return "invalid flag";
+        }
+
         @Override
         public @NotNull Flag loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
             final String flagName = scalar.toString();

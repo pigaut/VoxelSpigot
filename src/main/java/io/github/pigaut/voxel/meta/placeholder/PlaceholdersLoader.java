@@ -10,7 +10,7 @@ public class PlaceholdersLoader implements ConfigLoader<Placeholder[]> {
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load placeholders";
+        return "invalid placeholders";
     }
 
     @Override

@@ -17,7 +17,7 @@ public class ParticleEffectLoader implements ConfigLoader<ParticleEffect> {
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load particle effect";
+        return "invalid particle effect";
     }
 
     @Override

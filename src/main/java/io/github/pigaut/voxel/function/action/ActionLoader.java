@@ -156,7 +156,7 @@ public class ActionLoader extends AbstractLoader<Action> {
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load action";
+        return "invalid action";
     }
 
     @Override

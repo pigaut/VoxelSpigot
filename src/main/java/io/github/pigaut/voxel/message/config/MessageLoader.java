@@ -20,7 +20,7 @@ public class MessageLoader implements ConfigLoader<Message> {
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load player message";
+        return "invalid message";
     }
 
     @Override

@@ -17,7 +17,7 @@ public class SoundEffectLoader implements ConfigLoader<SoundEffect> {
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load sound effect";
+        return "invalid sound effect";
     }
 
     @Override

@@ -18,7 +18,7 @@ public class HologramLoader implements ConfigLoader<Hologram> {
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load hologram";
+        return "invalid hologram";
     }
 
     @Override

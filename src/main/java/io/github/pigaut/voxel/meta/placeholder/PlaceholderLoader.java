@@ -8,7 +8,7 @@ public class PlaceholderLoader implements ConfigLoader<Placeholder> {
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load placeholder";
+        return "invalid placeholder";
     }
 
     @Override

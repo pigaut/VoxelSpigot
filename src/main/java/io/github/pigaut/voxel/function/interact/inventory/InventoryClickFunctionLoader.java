@@ -12,7 +12,7 @@ public class InventoryClickFunctionLoader implements ConfigLoader<InventoryClick
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load inventory click function";
+        return "invalid inventory click function";
     }
 
     @Override

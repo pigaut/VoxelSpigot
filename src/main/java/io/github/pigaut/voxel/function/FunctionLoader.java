@@ -21,7 +21,7 @@ public class FunctionLoader implements ConfigLoader<Function> {
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load function";
+        return "invalid function";
     }
 
     @Override

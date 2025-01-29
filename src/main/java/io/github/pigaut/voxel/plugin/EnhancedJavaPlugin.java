@@ -49,13 +49,14 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final SoundManager soundManager = new PluginSoundManager(this);
     private final PluginScheduler scheduler = new PluginScheduler(this);
     private final List<Manager> loadedManagers = new ArrayList<>();
-    private RootSection config;
+    private final RootSection config = new RootSection(getFile("config.yml"), getConfigurator());
     private UpdateChecker updateChecker = null;
     private Metrics metrics = null;
     private boolean debug = true;
 
     @Override
     public void onDisable() {
+        logger.info("Saving data to database...");
         for (Manager manager : loadedManagers) {
             manager.disable();
             manager.saveData();
@@ -67,7 +68,9 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     public void onEnable() {
         checkSpigotVersion();
         createHooks();
-        createFiles();
+        generateFiles();
+        config.load();
+        generateExamples();
         loadManagers();
         createMetrics();
         createUpdateChecker();
@@ -89,7 +92,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     public void createHooks() {
     }
 
-    public void createFiles() {
+    public void generateFiles() {
         logger.info("Generating directories and files...");
         for (String directory : getPluginDirectories()) {
             createDirectory(directory);
@@ -97,8 +100,9 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         for (String resource : getPluginResources()) {
             saveResource(resource);
         }
-        config = new RootSection(getFile("config.yml"), getConfigurator());
-        config.load();
+    }
+
+    public void generateExamples() {
         if (config.getOptionalBoolean("generate-examples").orElse(true)) {
             logger.info("Generating example files...");
             for (String exampleResource : getExampleResources()) {
@@ -109,7 +113,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     public void createMetrics() {
         final Integer metricsId = getMetricsId();
-        if (metricsId != null && metrics != null) {
+        if (metricsId != null && metrics == null) {
             metrics = new Metrics(this, metricsId);
             logger.info("Created bStats metrics with id: " + metricsId);
         }
@@ -137,6 +141,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     private void loadManagers() {
+        logger.info("Loading configuration and data...");
         debug = config.getOptionalBoolean("debug").orElse(true);
 
         loadedManagers.add(languageManager);
@@ -171,7 +176,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
                         manager.saveData();
                     }
                 }
-                logger.info("Data saved successfully to database.");
+                logger.info("All data saved successfully to database.");
             });
         }
 
@@ -268,6 +273,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     @Override
     public @NotNull RootSection getConfiguration() {
+        config.load();
         return config;
     }
 

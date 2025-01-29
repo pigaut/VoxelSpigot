@@ -75,7 +75,7 @@ public class ConditionLoader extends AbstractLoader<Condition> {
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load condition";
+        return "invalid condition";
     }
 
     public ConfigLoader<? extends Condition> getLoader(ConfigField field, String id) {

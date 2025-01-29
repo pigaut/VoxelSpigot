@@ -5,7 +5,6 @@ import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.*;
-import io.github.pigaut.yaml.snakeyaml.engine.v2.exceptions.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.*;
@@ -19,7 +18,7 @@ public class ReloadSubCommand extends LangSubCommand {
         withCommandExecution((sender, args, placeholders) -> {
             plugin.sendMessage(sender, "reloading", placeholders);
             plugin.createHooks();
-            plugin.createFiles();
+            plugin.generateFiles();
             final List<Manager> loadedManagers = plugin.getLoadedManagers();
             for (Manager manager : loadedManagers) {
                 manager.disable();
@@ -27,7 +26,9 @@ public class ReloadSubCommand extends LangSubCommand {
             }
             plugin.getScheduler().runTaskAsync(() -> {
                 try {
+                    plugin.getLogger().info("Saving data to database...");
                     loadedManagers.forEach(Manager::saveData);
+                    plugin.getLogger().info("Loading configuration and data...");
                     loadedManagers.forEach(Manager::loadData);
                 } catch (ConfigurationLoadException | InvalidConfigurationException e) {
                     if (sender instanceof Player) {

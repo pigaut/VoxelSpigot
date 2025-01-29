@@ -10,7 +10,7 @@ public class BlockClickFunctionLoader implements ConfigLoader<BlockClickFunction
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "Could not load block click function";
+        return "invalid block click function";
     }
 
     @Override
