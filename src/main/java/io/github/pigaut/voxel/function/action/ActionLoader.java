@@ -120,9 +120,6 @@ public class ActionLoader extends AbstractLoader<Action> {
         addLoader("COMMAND", (BranchLoader<Action>) branch ->
                 new ExecutePlayerCommand(branch.getString("command", 1)));
 
-        addLoader("OP_COMMAND", (BranchLoader<Action>) branch ->
-                new ExecuteOpCommand(branch.getString("command", 1)));
-
         addLoader("CHAT_MESSAGE", (BranchLoader<Action>) branch ->
                 new SendChatMessage(branch.getString("message", 1)));
 
@@ -140,9 +137,6 @@ public class ActionLoader extends AbstractLoader<Action> {
 
         addLoader("SET_CURSOR_ITEM", (BranchLoader<Action>) branch ->
                 new SetPlayerCursorItem(branch.get("item", 1, ItemStack.class)));
-
-        addLoader("CLEAR_INVENTORY", (BranchLoader<Action>) branch ->
-                new ClearPlayerInventory(branch.getOptionalBoolean("remove-armor", 1).orElse(true)));
 
         addLoader("OPEN_ENDER_CHEST", (BranchLoader<Action>) branch ->
                 new OpenEnderChest());

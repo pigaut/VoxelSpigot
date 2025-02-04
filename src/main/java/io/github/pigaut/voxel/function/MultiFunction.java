@@ -2,6 +2,8 @@ package io.github.pigaut.voxel.function;
 
 import io.github.pigaut.voxel.player.*;
 import org.bukkit.block.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -15,9 +17,9 @@ public class MultiFunction implements Function {
     }
 
     @Override
-    public void run(@Nullable PluginPlayer player, @Nullable Block block) {
+    public void run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         for (Function function : functions) {
-            function.run(player, block);
+            function.run(player, event, block, target);
         }
     }
 

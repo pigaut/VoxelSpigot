@@ -4,6 +4,8 @@ import io.github.pigaut.voxel.function.action.*;
 import io.github.pigaut.voxel.particle.*;
 import io.github.pigaut.voxel.player.*;
 import org.bukkit.block.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 public class SpawnParticleOnBlock implements Action {
@@ -15,7 +17,7 @@ public class SpawnParticleOnBlock implements Action {
     }
 
     @Override
-    public void execute(@Nullable PluginPlayer player, @Nullable Block block) {
+    public void execute(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         if (block != null) {
             particle.spawn(player != null ? player.asPlayer() : null, block.getLocation().add(0.5, 0.5, 0.5));
         }

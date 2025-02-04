@@ -154,20 +154,6 @@ public class AbstractPluginPlayer implements PluginPlayer {
     }
 
     @Override
-    public void performCommandAsOp(String command) {
-        final Player player = asPlayer();
-
-        if (player.isOp()) {
-            player.performCommand(StringPlaceholders.parseAll(player, command, placeholders));
-        }
-        else {
-            player.setOp(true);
-            player.performCommand(StringPlaceholders.parseAll(player, command, placeholders));
-            player.setOp(false);
-        }
-    }
-
-    @Override
     public ItemStack getPlayerHead() {
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD, 1);
         final SkullMeta skullMeta = (SkullMeta) skull.getItemMeta();

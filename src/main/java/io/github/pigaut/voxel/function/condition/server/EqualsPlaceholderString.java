@@ -4,6 +4,8 @@ import io.github.pigaut.voxel.function.condition.*;
 import io.github.pigaut.voxel.meta.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import org.bukkit.block.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 public class EqualsPlaceholderString implements Condition {
@@ -17,7 +19,7 @@ public class EqualsPlaceholderString implements Condition {
     }
 
     @Override
-    public boolean isMet(@Nullable PluginPlayer player, @Nullable Block block) {
+    public boolean isMet(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         final String parsedValue;
         if (player != null) {
             parsedValue = StringPlaceholders.parseAll(player.asPlayer(), id, player.getPlaceholders());

@@ -4,9 +4,10 @@ import io.github.pigaut.voxel.function.condition.*;
 import io.github.pigaut.voxel.meta.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.util.*;
-import io.github.pigaut.yaml.parser.*;
 import io.github.pigaut.yaml.parser.deserializer.*;
 import org.bukkit.block.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 public class EqualsPlaceholderAmount implements Condition {
@@ -20,7 +21,7 @@ public class EqualsPlaceholderAmount implements Condition {
     }
 
     @Override
-    public boolean isMet(@Nullable PluginPlayer player, @Nullable Block block) {
+    public boolean isMet(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         final String parsedValue;
         if (player != null) {
             parsedValue = StringPlaceholders.parseAll(player.asPlayer(), id, player.getPlaceholders());

@@ -6,6 +6,8 @@ import io.github.pigaut.voxel.player.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.command.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 public class ExecuteConsoleCommand implements Action {
@@ -17,7 +19,7 @@ public class ExecuteConsoleCommand implements Action {
     }
 
     @Override
-    public void execute(@Nullable PluginPlayer player, @Nullable Block block) {
+    public void execute(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
         if (player != null) {
             Bukkit.dispatchCommand(console, StringPlaceholders.parseAll(player.asPlayer(), command, player.getPlaceholders()));

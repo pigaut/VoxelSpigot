@@ -3,6 +3,8 @@ package io.github.pigaut.voxel.function;
 import io.github.pigaut.voxel.function.action.*;
 import io.github.pigaut.voxel.player.*;
 import org.bukkit.block.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -26,11 +28,11 @@ public class SwitchFunction implements Function {
     }
 
     @Override
-    public void run(@Nullable PluginPlayer player, @Nullable Block block) {
+    public void run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         for (SwitchCase switchCase : cases) {
-            if (switchCase.getCondition().isMet(player, block)) {
+            if (switchCase.getCondition().isMet(player, event, block, target)) {
                 for (Action action : switchCase.getActions()) {
-                    action.execute(player, block);
+                    action.execute(player, event, block, target);
                 }
                 if (switchCase.isBreakCycle()) return;
             }

@@ -3,6 +3,8 @@ package io.github.pigaut.voxel.function.options;
 import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.player.*;
 import org.bukkit.block.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 public class RepeatedFunction implements Function {
@@ -16,9 +18,9 @@ public class RepeatedFunction implements Function {
     }
 
     @Override
-    public void run(@Nullable PluginPlayer player, @Nullable Block block) {
+    public void run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         for (int i = 0; i < repetitions; i++) {
-            function.run(player);
+            function.run(player, event, block, target);
         }
     }
 

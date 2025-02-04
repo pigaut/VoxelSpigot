@@ -152,13 +152,6 @@ public interface PluginPlayer {
     void performCommand(String command);
 
     /**
-     * Executes a command as an operator (op) on the server.
-     *
-     * @param command The command to execute as an operator.
-     */
-    void performCommandAsOp(String command);
-
-    /**
      * Gets a player head item representing the player.
      *
      * @return The player head item.

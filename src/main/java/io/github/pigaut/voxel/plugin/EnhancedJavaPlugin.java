@@ -49,7 +49,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final SoundManager soundManager = new PluginSoundManager(this);
     private final PluginScheduler scheduler = new PluginScheduler(this);
     private final List<Manager> loadedManagers = new ArrayList<>();
-    private final RootSection config = new RootSection(getFile("config.yml"), getConfigurator());
+    private RootSection config;
     private UpdateChecker updateChecker = null;
     private Metrics metrics = null;
     private boolean debug = true;
@@ -69,6 +69,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         checkSpigotVersion();
         createHooks();
         generateFiles();
+        config = new RootSection(getFile("config.yml"), getConfigurator());
         config.load();
         generateExamples();
         loadManagers();
@@ -273,6 +274,9 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     @Override
     public @NotNull RootSection getConfiguration() {
+        if (config == null) {
+            config = new RootSection(getFile("config.yml"), getConfigurator());
+        }
         config.load();
         return config;
     }

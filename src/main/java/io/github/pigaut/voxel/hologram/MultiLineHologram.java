@@ -2,6 +2,7 @@ package io.github.pigaut.voxel.hologram;
 
 import io.github.pigaut.voxel.hologram.display.*;
 import io.github.pigaut.voxel.meta.placeholder.*;
+import io.github.pigaut.voxel.util.Rotation;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
 
@@ -16,8 +17,8 @@ public class MultiLineHologram implements Hologram {
     }
 
     @Override
-    public HologramDisplay spawn(Location location, boolean persistent, PlaceholderSupplier... placeholderSuppliers) {
-        final HologramDisplay hologram = new MultiLineHologramDisplay(location, persistent, placeholderSuppliers);
+    public HologramDisplay spawn(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholderSuppliers) {
+        final HologramDisplay hologram = new MultiLineHologramDisplay(location, rotation, persistent, placeholderSuppliers);
         hologram.spawn();
         return hologram;
     }
@@ -26,9 +27,9 @@ public class MultiLineHologram implements Hologram {
 
         private final List<HologramDisplay> displays;
 
-        protected MultiLineHologramDisplay(Location location, boolean persistent, PlaceholderSupplier... placeholderSuppliers) {
+        protected MultiLineHologramDisplay(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholderSuppliers) {
             this.displays = holograms.stream()
-                    .map(hologram -> hologram.spawn(location, persistent, placeholderSuppliers))
+                    .map(hologram -> hologram.spawn(location, rotation, persistent, placeholderSuppliers))
                     .filter(Objects::nonNull)
                     .toList();
         }

@@ -7,6 +7,8 @@ import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 public class PlaySound implements Action {
@@ -20,19 +22,8 @@ public class PlaySound implements Action {
     }
 
     @Override
-    public void execute(@Nullable PluginPlayer player, @Nullable Block block) {
+    public void execute(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         sound.play(player != null ? player.asPlayer() : null, location);
-    }
-
-    public static ConfigLoader<PlaySound> newConfigLoader() {
-        return new BranchLoader<>() {
-            @Override
-            public @NotNull PlaySound loadFromBranch(ConfigBranch branch) throws InvalidConfigurationException {
-                final SoundEffect sound = branch.getField("sound|value", 1).load(SoundEffect.class);
-                final Location location = branch.getField("location", 2).load(Location.class);
-                return new PlaySound(sound, location);
-            }
-        };
     }
 
 }

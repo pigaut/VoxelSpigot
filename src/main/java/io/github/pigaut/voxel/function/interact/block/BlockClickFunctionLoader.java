@@ -16,10 +16,8 @@ public class BlockClickFunctionLoader implements ConfigLoader<BlockClickFunction
     @Override
     public @NotNull BlockClickFunction loadFromSection(@NotNull ConfigSection config) throws InvalidConfigurationException {
         final Action action = config.get("click", Action.class);
-        final boolean sneaking = config.getOptionalBoolean("sneaking").orElse(false);
-        final boolean shouldCancel = config.getOptionalBoolean("cancel").orElse(false);
         final Function function = config.load(Function.class);
-        return new SimpleBlockClickFunction(action, sneaking, shouldCancel, function);
+        return new SimpleBlockClickFunction(action, function);
     }
 
     @Override

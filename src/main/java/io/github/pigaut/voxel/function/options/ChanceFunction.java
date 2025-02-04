@@ -4,6 +4,8 @@ import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.util.*;
 import org.bukkit.block.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 public class ChanceFunction implements Function {
@@ -17,9 +19,9 @@ public class ChanceFunction implements Function {
     }
 
     @Override
-    public void run(@Nullable PluginPlayer player, @Nullable Block block) {
+    public void run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         if (Probability.test(chance)) {
-            function.run(player, block);
+            function.run(player, event, block, target);
         }
     }
 

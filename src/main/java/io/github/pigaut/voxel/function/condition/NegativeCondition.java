@@ -1,8 +1,9 @@
 package io.github.pigaut.voxel.function.condition;
 
-import io.github.pigaut.voxel.function.*;
 import io.github.pigaut.voxel.player.*;
 import org.bukkit.block.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 public class NegativeCondition implements Condition {
@@ -21,8 +22,8 @@ public class NegativeCondition implements Condition {
     }
 
     @Override
-    public boolean isMet(@Nullable PluginPlayer player, @Nullable Block block) {
-        return !condition.isMet(player, block);
+    public boolean isMet(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+        return !condition.isMet(player, event, block, target);
     }
 
 }
