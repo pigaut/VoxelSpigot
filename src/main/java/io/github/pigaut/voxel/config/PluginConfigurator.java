@@ -46,6 +46,7 @@ public class PluginConfigurator extends SpigotConfigurator {
         addLoader(SoundEffect.class, new SoundEffectLoader(plugin));
 
         addLoader(Condition.class, conditionLoader);
+        addLoader(NegativeCondition.class, new NegativeConditionLoader());
         addLoader(Action.class, actionLoader);
         addLoader(Function.class, new FunctionLoader(plugin));
         addLoader(BlockClickFunction.class, new BlockClickFunctionLoader());

@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.function.condition;
 
+import io.github.pigaut.voxel.function.action.*;
 import io.github.pigaut.voxel.function.condition.player.*;
 import io.github.pigaut.voxel.function.condition.server.*;
 import io.github.pigaut.voxel.hook.*;
@@ -12,7 +13,7 @@ import org.bukkit.enchantments.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
-import java.util.*;
+import java.util.regex.*;
 
 public class ConditionLoader extends AbstractLoader<Condition> {
 
@@ -73,46 +74,38 @@ public class ConditionLoader extends AbstractLoader<Condition> {
 
     }
 
-    @Override
-    public @NotNull String getProblemDescription() {
-        return "invalid condition";
-    }
-
     public ConfigLoader<? extends Condition> getLoader(ConfigField field, String id) {
         final ConfigLoader<? extends Condition> loader = getLoader(id);
         if (loader == null) {
             throw new InvalidConfigurationException(field,
-                    "Could not find '" + StringFormatter.toConstantCase(id) + "' condition");
+                    "Could not find condition with name: " + StringFormatter.toCamelCase(id));
         }
         return loader;
     }
 
     @Override
+    public @NotNull String getProblemDescription() {
+        return "invalid condition";
+    }
+
+    private static final Pattern INLINE_CONDITION_PATTERN = Pattern.compile("<([^>]*)>|(\\S+)");
+
+    @Override
+    public @NotNull Condition loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
+        final ConfigSequence splitScalar = scalar.split(INLINE_CONDITION_PATTERN);
+        final ConfigLoader<? extends Condition> loader = getLoader(scalar, splitScalar.getString(0));
+        return loader.loadFromSequence(splitScalar);
+    }
+
+    @Override
     public @NotNull Condition loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        String conditionName = section.getString("condition");
-        boolean negative = false;
-
-        if (conditionName.startsWith("!")) {
-            conditionName = conditionName.replace("!", conditionName);
-            negative = true;
-        }
-
-        final Condition condition = getLoader(section, conditionName).loadFromSection(section);
-        return negative ? new NegativeCondition(condition) : condition;
+        final ConfigLoader<? extends Condition> loader = getLoader(section, section.getString("condition"));
+        return loader.loadFromSection(section);
     }
 
     @Override
     public @NotNull Condition loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
-        String conditionName = sequence.getString(0);
-        boolean negative = false;
-
-        if (conditionName.startsWith("!")) {
-            conditionName = conditionName.replace("!", conditionName);
-            negative = true;
-        }
-
-        final Condition condition = getLoader(sequence, conditionName).loadFromSequence(sequence);
-        return negative ? new NegativeCondition(condition) : condition;
+        return new MultiCondition(sequence.getAll(Condition.class));
     }
 
 }

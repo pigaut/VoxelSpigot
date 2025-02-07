@@ -17,10 +17,13 @@ public class MultiFunction implements Function {
     }
 
     @Override
-    public void run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+    public boolean run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         for (Function function : functions) {
-            function.run(player, event, block, target);
+            if (!function.run(player, event, block, target)) {
+                return false;
+            }
         }
+        return true;
     }
 
 }

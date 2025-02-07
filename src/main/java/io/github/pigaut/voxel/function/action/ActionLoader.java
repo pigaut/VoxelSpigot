@@ -1,6 +1,7 @@
 package io.github.pigaut.voxel.function.action;
 
 import io.github.pigaut.voxel.function.action.block.*;
+import io.github.pigaut.voxel.function.action.event.*;
 import io.github.pigaut.voxel.function.action.player.*;
 import io.github.pigaut.voxel.function.action.server.*;
 import io.github.pigaut.voxel.hook.*;
@@ -16,6 +17,8 @@ import io.github.pigaut.yaml.parser.*;
 import org.bukkit.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
+
+import java.util.regex.*;
 
 public class ActionLoader extends AbstractLoader<Action> {
 
@@ -39,9 +42,21 @@ public class ActionLoader extends AbstractLoader<Action> {
                         branch.get("location", 2, Location.class)
                 ));
 
+        addLoader("SPAWN_PARTICLE", (BranchLoader<Action>) branch ->
+                new SpawnParticle(
+                        branch.get("particle", 1, ParticleEffect.class),
+                        branch.get("location", 2, Location.class)
+                ));
+
         addLoader("PARTICLE", (BranchLoader<Action>) branch ->
                 new SpawnParticle(
                         branch.get("particle", 1, ParticleEffect.class),
+                        branch.get("location", 2, Location.class)
+                ));
+
+        addLoader("PLAY_SOUND", (BranchLoader<Action>) branch ->
+                new PlaySound(
+                        branch.get("sound", 1, SoundEffect.class),
                         branch.get("location", 2, Location.class)
                 ));
 
@@ -51,6 +66,25 @@ public class ActionLoader extends AbstractLoader<Action> {
                         branch.get("location", 2, Location.class)
                 ));
 
+        //Function Actions
+
+        addLoader("RETURN", (BranchLoader<Action>) branch ->
+                new ReturnAction());
+
+        addLoader("STOP", (BranchLoader<Action>) branch ->
+                new ReturnAction());
+
+        //Event Actions
+
+        addLoader("CANCEL_EVENT", (BranchLoader<Action>) branch ->
+                new CancelEventAction(true));
+
+        addLoader("CANCEL", (BranchLoader<Action>) branch ->
+                new CancelEventAction(true));
+
+        addLoader("SET_CANCELLED", (BranchLoader<Action>) branch ->
+                new CancelEventAction(branch.getBoolean("cancelled", 1)));
+
         //Block Actions
         addLoader("STRIKE_BLOCK", (BranchLoader<Action>) branch ->
                 new StrikeBlockWithLightning(branch.getOptionalBoolean("do-damage", 1).orElse(true)));
@@ -58,21 +92,39 @@ public class ActionLoader extends AbstractLoader<Action> {
         addLoader("DROP_AT_BLOCK", (BranchLoader<Action>) branch ->
                 new DropItemOnBlock(branch.get("item", 1, ItemStack.class)));
 
+        addLoader("DROP_ITEM_AT_BLOCK", (BranchLoader<Action>) branch ->
+                new DropItemOnBlock(branch.get("item", 1, ItemStack.class)));
+
         addLoader("PARTICLE_AT_BLOCK", (BranchLoader<Action>) branch ->
+                new SpawnParticleOnBlock(branch.get("particle", 1, ParticleEffect.class)));
+
+        addLoader("SPAWN_PARTICLE_AT_BLOCK", (BranchLoader<Action>) branch ->
                 new SpawnParticleOnBlock(branch.get("particle", 1, ParticleEffect.class)));
 
         addLoader("SOUND_AT_BLOCK", (BranchLoader<Action>) branch ->
                 new PlaySoundOnBlock(branch.get("sound", 1, SoundEffect.class)));
 
-        //player
+        addLoader("PLAY_SOUND_AT_BLOCK", (BranchLoader<Action>) branch ->
+                new PlaySoundOnBlock(branch.get("sound", 1, SoundEffect.class)));
+
+        //player actions
 
         addLoader("DROP_AT_PLAYER", (BranchLoader<Action>) branch ->
+                new DropItemOnPlayer(branch.get("item", 1, ItemStack.class)));
+
+        addLoader("DROP_ITEM_AT_PLAYER", (BranchLoader<Action>) branch ->
                 new DropItemOnPlayer(branch.get("item", 1, ItemStack.class)));
 
         addLoader("PARTICLE_AT_PLAYER", (BranchLoader<Action>) branch ->
                 new SpawnParticleOnPlayer(branch.get("particle", 1, ParticleEffect.class)));
 
+        addLoader("SPAWN_PARTICLE_AT_PLAYER", (BranchLoader<Action>) branch ->
+                new SpawnParticleOnPlayer(branch.get("particle", 1, ParticleEffect.class)));
+
         addLoader("SOUND_AT_PLAYER", (BranchLoader<Action>) branch ->
+                new PlaySoundOnPlayer(branch.get("sound", 1, SoundEffect.class)));
+
+        addLoader("PLAY_SOUND_AT_PLAYER", (BranchLoader<Action>) branch ->
                 new PlaySoundOnPlayer(branch.get("sound", 1, SoundEffect.class)));
 
         addLoader("GIVE_EXP", (BranchLoader<Action>) branch ->
@@ -148,9 +200,27 @@ public class ActionLoader extends AbstractLoader<Action> {
                 ));
     }
 
+    public ConfigLoader<? extends Action> getLoader(ConfigField field, String id) throws InvalidConfigurationException {
+        final ConfigLoader<? extends Action> loader = getLoader(id);
+        if (loader == null) {
+            throw new InvalidConfigurationException(field,
+                    "Could not find action with name: " + StringFormatter.toCamelCase(id));
+        }
+        return loader;
+    }
+
     @Override
     public @NotNull String getProblemDescription() {
         return "invalid action";
+    }
+
+    private static final Pattern INLINE_ACTION_PATTERN = Pattern.compile("<([^>]*)>|(\\S+)");
+
+    @Override
+    public @NotNull Action loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
+        final ConfigSequence splitString = scalar.split(INLINE_ACTION_PATTERN);
+        final ConfigLoader<? extends Action> loader = getLoader(splitString, splitString.getString(0));
+        return loader.loadFromSequence(splitString);
     }
 
     @Override
@@ -161,17 +231,7 @@ public class ActionLoader extends AbstractLoader<Action> {
 
     @Override
     public @NotNull Action loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
-        final ConfigLoader<? extends Action> loader = getLoader(sequence, sequence.getString(0));
-        return loader.loadFromSequence(sequence);
-    }
-
-    public ConfigLoader<? extends Action> getLoader(ConfigField field, String id) throws InvalidConfigurationException {
-        final ConfigLoader<? extends Action> loader = getLoader(id);
-        if (loader == null) {
-            throw new InvalidConfigurationException(field,
-                    "Could not find '" + StringFormatter.toConstantCase(id) + "' action");
-        }
-        return loader;
+        return new MultiAction(sequence.getAll(Action.class));
     }
 
 }

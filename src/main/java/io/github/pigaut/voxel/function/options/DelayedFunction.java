@@ -22,8 +22,9 @@ public class DelayedFunction implements Function {
     }
 
     @Override
-    public void run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+    public boolean run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         Bukkit.getScheduler().runTaskLater(plugin, () -> function.run(player, event, block, target), delay);
+        return true;
     }
 
 }

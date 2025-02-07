@@ -12,35 +12,31 @@ import java.util.*;
 
 public class ConditionalFunction implements Function {
 
-    private final Set<Condition> conditions = new HashSet<>();
-    private final Set<Action> success = new HashSet<>();
-    private final Set<Action> failure = new HashSet<>();
+    private final Condition condition;
+    private final Action success;
+    private final Action failure;
 
-    public ConditionalFunction() {}
-
-    public ConditionalFunction(Collection<Condition> conditions, Collection<Action> success, Collection<Action> failure) {
-        this.conditions.addAll(conditions);
-        this.success.addAll(success);
-        this.failure.addAll(failure);
+    public ConditionalFunction(Condition condition, Action success, Action failure) {
+        this.condition = condition;
+        this.success = success;
+        this.failure = failure;
     }
 
     @Override
-    public void run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
-        boolean allConditionsMet = true;
-        for (Condition condition : conditions) {
-            if (condition.isMet(player, event, block, target)) {
-                continue;
+    public boolean run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+        if (condition.isMet(player, event, block, target)) {
+            success.execute(player, event, block, target);
+            if (success.shouldReturn()) {
+                return false;
             }
-            allConditionsMet = false;
-            break;
-        }
-
-        if (allConditionsMet) {
-            success.forEach(action -> action.execute(player, event, block, target));
         }
         else {
-            failure.forEach(action -> action.execute(player, event, block, target));
+            failure.execute(player, event, block, target);
+            if (failure.shouldReturn()) {
+                return false;
+            }
         }
+        return true;
     }
 
 }

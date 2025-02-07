@@ -11,7 +11,16 @@ import java.util.*;
 @FunctionalInterface
 public interface Function {
 
-    void run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target);
+    /**
+     * Executes the function and returns whether it completed successfully or was interrupted.
+     *
+     * @param player The player involved, can be null.
+     * @param event The event triggering the function, can be null.
+     * @param block The block involved, can be null.
+     * @param target The target entity, can be null.
+     * @return true if the function executed completely, false if interrupted by a return action.
+     */
+    boolean run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target);
 
     default void run() {
         run(null, null, null, null);
@@ -27,6 +36,14 @@ public interface Function {
 
     default void run(@NotNull Block block) {
         run(null, null, block, null);
+    }
+
+    default void run(@NotNull PluginPlayer player, @NotNull Event event, @NotNull Block targetBlock) {
+        run(player, event, targetBlock, null);
+    }
+
+    default void run(@NotNull PluginPlayer player, @NotNull Event event, @NotNull Entity targetEntity) {
+        run(player, event, null, targetEntity);
     }
 
 }

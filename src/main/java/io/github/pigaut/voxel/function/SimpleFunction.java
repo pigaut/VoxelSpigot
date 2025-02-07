@@ -11,17 +11,16 @@ import java.util.*;
 
 public class SimpleFunction implements Function {
 
-    private final Set<Action> actions = new HashSet<>();
+    private final Action action;
 
-    public SimpleFunction() {}
-
-    public SimpleFunction(Collection<@NotNull Action> actions) {
-        this.actions.addAll(actions);
+    public SimpleFunction(Action action) {
+        this.action = action;
     }
 
     @Override
-    public void run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
-        actions.forEach(action -> action.execute(player, event, block, target));
+    public boolean run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+        action.execute(player, event, block, target);
+        return !action.shouldReturn();
     }
 
 }

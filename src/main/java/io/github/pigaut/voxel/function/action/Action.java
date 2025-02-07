@@ -9,6 +9,12 @@ import org.jetbrains.annotations.*;
 @FunctionalInterface
 public interface Action {
 
+    Action EMPTY = ((player, event, block, target) -> {});
+
     void execute(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target);
+
+    default boolean shouldReturn() {
+        return false;
+    }
 
 }

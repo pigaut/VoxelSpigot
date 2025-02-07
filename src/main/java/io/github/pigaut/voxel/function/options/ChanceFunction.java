@@ -19,10 +19,11 @@ public class ChanceFunction implements Function {
     }
 
     @Override
-    public void run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+    public boolean run(@Nullable PluginPlayer player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         if (Probability.test(chance)) {
-            function.run(player, event, block, target);
+            return function.run(player, event, block, target);
         }
+        return true;
     }
 
 }

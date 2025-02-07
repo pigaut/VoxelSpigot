@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.message.config;
 
+import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.message.*;
 import io.github.pigaut.voxel.message.type.*;
 import io.github.pigaut.voxel.plugin.*;
@@ -34,44 +35,51 @@ public class MessageLoader implements ConfigLoader<Message> {
     }
 
     @Override
-    public @NotNull Message loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        final String type = section.getString("type", StringStyle.CONSTANT);
+    public @NotNull Message loadFromSection(@NotNull ConfigSection config) throws InvalidConfigurationException {
+        final String type = config.getString("type", StringStyle.CONSTANT);
         Message message;
         switch (type) {
             case "CHAT" -> {
-                message = new ChatMessage(section.getString("message", StringColor.FORMATTER));
+                message = new ChatMessage(config.getString("message", StringColor.FORMATTER));
             }
 
             case "ACTIONBAR" -> {
-                message = new ActionBarMessage(section.getString("message", StringColor.FORMATTER));
+                message = new ActionBarMessage(config.getString("message", StringColor.FORMATTER));
             }
 
             case "BOSSBAR" -> {
                 message = new BossBarMessage(plugin,
-                        section.getString("title", StringColor.FORMATTER),
-                        section.getOptional("style", BarStyle.class).orElse(BarStyle.SEGMENTED_6),
-                        section.getOptional("color", BarColor.class).orElse(BarColor.RED),
-                        section.getOptionalInteger("duration").orElse(100),
-                        section.getDoubleList("progress")
+                        config.getString("title", StringColor.FORMATTER),
+                        config.getOptional("style", BarStyle.class).orElse(BarStyle.SEGMENTED_6),
+                        config.getOptional("color", BarColor.class).orElse(BarColor.RED),
+                        config.getOptionalInteger("duration").orElse(100),
+                        config.getDoubleList("progress")
                 );
             }
 
             case "TITLE" -> {
                 message = new TitleMessage(
-                        section.getString("title", StringColor.FORMATTER),
-                        section.getOptionalString("subtitle", StringColor.FORMATTER).orElse(""),
-                        section.getOptionalInteger("fade-in").orElse(20),
-                        section.getOptionalInteger("stay").orElse(60),
-                        section.getOptionalInteger("fade-out").orElse(20)
+                        config.getString("title", StringColor.FORMATTER),
+                        config.getOptionalString("subtitle", StringColor.FORMATTER).orElse(""),
+                        config.getOptionalInteger("fade-in").orElse(20),
+                        config.getOptionalInteger("stay").orElse(60),
+                        config.getOptionalInteger("fade-out").orElse(20)
+                );
+            }
+
+            case "HOLOGRAM" -> {
+                message = new HologramMessage(plugin,
+                        config.get("hologram", Hologram.class),
+                        config.getOptionalInteger("duration").orElse(40)
                 );
             }
 
             default -> {
-                throw new InvalidConfigurationException(section, "type", "'" + type + "' is not valid message type");
+                throw new InvalidConfigurationException(config, "type", "'" + type + "' is not valid message type");
             }
         }
 
-        return addMessageOptions(section, message);
+        return addMessageOptions(config, message);
     }
 
     @Override

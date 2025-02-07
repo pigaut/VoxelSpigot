@@ -13,7 +13,7 @@ public class SendChatMessage implements PlayerAction {
     private final String message;
 
     public SendChatMessage(String message) {
-        this.message = message;
+        this.message = StringColor.translateColors(message);
     }
 
     @Override

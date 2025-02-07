@@ -2,7 +2,6 @@ package io.github.pigaut.voxel.util;
 
 import org.bukkit.*;
 import org.bukkit.block.*;
-import org.jetbrains.annotations.*;
 
 public enum Rotation {
 
@@ -26,20 +25,6 @@ public enum Rotation {
         @Override
         public Location apply(Location location, double x, double y, double z) {
             return location.add(-z, y, x);
-        }
-
-        @Override
-        public BlockFace translateBlockFace(BlockFace blockFace) {
-            if (blockFace == BlockFace.NORTH) {
-                return BlockFace.EAST;
-            }
-            if (blockFace == BlockFace.EAST) {
-                return BlockFace.SOUTH;
-            }
-            if (blockFace == BlockFace.SOUTH) {
-                return BlockFace.WEST;
-            }
-            return BlockFace.NORTH;
         }
 
         @Override
@@ -73,20 +58,6 @@ public enum Rotation {
         }
 
         @Override
-        public BlockFace translateBlockFace(BlockFace blockFace) {
-            if (blockFace == BlockFace.NORTH) {
-                return BlockFace.WEST;
-            }
-            if (blockFace == BlockFace.WEST) {
-                return BlockFace.SOUTH;
-            }
-            if (blockFace == BlockFace.SOUTH) {
-                return BlockFace.EAST;
-            }
-            return BlockFace.NORTH;
-        }
-
-        @Override
         public Axis translateAxis(Axis axis) {
             if (axis == Axis.Y) {
                 return Axis.Y;
@@ -97,7 +68,9 @@ public enum Rotation {
 
     public abstract Location apply(Location location, double x, double y, double z);
 
-    public abstract BlockFace translateBlockFace(BlockFace blockFace);
+    public BlockFace translateBlockFace(BlockFace blockFace) {
+        return rotateBlockFace(blockFace, this);
+    }
 
     public abstract Axis translateAxis(Axis axis);
 
@@ -108,8 +81,34 @@ public enum Rotation {
         return RIGHT;
     }
 
-    public static Rotation getNextRotation(@Nullable Rotation rotation) {
-        return rotation != null ? rotation.next() : Rotation.NONE;
+    private static final BlockFace[] ORDER = {
+            BlockFace.NORTH, BlockFace.NORTH_NORTH_EAST, BlockFace.NORTH_EAST, BlockFace.EAST_NORTH_EAST,
+            BlockFace.EAST, BlockFace.EAST_SOUTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_SOUTH_EAST,
+            BlockFace.SOUTH, BlockFace.SOUTH_SOUTH_WEST, BlockFace.SOUTH_WEST, BlockFace.WEST_SOUTH_WEST,
+            BlockFace.WEST, BlockFace.WEST_NORTH_WEST, BlockFace.NORTH_WEST, BlockFace.NORTH_NORTH_WEST
+    };
+
+    public static BlockFace rotateBlockFace(BlockFace face, Rotation rotation) {
+        int index = -1;
+        for (int i = 0; i < ORDER.length; i++) {
+            if (ORDER[i] == face) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1) {
+            return face;
+        }
+
+        int stepOffset = switch (rotation) {
+            case NONE -> 0;
+            case RIGHT -> 4;
+            case BACK -> 8;
+            case LEFT -> 12;
+        };
+
+        return ORDER[(index + stepOffset) % ORDER.length];
     }
 
 }

@@ -27,49 +27,29 @@ public class FunctionLoader implements ConfigLoader<Function> {
     @Override
     public @NotNull Function loadFromSection(@NotNull ConfigSection config) throws InvalidConfigurationException {
 
-        final ConfigSequence conditionSequence = config.getOptionalSequence("if").orElse(null);
-        if (conditionSequence != null) {
+        final ConfigField conditionField = config.getOptionalField("conditions|if|condition").orElse(null);
+        if (conditionField != null) {
             final Function function = new ConditionalFunction(
-                    conditionSequence.getAll(Condition.class),
-                    config.getAll("do", Action.class),
-                    config.getAll("or", Action.class)
+                    conditionField.load(Condition.class),
+                    config.getOptional("do|action|actions|success", Action.class).orElse(Action.EMPTY),
+                    config.getOptional("or|else|fail", Action.class).orElse(Action.EMPTY)
             );
             return addFunctionOptions(config, function);
         }
 
-        final ConfigSequence doSequence = config.getOptionalSequence("actions").orElse(null);
-        if (doSequence != null) {
-            final Function function = new SimpleFunction(doSequence.getAll(Action.class));
-            return addFunctionOptions(config, function);
+        final ConfigField negativeConditionField = config.getOptionalField("if-not|if not").orElse(null);
+        if (negativeConditionField != null) {
+            final Function function = new ConditionalFunction(
+                    negativeConditionField.load(NegativeCondition.class),
+                    config.getOptional("do|action|actions|success", Action.class).orElse(Action.EMPTY),
+                    config.getOptional("or|else|fail", Action.class).orElse(Action.EMPTY)
+            );
+            return function;
         }
 
-        final ConfigScalar switchType = config.getOptionalScalar("switch").orElse(null);
-        if (switchType != null) {
-            final PluginConfigurator configurator = plugin.getConfigurator();
-            final ConfigLoader<? extends Condition> conditionLoader = configurator.getConditionLoader().getLoader(switchType, switchType.toString());
-
-            final SwitchFunction function = new SwitchFunction();
-
-            final SwitchCase defaultCase = config.getOptionalSection("default")
-                    .map(defaultSection -> {
-                        final List<Action> actions = defaultSection.getAll(Action.class);
-                        return SwitchCase.createDefaultCase(actions);
-                    })
-                    .orElse(null);
-
-            for (ConfigSection caseSection : config.getNestedSections("cases")) {
-                final Condition condition = conditionLoader.loadFromScalar(caseSection.getScalar("case"));
-                final List<Action> actions = caseSection.getAll("do", Action.class);
-                final boolean breakCycle = caseSection.getOptionalBoolean("break").orElse(false);
-
-                final SwitchCase switchCase = new SwitchCase(condition, actions, breakCycle);
-                function.addCase(switchCase);
-            }
-
-            if (defaultCase != null) {
-                function.addCase(defaultCase);
-            }
-
+        final ConfigSequence doSequence = config.getOptionalSequence("do|actions|action").orElse(null);
+        if (doSequence != null) {
+            final Function function = new SimpleFunction(doSequence.load(Action.class));
             return addFunctionOptions(config, function);
         }
 
