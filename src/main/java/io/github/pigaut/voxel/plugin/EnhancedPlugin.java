@@ -1,21 +1,26 @@
 package io.github.pigaut.voxel.plugin;
 
+import io.github.pigaut.sql.*;
 import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.config.*;
-import io.github.pigaut.voxel.item.*;
+import io.github.pigaut.voxel.core.function.*;
+import io.github.pigaut.voxel.core.item.*;
+import io.github.pigaut.voxel.core.item.Item;
+import io.github.pigaut.voxel.core.message.*;
+import io.github.pigaut.voxel.core.particle.*;
+import io.github.pigaut.voxel.core.sound.*;
+import io.github.pigaut.voxel.core.structure.*;
 import io.github.pigaut.voxel.language.*;
-import io.github.pigaut.voxel.message.*;
-import io.github.pigaut.voxel.meta.flag.*;
-import io.github.pigaut.voxel.meta.placeholder.*;
-import io.github.pigaut.voxel.particle.*;
+import io.github.pigaut.voxel.menu.*;
+import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
-import io.github.pigaut.voxel.sound.*;
-import io.github.pigaut.voxel.version.*;
+import io.github.pigaut.yaml.node.*;
 import io.github.pigaut.yaml.node.scalar.*;
 import io.github.pigaut.yaml.node.section.*;
 import io.github.pigaut.yaml.node.sequence.*;
+import io.github.pigaut.yaml.util.*;
+import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -23,6 +28,7 @@ import org.bukkit.inventory.*;
 import org.bukkit.plugin.*;
 import org.jetbrains.annotations.*;
 
+import javax.xml.crypto.*;
 import java.io.*;
 import java.util.*;
 
@@ -30,42 +36,91 @@ public interface EnhancedPlugin extends Plugin {
 
     boolean isDebug();
 
-    RootSection loadConfigSection(@NotNull File file);
+    String getVersion();
 
-    RootSequence loadConfigSequence(@NotNull File file);
+    @Nullable
+    Database getDatabase();
 
-    RootScalar loadConfigScalar(@NotNull File file);
-
+    @NotNull
     PluginScheduler getScheduler();
 
     @NotNull
-    List<SpigotVersion> getCompatibleVersions();
-
-    List<Manager> getLoadedManagers();
+    String getPermission(@NotNull String permission);
 
     @NotNull
-    CommandManager getCommands();
-
-    @NotNull
-    PlayerManager<? extends PluginPlayer> getPlayers();
-
-    @NotNull
-    ItemManager getItems();
-
-    @NotNull
-    MessageManager getMessages();
+    NamespacedKey getNamespacedKey(@NotNull String key);
 
     @NotNull
     LanguageManager getLanguages();
 
     @NotNull
-    FlagManager getFlags();
+    String getLang(@NotNull String name) throws LangNotFoundException;
+
+    @NotNull
+    String getLang(@NotNull String name, @NotNull String def);
+
+    @NotNull
+    CommandManager getCommands();
+
+    @NotNull
+    PlayerStateManager<? extends @NotNull PlayerState> getPlayersState();
+
+    @NotNull
+    PlayerState getPlayerState(@NotNull Player player);
+
+    @Nullable
+    PlayerState getPlayerState(@NotNull String playerName);
+
+    @Nullable
+    PlayerState getPlayerState(@NotNull UUID playerId);
+
+    @NotNull
+    ItemManager getItems();
+
+    @Nullable
+    ItemStack getItemStack(@NotNull String name);
+
+    @Nullable
+    Item getItem(@NotNull String name);
+
+    @NotNull
+    List<Item> getItems(@NotNull String group);
+
+    @NotNull
+    MessageManager getMessages();
+
+    @Nullable
+    Message getMessage(@NotNull String name);
 
     @NotNull
     ParticleManager getParticles();
 
+    @Nullable
+    ParticleEffect getParticle(@NotNull String name);
+
     @NotNull
     SoundManager getSounds();
+
+    @Nullable
+    SoundEffect getSound(@NotNull String name);
+
+    @NotNull
+    FunctionManager getFunctions();
+
+    @Nullable
+    Function getFunction(@NotNull String name);
+
+    @NotNull
+    StructureManager getStructures();
+
+    @Nullable
+    BlockStructure getStructure(@NotNull String name);
+
+    @NotNull
+    MenuManager getMenus();
+
+    @Nullable
+    Menu getMenu(@NotNull String name);
 
     @NotNull
     RootSection getConfiguration();
@@ -76,59 +131,36 @@ public interface EnhancedPlugin extends Plugin {
     @Nullable
     EnhancedCommand getCustomCommand(String name);
 
-    void registerCommand(EnhancedCommand command);
+    void sendMessage(@NotNull Player player, @NotNull String messageId) throws LangNotFoundException;
 
-    void unregisterCommand(String name);
+    void sendMessage(@NotNull Player player, @NotNull String messageId, @NotNull PlaceholderSupplier... placeholderSuppliers) throws LangNotFoundException;
 
-    @Nullable
-    PluginPlayer getPlayer(String playerName);
+    void sendMessage(@NotNull CommandSender sender, @NotNull String messageId) throws LangNotFoundException;
 
-    @Nullable
-    PluginPlayer getPlayer(UUID playerId);
+    void sendMessage(@NotNull CommandSender sender, @NotNull String messageId, @NotNull PlaceholderSupplier... placeholderSuppliers) throws LangNotFoundException;
 
-    @Nullable
-    ItemStack getItemStack(String name);
+    void registerCommand(@NotNull EnhancedCommand command);
 
-    @Nullable
-    Message getMessage(String name);
+    void unregisterCommand(@NotNull String name);
 
-    @NotNull
-    String getLang(String name) throws LangNotFoundException;
-
-    @NotNull
-    String getLang(String name, String def);
-
-    void sendMessage(Player player, String messageId);
-
-    void sendMessage(Player player, String messageId, PlaceholderSupplier... placeholderSuppliers);
-
-    void sendMessage(CommandSender sender, String messageId);
-
-    void sendMessage(CommandSender sender, String messageId, PlaceholderSupplier... placeholderSuppliers);
-
-    @Nullable
-    Flag getFlag(String name);
-
-    @Nullable
-    ParticleEffect getParticle(String name);
-
-    @Nullable
-    SoundEffect getSound(String name);
+    void registerListener(@NotNull Listener listener);
 
     void createDirectory();
 
-    void createDirectory(String path);
+    void createDirectory(@NotNull String path);
 
-    void saveResource(String path);
+    void saveResource(@NotNull String path);
 
-    File getFile(String file);
+    File getFile(@NotNull String file);
 
-    File getFile(String directory, String file);
+    File getFile(@NotNull String parent, @NotNull String child);
 
-    List<File> getFiles(String path);
+    List<File> getFiles(@NotNull String path);
 
-    List<String> getFilePaths(String directory);
+    String getFilePath(@NotNull String path);
 
-    void registerListener(Listener listener);
+    List<String> getFilePaths(@NotNull String directory);
+
+    void logConfigurationErrors(@Nullable Player player, @NotNull List<ConfigurationException> errors);
 
 }

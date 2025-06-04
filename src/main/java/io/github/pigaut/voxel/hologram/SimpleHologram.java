@@ -1,8 +1,7 @@
 package io.github.pigaut.voxel.hologram;
 
 import io.github.pigaut.voxel.*;
-import io.github.pigaut.voxel.hologram.display.*;
-import io.github.pigaut.voxel.meta.placeholder.*;
+import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.util.Rotation;
 import org.bukkit.*;
@@ -23,7 +22,7 @@ public class SimpleHologram implements Hologram {
     }
 
     @Override
-    public HologramDisplay spawn(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholderSuppliers) {
+    public HologramDisplay spawn(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholders) {
         final World world = SpigotLibs.getWorldOrDefault(location);
         final Block block = world.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         if (block.getType() != Material.AIR) {
@@ -32,7 +31,7 @@ public class SimpleHologram implements Hologram {
 
         final HologramDisplay hologram = new SimpleHologramDisplay(
                 new Location(world, location.getX(), location.getY(), location.getZ()),
-                persistent, placeholderSuppliers);
+                persistent, placeholders);
         hologram.spawn();
         return hologram;
     }

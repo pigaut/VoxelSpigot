@@ -1,28 +1,36 @@
 package io.github.pigaut.voxel.config;
 
 import io.github.pigaut.voxel.*;
-import io.github.pigaut.voxel.function.*;
-import io.github.pigaut.voxel.function.action.*;
-import io.github.pigaut.voxel.function.condition.*;
-import io.github.pigaut.voxel.function.interact.block.*;
-import io.github.pigaut.voxel.function.interact.inventory.*;
+import io.github.pigaut.voxel.bukkit.*;
+import io.github.pigaut.voxel.core.function.*;
+import io.github.pigaut.voxel.core.function.action.*;
+import io.github.pigaut.voxel.core.function.condition.*;
+import io.github.pigaut.voxel.core.function.condition.config.*;
+import io.github.pigaut.voxel.core.function.config.*;
+import io.github.pigaut.voxel.core.function.interact.block.*;
+import io.github.pigaut.voxel.core.function.interact.inventory.*;
+import io.github.pigaut.voxel.core.message.*;
+import io.github.pigaut.voxel.core.message.config.*;
+import io.github.pigaut.voxel.core.particle.*;
+import io.github.pigaut.voxel.core.particle.config.*;
+import io.github.pigaut.voxel.core.sound.*;
+import io.github.pigaut.voxel.core.sound.config.*;
+import io.github.pigaut.voxel.core.structure.*;
+import io.github.pigaut.voxel.core.structure.config.*;
 import io.github.pigaut.voxel.hologram.*;
-import io.github.pigaut.voxel.message.*;
-import io.github.pigaut.voxel.message.config.*;
-import io.github.pigaut.voxel.meta.flag.*;
-import io.github.pigaut.voxel.meta.placeholder.*;
-import io.github.pigaut.voxel.particle.*;
-import io.github.pigaut.voxel.particle.config.*;
+import io.github.pigaut.voxel.hologram.config.*;
+import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.sound.*;
-import io.github.pigaut.voxel.sound.config.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
+import io.github.pigaut.yaml.configurator.mapper.*;
 import io.github.pigaut.yaml.itemstack.*;
 import io.github.pigaut.yaml.parser.*;
 import io.github.pigaut.yaml.parser.deserializer.*;
 import org.bukkit.*;
+import org.bukkit.block.*;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
@@ -34,12 +42,22 @@ public class PluginConfigurator extends SpigotConfigurator {
 
     public PluginConfigurator(@NotNull EnhancedPlugin plugin) {
         this.plugin = plugin;
+
+        addDeserializer(Action.class, string ->
+            Deserializers.enumDeserializer(BlockInteraction.class).deserialize(string).toAction());
+
         addLoader(Placeholder.class, new PlaceholderLoader());
         addLoader(Placeholder[].class, new PlaceholdersLoader());
 
         addLoader(Amount.class, new AmountLoader());
+        addMapper(Amount.Range.class, (ScalarMapper<Amount.Range>) Amount.Range::toString);
+        addMapper(Amount.Single.class, (ScalarMapper<Amount.Single>) Amount.Single::getDouble);
+
         addLoader(ItemStack.class, new PluginItemStackLoader());
-        addLoader(Flag.class, new FlagLoader());
+        addLoader(BlockChange.class, new BlockChangeLoader());
+        addLoader(BlockStructure.class, new BlockStructureLoader(plugin));
+        addMapper(Block.class, new BlockDataMapper());
+
         addLoader(Message.class, new MessageLoader(plugin));
         addLoader(Hologram.class, new HologramLoader(plugin));
         addLoader(ParticleEffect.class, new ParticleEffectLoader(plugin));
@@ -47,7 +65,8 @@ public class PluginConfigurator extends SpigotConfigurator {
 
         addLoader(Condition.class, conditionLoader);
         addLoader(NegativeCondition.class, new NegativeConditionLoader());
-        addLoader(Action.class, actionLoader);
+        addLoader(DisjunctiveCondition.class, new DisjunctiveConditionLoader());
+        addLoader(SystemAction.class, actionLoader);
         addLoader(Function.class, new FunctionLoader(plugin));
         addLoader(BlockClickFunction.class, new BlockClickFunctionLoader());
         addLoader(InventoryClickFunction.class, new InventoryClickFunctionLoader());
@@ -118,23 +137,5 @@ public class PluginConfigurator extends SpigotConfigurator {
             return foundItem;
         }
     }
-
-    protected class FlagLoader implements ScalarLoader<Flag> {
-        @Override
-        public @Nullable String getProblemDescription() {
-            return "invalid flag";
-        }
-
-        @Override
-        public @NotNull Flag loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
-            final String flagName = scalar.toString();
-            final Flag foundFlag = plugin.getFlag(flagName);
-            if (foundFlag == null) {
-                throw new InvalidConfigurationException(scalar, "Could not find any flag called: '" + flagName + "'");
-            }
-            return foundFlag;
-        }
-    }
-
 
 }

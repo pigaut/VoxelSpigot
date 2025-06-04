@@ -1,47 +1,42 @@
 package io.github.pigaut.voxel.plugin.command;
 
 import io.github.pigaut.voxel.command.node.*;
+import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
+import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.*;
+import io.github.pigaut.yaml.util.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.*;
 
+import java.io.*;
 import java.util.*;
 
-public class ReloadSubCommand extends LangSubCommand {
+public class ReloadSubCommand extends SubCommand {
 
     public ReloadSubCommand(@NotNull EnhancedJavaPlugin plugin) {
         super("reload", plugin);
+        withPermission(plugin.getPermission("reload"));
+        withDescription(plugin.getLang("reload-command"));
         withCommandExecution((sender, args, placeholders) -> {
-            plugin.sendMessage(sender, "reloading", placeholders);
-            plugin.createHooks();
-            plugin.generateFiles();
-            plugin.generateExamples();
-            final List<Manager> loadedManagers = plugin.getLoadedManagers();
-            for (Manager manager : loadedManagers) {
-                manager.disable();
-                manager.enable();
+            try {
+                plugin.reload(errorsFound -> {
+                    if (sender instanceof Player player) {
+                        plugin.logConfigurationErrors(player, errorsFound);
+                    }
+                    else {
+                        plugin.logConfigurationErrors(null, errorsFound);
+                    }
+                    plugin.sendMessage(sender, "reload-complete", placeholders);
+                });
+            } catch (PluginReloadInProgressException e) {
+                plugin.sendMessage(sender, "already-reloading", placeholders);
+                return;
             }
-            plugin.getScheduler().runTaskAsync(() -> {
-                try {
-                    plugin.getLogger().info("Saving data to database...");
-                    loadedManagers.forEach(Manager::saveData);
-                    plugin.getLogger().info("Loading configuration and data...");
-                    loadedManagers.forEach(Manager::loadData);
-                } catch (ConfigurationLoadException | InvalidConfigurationException e) {
-                    if (sender instanceof Player) {
-                        sender.sendMessage(ChatColor.RED + e.getMessage());
-                    }
-                    for (Manager manager : loadedManagers) {
-                        manager.disable();
-                    }
-                    throw e;
-                }
-                plugin.sendMessage(sender, "reload-complete", placeholders);
-            });
+            plugin.sendMessage(sender, "reloading", placeholders);
         });
     }
 

@@ -12,7 +12,7 @@ public class LanguageManager extends Manager {
     private Locale defaultLanguage = Locale.ENGLISH;
     private final Map<String, String> dictionary = new HashMap<>();
 
-    public LanguageManager(EnhancedPlugin plugin) {
+    public LanguageManager(EnhancedJavaPlugin plugin) {
         super(plugin);
     }
 

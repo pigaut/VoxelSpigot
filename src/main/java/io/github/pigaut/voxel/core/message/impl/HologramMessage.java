@@ -1,0 +1,63 @@
+package io.github.pigaut.voxel.core.message.impl;
+
+import io.github.pigaut.voxel.hologram.*;
+import io.github.pigaut.voxel.menu.button.*;
+import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.yaml.*;
+import org.bukkit.*;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.*;
+import org.jetbrains.annotations.*;
+
+import java.util.concurrent.*;
+
+public class HologramMessage extends GenericMessage {
+
+    private final EnhancedPlugin plugin;
+    private final Hologram hologram;
+    private final int duration;
+    private final Double radiusX, radiusY, radiusZ;
+
+    public HologramMessage(@NotNull EnhancedPlugin plugin, String name, @Nullable String group,
+                           ConfigSection section, @NotNull Hologram hologram, int duration,
+                           @Nullable Double radiusX, @Nullable Double radiusY, @Nullable Double radiusZ) {
+        super(name, group, section);
+        this.plugin = plugin;
+        this.hologram = hologram;
+        this.duration = duration;
+        this.radiusX = radiusX;
+        this.radiusY = radiusY;
+        this.radiusZ = radiusZ;
+    }
+
+    @Override
+    public @NotNull ItemStack getIcon() {
+        return IconBuilder.of(Material.BEACON).buildIcon();
+    }
+
+    @Override
+    public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
+        final Location location = player.getLocation();
+        location.add(player.getFacing().getDirection().multiply(2));
+
+        if (radiusX != null && radiusX > 0) {
+            location.add(ThreadLocalRandom.current().nextDouble(-radiusX, radiusX), 0, 0);
+        }
+
+        if (radiusY != null && radiusY > 0) {
+            location.add(0, ThreadLocalRandom.current().nextDouble(-radiusY, radiusY), 0);
+        }
+
+        if (radiusZ != null && radiusZ > 0) {
+            location.add(0, 0, ThreadLocalRandom.current().nextDouble(-radiusZ, radiusZ));
+        }
+
+        final HologramDisplay display = hologram.spawn(location, false, placeholderSuppliers);
+
+        if (display != null) {
+            plugin.getScheduler().runTaskLater(duration, display::despawn);
+        }
+    }
+
+}

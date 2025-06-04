@@ -12,8 +12,8 @@ import java.util.*;
 
 public abstract class EnhancedCommand extends BukkitCommand {
 
-    private final EnhancedPlugin plugin;
-    private final RootCommand rootCommand;
+    protected final EnhancedPlugin plugin;
+    protected final RootCommand rootCommand;
 
     protected EnhancedCommand(@NotNull EnhancedPlugin plugin, @NotNull String name) {
         super(name);

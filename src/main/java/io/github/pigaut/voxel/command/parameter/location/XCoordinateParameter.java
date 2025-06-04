@@ -13,7 +13,7 @@ import java.util.*;
 public class XCoordinateParameter extends CommandParameter {
 
     public XCoordinateParameter(@NotNull EnhancedPlugin plugin) {
-        super(plugin.getLang("x-coordinate-parameter"), new XCoordinateCompletion());
+        super("x", new XCoordinateCompletion());
     }
 
     private static class XCoordinateCompletion implements PlayerCompletion {

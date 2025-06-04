@@ -1,6 +1,6 @@
 package io.github.pigaut.voxel.command.execution;
 
-import io.github.pigaut.voxel.meta.placeholder.*;
+import io.github.pigaut.voxel.placeholder.*;
 import org.bukkit.entity.*;
 
 @FunctionalInterface

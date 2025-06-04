@@ -1,7 +1,6 @@
 package io.github.pigaut.voxel.hologram;
 
-import io.github.pigaut.voxel.hologram.display.*;
-import io.github.pigaut.voxel.meta.placeholder.*;
+import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.util.Rotation;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
@@ -17,8 +16,8 @@ public class MultiLineHologram implements Hologram {
     }
 
     @Override
-    public HologramDisplay spawn(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholderSuppliers) {
-        final HologramDisplay hologram = new MultiLineHologramDisplay(location, rotation, persistent, placeholderSuppliers);
+    public HologramDisplay spawn(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholders) {
+        final HologramDisplay hologram = new MultiLineHologramDisplay(location, rotation, persistent, placeholders);
         hologram.spawn();
         return hologram;
     }

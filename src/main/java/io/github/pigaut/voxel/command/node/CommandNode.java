@@ -1,9 +1,10 @@
 package io.github.pigaut.voxel.command.node;
 
+import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.command.completion.*;
 import io.github.pigaut.voxel.command.execution.*;
 import io.github.pigaut.voxel.command.parameter.*;
-import io.github.pigaut.voxel.meta.placeholder.*;
+import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.util.*;
@@ -38,10 +39,10 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
 
     public Placeholder[] getPlaceholders() {
         return new Placeholder[] {
-                Placeholder.of("%command%", getCommand()),
-                Placeholder.of("%full_command%", getFullCommand()),
-                Placeholder.of("%description%", description),
-                Placeholder.of("%permission%", permission)
+                Placeholder.of("{command}", getFullCommand()),
+                Placeholder.of("{command_name}", getCommand()),
+                Placeholder.of("{command_description}", description),
+                Placeholder.of("{command_permission}", permission)
         };
     }
 
@@ -246,7 +247,7 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
 
     public CommandNode withPlayerStateExecution(@NotNull PlayerStateExecution playerExecution) {
         return withPlayerExecution((player, args, placeholders) -> {
-            final PluginPlayer pluginPlayer = plugin.getPlayer(player.getUniqueId());
+            final PlayerState pluginPlayer = plugin.getPlayerState(player.getUniqueId());
             if (pluginPlayer == null) {
                 Chat.send(player, plugin.getLang("loading-player-data"));
                 return;
@@ -269,17 +270,6 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
         return this;
     }
 
-    private boolean hasPermission(CommandSender sender) {
-        CommandNode currentNode = this;
-        while (!currentNode.isRoot()) {
-            if (currentNode.permission != null && !sender.hasPermission(currentNode.permission)) {
-                return false;
-            }
-            currentNode = currentNode.getParent();
-        }
-        return true;
-    }
-
     public final void execute(CommandSender sender, String[] args) {
         final int argsCount = args.length;
         if (argsCount < minArgs) {
@@ -292,23 +282,23 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
             return;
         }
 
-        if (!hasPermission(sender)) {
+        if (permission != null && !sender.hasPermission(permission)) {
             plugin.sendMessage(sender, "no-permission", this);
             return;
         }
 
         final List<Placeholder> placeholders = new ArrayList<>();
-        placeholders.add(Placeholder.of("%command%", getCommand()));
-        placeholders.add(Placeholder.of("%full_command%", getFullCommand()));
-        placeholders.add(Placeholder.of("%description%", description));
-        placeholders.add(Placeholder.of("%permission%", permission));
+        placeholders.add(Placeholder.of("{command}", getFullCommand()));
+        placeholders.add(Placeholder.of("{command_name}", getCommand()));
+        placeholders.add(Placeholder.of("{command_description}", description));
+        placeholders.add(Placeholder.of("{command_permission}", permission));
 
         final String[] paramArgs = new String[this.parameters.size()];
         for (int i = 0; i < parameters.size(); i++) {
             final CommandParameter parameter = parameters.get(i);
             final String value = args.length > i ? args[i] : parameter.getDefaultValue();
             paramArgs[i] = value;
-            placeholders.add(Placeholder.from(parameter.getName(), value));
+            placeholders.add(Placeholder.create(parameter.getName(), '{', '}', value));
         }
 
         final PlaceholderSupplier placeholderSupplier = () -> placeholders.toArray(new Placeholder[0]);
@@ -331,6 +321,10 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
     }
 
     public final List<String> tabComplete(CommandSender sender, String[] args) {
+        if (permission != null && !sender.hasPermission(permission)) {
+            return List.of();
+        }
+
         final int argsLength = args.length;
         if (argsLength < 1) {
             return List.of();

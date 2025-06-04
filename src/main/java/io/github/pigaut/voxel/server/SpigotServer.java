@@ -62,8 +62,8 @@ public class SpigotServer {
         return isPluginLoaded("Vault") ? EconomyHook.newInstance() : null;
     }
 
-    public static @Nullable PlaceholderAPIHook getPlaceholderAPIHook() {
-        return isPluginLoaded("PlaceholderAPI") ? new PlaceholderAPIHook() : null;
+    public static @Nullable PlaceholdersHook getPlaceholderAPIHook() {
+        return isPluginLoaded("PlaceholderAPI") ? new PlaceholdersHook() : null;
     }
 
     public static @Nullable Plugin getPlugin(String name) {

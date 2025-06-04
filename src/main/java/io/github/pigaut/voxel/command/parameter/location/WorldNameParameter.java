@@ -7,8 +7,8 @@ import org.jetbrains.annotations.*;
 
 public class WorldNameParameter extends CommandParameter {
 
-    public WorldNameParameter(@NotNull EnhancedPlugin plugin) {
-        super(plugin.getLang("world-name-parameter"), (sender, args) -> SpigotServer.getWorldNames());
+    public WorldNameParameter() {
+        super("world-name", (sender, args) -> SpigotServer.getWorldNames());
     }
 
 }

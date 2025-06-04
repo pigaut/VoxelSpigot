@@ -12,7 +12,7 @@ public class CommandManager extends Manager {
 
     private final Map<String, EnhancedCommand> customCommands = new HashMap<>();
 
-    public CommandManager(EnhancedPlugin plugin) {
+    public CommandManager(EnhancedJavaPlugin plugin) {
         super(plugin);
     }
 

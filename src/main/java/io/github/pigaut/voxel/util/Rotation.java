@@ -2,6 +2,10 @@ package io.github.pigaut.voxel.util;
 
 import org.bukkit.*;
 import org.bukkit.block.*;
+import org.jetbrains.annotations.*;
+
+import java.util.*;
+import java.util.stream.*;
 
 public enum Rotation {
 
@@ -12,7 +16,7 @@ public enum Rotation {
         }
 
         @Override
-        public BlockFace translateBlockFace(BlockFace blockFace) {
+        public BlockFace translateBlockFace(@NotNull BlockFace blockFace) {
             return blockFace;
         }
 
@@ -42,7 +46,7 @@ public enum Rotation {
         }
 
         @Override
-        public BlockFace translateBlockFace(BlockFace blockFace) {
+        public BlockFace translateBlockFace(@NotNull BlockFace blockFace) {
             return blockFace.getOppositeFace();
         }
 
@@ -68,8 +72,14 @@ public enum Rotation {
 
     public abstract Location apply(Location location, double x, double y, double z);
 
-    public BlockFace translateBlockFace(BlockFace blockFace) {
+    public BlockFace translateBlockFace(@NotNull BlockFace blockFace) {
         return rotateBlockFace(blockFace, this);
+    }
+
+    public Set<BlockFace> translateBlockFaces(@NotNull Collection<@NotNull BlockFace> blockFaces) {
+        return blockFaces.stream()
+                .map(this::translateBlockFace)
+                .collect(Collectors.toSet());
     }
 
     public abstract Axis translateAxis(Axis axis);

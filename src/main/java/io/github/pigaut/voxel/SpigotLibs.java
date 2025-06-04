@@ -1,6 +1,7 @@
 package io.github.pigaut.voxel;
 
 import io.github.pigaut.voxel.server.*;
+import io.github.pigaut.yaml.deserializer.*;
 import io.github.pigaut.yaml.parser.*;
 import io.github.pigaut.yaml.parser.deserializer.*;
 import org.bukkit.*;
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.*;
 
 public class SpigotLibs {
 
-    private static final Deserializer<Material> materialDeserializer = Deserializers.enumDeserializer(Material.class);
+    private static final Deserializer<Material> materialDeserializer = new MaterialDeserializer();
 
     public static @Nullable Material getMaterial(String value) {
         try {
@@ -21,7 +22,7 @@ public class SpigotLibs {
         }
     }
 
-    public static Material deserializeMaterial(String value) throws DeserializationException {
+    public static @NotNull Material deserializeMaterial(String value) throws DeserializationException {
         return materialDeserializer.deserialize(value);
     }
 
@@ -66,7 +67,7 @@ public class SpigotLibs {
         return hologram;
     }
 
-    public static @NotNull ArmorStand createHologram(@NotNull Location location, boolean persistent) {
+    public static @NotNull ArmorStand createEmptyHologram(@NotNull Location location, boolean persistent) {
         return createHologram("&7", location, persistent);
     }
 

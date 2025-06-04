@@ -1,10 +1,8 @@
 package io.github.pigaut.voxel.hologram;
 
 import io.github.pigaut.voxel.*;
-import io.github.pigaut.voxel.hologram.display.*;
-import io.github.pigaut.voxel.meta.placeholder.*;
+import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.Rotation;
 import org.bukkit.*;
 import org.bukkit.block.*;
@@ -31,7 +29,7 @@ public class AnimatedHologram implements Hologram {
     }
 
     @Override
-    public HologramDisplay spawn(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholderSuppliers) {
+    public HologramDisplay spawn(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholders) {
         final World world = SpigotLibs.getWorldOrDefault(location);
         final Block block = world.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         if (block.getType() != Material.AIR) {
@@ -39,7 +37,7 @@ public class AnimatedHologram implements Hologram {
         }
         final HologramDisplay hologram = new AnimatedHologramDisplay(
                 new Location(world, location.getX(), location.getY(), location.getZ()),
-                persistent, placeholderSuppliers);
+                persistent, placeholders);
         hologram.spawn();
         return hologram;
     }
@@ -69,7 +67,7 @@ public class AnimatedHologram implements Hologram {
             if (!location.getChunk().isLoaded()) {
                 return;
             }
-            display = SpigotLibs.createHologram(location, persistent);
+            display = SpigotLibs.createEmptyHologram(location, persistent);
             updateTask = new BukkitRunnable() {
                 int interval = 0;
                 @Override

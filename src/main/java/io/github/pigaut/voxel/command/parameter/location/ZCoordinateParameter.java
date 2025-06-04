@@ -13,7 +13,7 @@ import java.util.*;
 public class ZCoordinateParameter extends CommandParameter {
 
     public ZCoordinateParameter(@NotNull EnhancedPlugin plugin) {
-        super(plugin.getLang("z-coordinate-parameter"), new ZCoordinateCompletion());
+        super("z", new ZCoordinateCompletion());
     }
 
     private static class ZCoordinateCompletion implements PlayerCompletion {

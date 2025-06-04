@@ -1,6 +1,6 @@
 package io.github.pigaut.voxel.player;
 
-import io.github.pigaut.voxel.meta.placeholder.*;
+import io.github.pigaut.voxel.placeholder.*;
 import net.md_5.bungee.api.*;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.*;
