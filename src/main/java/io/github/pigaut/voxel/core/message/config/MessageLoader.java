@@ -5,9 +5,9 @@ import io.github.pigaut.voxel.core.message.impl.*;
 import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
+import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
-import io.github.pigaut.yaml.formatter.*;
 import io.github.pigaut.yaml.parser.*;
 import org.bukkit.boss.*;
 import org.jetbrains.annotations.*;
@@ -43,19 +43,19 @@ public class MessageLoader implements ConfigLoader<Message> {
         Message message;
         switch (type) {
             case "CHAT" -> {
-                final String chat = section.getString("message", StringColor.FORMATTER);
+                final String chat = section.getOptionalString("message", StringColor.FORMATTER).orElse("none");
                 message = new ChatMessage(messageName, messageGroup, section, chat);
             }
 
             case "ACTIONBAR" -> {
-                final String actionbar = section.getString("message", StringColor.FORMATTER);
+                final String actionbar = section.getOptionalString("message", StringColor.FORMATTER).orElse("none");
                 message = new ActionBarMessage(messageName, messageGroup, section, actionbar);
             }
 
             case "BOSSBAR" -> {
                 message = new BossBarMessage(plugin, messageName, messageGroup, section,
-                        section.getString("title", StringColor.FORMATTER),
-                        section.getOptional("style", BarStyle.class).orElse(BarStyle.SEGMENTED_6),
+                        section.getOptionalString("title", StringColor.FORMATTER).orElse("none"),
+                        section.getOptional("style", BarStyle.class).orElse(BarStyle.SOLID),
                         section.getOptional("color", BarColor.class).orElse(BarColor.RED),
                         section.getOptionalInteger("duration").orElse(100),
                         section.getDoubleList("progress")
@@ -64,7 +64,7 @@ public class MessageLoader implements ConfigLoader<Message> {
 
             case "TITLE" -> {
                 message = new TitleMessage(messageName, messageGroup, section,
-                        section.getString("title", StringColor.FORMATTER),
+                        section.getOptionalString("title", StringColor.FORMATTER).orElse("none"),
                         section.getOptionalString("subtitle", StringColor.FORMATTER).orElse(""),
                         section.getOptionalInteger("fade-in").orElse(20),
                         section.getOptionalInteger("stay").orElse(60),

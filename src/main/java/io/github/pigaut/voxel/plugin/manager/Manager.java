@@ -65,7 +65,6 @@ public abstract class Manager {
      *                       handle or log errors after reload completes
      */
     public void reload(Consumer<List<ConfigurationException>> errorCollector) {
-        plugin.getLogger().info("Reloading " + StringFormatter.toTitleCase(getClass()) + "...");
         disable();
         enable();
         plugin.getScheduler().runTaskAsync(() -> {

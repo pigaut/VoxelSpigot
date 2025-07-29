@@ -118,9 +118,9 @@ public class SimplePlayerState implements PlayerState {
 
     @Override
     public @NotNull MenuView openMenu(Menu menu, MenuView previousView) {
-        final MenuView menuView = menu.createView(this, previousView);
-        this.setOpenView(menuView);
-        return menuView;
+        final MenuView view = menu.createView(this, previousView);
+        view.open();
+        return view;
     }
 
     @Override
@@ -129,22 +129,8 @@ public class SimplePlayerState implements PlayerState {
     }
 
     @Override
-    public void setOpenView(@Nullable MenuView menuView) {
-        if (openMenu != null) {
-            if (menuView != null) {
-                openMenu.getMenu().onClose(menuView);
-            }
-            openMenu = null;
-        }
-
-        if (menuView == null) {
-            return;
-        }
-
-        menuView.update();
-        menuView.getMenu().onOpen(menuView);
-        this.openInventory(menuView.getInventory());
-        this.openMenu = menuView;
+    public void setOpenMenu(@Nullable MenuView view) {
+        this.openMenu = view;
     }
 
     @Override

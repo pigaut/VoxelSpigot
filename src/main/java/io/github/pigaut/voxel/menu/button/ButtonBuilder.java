@@ -1,18 +1,20 @@
 package io.github.pigaut.voxel.menu.button;
 
 import io.github.pigaut.voxel.menu.*;
-import io.github.pigaut.yaml.parser.*;
+import io.github.pigaut.voxel.player.*;
+import io.github.pigaut.voxel.util.*;
 import org.bukkit.*;
 import org.bukkit.event.inventory.*;
 
+import java.util.*;
 import java.util.function.*;
 
 public class ButtonBuilder extends IconBuilder {
 
-    private BiConsumer<MenuView, InventoryClickEvent> leftClick = (view, event) -> {};
-    private BiConsumer<MenuView, InventoryClickEvent> shiftLeftClick = (view, event) -> {};
-    private BiConsumer<MenuView, InventoryClickEvent> rightClick = (view, event) -> {};
-    private BiConsumer<MenuView, InventoryClickEvent> shiftRightClick = (view, event) -> {};
+    private TriConsumer<MenuView, PlayerState, InventoryClickEvent> leftClick = (view, player, event) -> {};
+    private TriConsumer<MenuView, PlayerState, InventoryClickEvent> shiftLeftClick = (view, player, event) -> {};
+    private TriConsumer<MenuView, PlayerState, InventoryClickEvent> rightClick = (view, player, event) -> {};
+    private TriConsumer<MenuView, PlayerState, InventoryClickEvent> shiftRightClick = (view, player, event) -> {};
 
     ButtonBuilder() {
         super(Material.TERRACOTTA);
@@ -25,23 +27,23 @@ public class ButtonBuilder extends IconBuilder {
     public Button buildButton() {
         return new Button(this.buildIcon()) {
             @Override
-            public void onLeftClick(MenuView view, InventoryClickEvent event) {
-                leftClick.accept(view, event);
+            public void onLeftClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+                leftClick.accept(view, player, event);
             }
 
             @Override
-            public void onRightClick(MenuView view, InventoryClickEvent event) {
-                rightClick.accept(view, event);
+            public void onRightClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+                rightClick.accept(view, player, event);
             }
 
             @Override
-            public void onShiftLeftClick(MenuView view, InventoryClickEvent event) {
-                shiftLeftClick.accept(view, event);
+            public void onShiftLeftClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+                shiftLeftClick.accept(view, player, event);
             }
 
             @Override
-            public void onShiftRightClick(MenuView view, InventoryClickEvent event) {
-                shiftRightClick.accept(view, event);
+            public void onShiftRightClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+                shiftRightClick.accept(view, player, event);
             }
         };
     }
@@ -62,8 +64,13 @@ public class ButtonBuilder extends IconBuilder {
     }
 
     @Override
-    public ButtonBuilder addLore(String line) {
-        return (ButtonBuilder) super.addLore(line);
+    public ButtonBuilder addLore(String... loreLines) {
+        return (ButtonBuilder) super.addLore(loreLines);
+    }
+
+    @Override
+    public ButtonBuilder addLore(List<String> loreLines) {
+        return (ButtonBuilder) super.addLore(loreLines);
     }
 
     @Override
@@ -71,22 +78,22 @@ public class ButtonBuilder extends IconBuilder {
         return (ButtonBuilder) super.enchanted(enchanted);
     }
 
-    public ButtonBuilder onLeftClick(BiConsumer<MenuView, InventoryClickEvent> action) {
+    public ButtonBuilder onLeftClick(TriConsumer<MenuView, PlayerState, InventoryClickEvent> action) {
         this.leftClick = action;
         return this;
     }
 
-    public ButtonBuilder onShiftLeftClick(BiConsumer<MenuView, InventoryClickEvent> action) {
+    public ButtonBuilder onShiftLeftClick(TriConsumer<MenuView, PlayerState, InventoryClickEvent> action) {
         this.shiftLeftClick = action;
         return this;
     }
 
-    public ButtonBuilder onRightClick(BiConsumer<MenuView, InventoryClickEvent> action) {
+    public ButtonBuilder onRightClick(TriConsumer<MenuView, PlayerState, InventoryClickEvent> action) {
         this.rightClick = action;
         return this;
     }
 
-    public ButtonBuilder onShiftRightClick(BiConsumer<MenuView, InventoryClickEvent> action) {
+    public ButtonBuilder onShiftRightClick(TriConsumer<MenuView, PlayerState, InventoryClickEvent> action) {
         this.shiftRightClick = action;
         return this;
     }

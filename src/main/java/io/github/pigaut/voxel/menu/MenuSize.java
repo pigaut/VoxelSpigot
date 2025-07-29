@@ -9,4 +9,8 @@ public class MenuSize {
     public static final int BIG = 45;
     public static final int LARGE = 54;
 
+    public static boolean isValid(int size) {
+        return size >= TINY && size <= LARGE && size % 9 == 0;
+    }
+
 }

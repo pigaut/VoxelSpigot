@@ -33,6 +33,11 @@ public class PeriodicMessage implements Message {
     }
 
     @Override
+    public @NotNull MessageType getType() {
+        return message.getType();
+    }
+
+    @Override
     public @NotNull ItemStack getIcon() {
         return message.getIcon();
     }
@@ -43,7 +48,7 @@ public class PeriodicMessage implements Message {
     }
 
     @Override
-    public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
+    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
         message.send(player, placeholderSuppliers);
         for (int i = 1; i < repetitions; i++) {
             final long delay = (long) interval * i;

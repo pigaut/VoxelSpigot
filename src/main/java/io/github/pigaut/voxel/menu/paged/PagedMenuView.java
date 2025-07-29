@@ -59,7 +59,14 @@ public class PagedMenuView extends FixedMenuView {
         for (int i = startIndex, j = 0; i < endIndex; i++, j++) {
             buttons[pagedMenu.getEntrySlot(j)] = entries.get(i);
         }
-        updateInventory();
+        inventory.clear();
+        for (int i = 0; i < menu.getSize(); i++) {
+            final Button button = buttons[i];
+            if (button != null) {
+                inventory.setItem(i, button.getIcon());
+            }
+        }
+        viewer.updateInventory();
     }
 
 }

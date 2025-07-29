@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel;
 
+import io.github.pigaut.voxel.config.deserializer.*;
 import io.github.pigaut.voxel.server.*;
-import io.github.pigaut.yaml.deserializer.*;
 import io.github.pigaut.yaml.parser.*;
 import io.github.pigaut.yaml.parser.deserializer.*;
 import org.bukkit.*;

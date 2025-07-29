@@ -16,6 +16,10 @@ public interface Menu {
 
     @NotNull Button[] createButtons();
 
+    boolean keepOpen();
+
+    boolean backOnClose();
+
     void onOpen(MenuView view);
 
     void onClose(MenuView view);

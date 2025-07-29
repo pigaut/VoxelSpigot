@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.core.function.action.player;
 
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.yaml.formatter.*;
+import io.github.pigaut.voxel.util.*;
 import org.jetbrains.annotations.*;
 
 public class SendChatMessage implements PlayerAction {

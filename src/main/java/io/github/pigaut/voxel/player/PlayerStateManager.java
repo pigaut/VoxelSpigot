@@ -2,6 +2,7 @@ package io.github.pigaut.voxel.player;
 
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.Manager;
+import io.github.pigaut.yaml.util.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -9,6 +10,7 @@ import org.bukkit.event.player.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
+import java.util.function.*;
 
 public class PlayerStateManager<P extends PlayerState> extends Manager implements Listener {
 
@@ -38,21 +40,6 @@ public class PlayerStateManager<P extends PlayerState> extends Manager implement
     public List<P> getAllPlayerStates() {
         return new ArrayList<>(playersByUUID.values());
     }
-
-    @Override
-    public void enable() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            this.registerPlayer(playerStateFactory.create(plugin, player));
-        }
-    }
-
-    @Override
-    public void disable() {
-        this.clearPlayers();
-    }
-
-    @Override
-    public void reload() {}
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {

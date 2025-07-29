@@ -2,12 +2,10 @@ package io.github.pigaut.voxel.menu.template.button;
 
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.menu.button.*;
-import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.util.*;
-import io.github.pigaut.yaml.util.*;
 import org.bukkit.*;
+import org.bukkit.entity.*;
 import org.bukkit.event.inventory.*;
 
 public class PluginReloadButton extends Button {
@@ -16,26 +14,29 @@ public class PluginReloadButton extends Button {
 
     public PluginReloadButton(EnhancedJavaPlugin plugin) {
         super(IconBuilder.of(Material.OAK_BUTTON)
-                .withDisplay("&f&lReload")
-                .addLore("")
-                .addLore("&eLeft-Click: &fReload the plugin")
+                .withDisplay("&aReload")
                 .enchanted(true)
                 .buildIcon());
         this.plugin = plugin;
     }
 
     @Override
-    public void onLeftClick(MenuView view, InventoryClickEvent event) {
+    public void onLeftClick(MenuView view, PlayerState playerState, InventoryClickEvent event) {
         view.close();
+        final Player player = playerState.asPlayer();
         try {
             plugin.reload(errorsFound -> {
-                final PlayerState player = view.getViewer();
-                plugin.logConfigurationErrors(player.asPlayer(), errorsFound);
+                plugin.logConfigurationErrors(player, errorsFound);
+                plugin.sendMessage(player, "reload-complete");
                 if (errorsFound.isEmpty()) {
-                    player.setOpenView(view);
+                    plugin.getScheduler().runTask(view::open);
                 }
             });
-        } catch (PluginReloadInProgressException ignored) {}
+        } catch (PluginReloadInProgressException e) {
+            plugin.sendMessage(player, "already-reloading");
+            return;
+        }
+        plugin.sendMessage(player, "reloading");
     }
 
 }

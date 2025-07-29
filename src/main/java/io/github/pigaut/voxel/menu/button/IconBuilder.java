@@ -1,13 +1,14 @@
 package io.github.pigaut.voxel.menu.button;
 
-import io.github.pigaut.yaml.formatter.*;
-import io.github.pigaut.yaml.parser.*;
+import io.github.pigaut.voxel.util.*;
 import org.bukkit.*;
 import org.bukkit.enchantments.*;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
+import org.jetbrains.annotations.*;
 
 import java.util.*;
+import java.util.function.*;
 
 public class IconBuilder {
 
@@ -16,6 +17,7 @@ public class IconBuilder {
     private String display = "";
     private boolean enchanted = false;
     private final List<String> lore = new ArrayList<>();
+    private @Nullable String headTexture = null;
 
     public IconBuilder() {
         this(Material.TERRACOTTA);
@@ -39,11 +41,12 @@ public class IconBuilder {
             if (!lore.isEmpty()) {
                 meta.setLore(lore);
             }
-
             if (enchanted) {
                 meta.addEnchant(Enchantment.ARROW_DAMAGE, 1, false);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
+
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE);
             icon.setItemMeta(meta);
         }
         return icon;
@@ -60,12 +63,21 @@ public class IconBuilder {
     }
 
     public IconBuilder withDisplay(String display) {
-        this.display = StringColor.translateColors(display);
+        this.display = StringColor.translateColors("&f" + display);
         return this;
     }
 
-    public IconBuilder addLore(String line) {
-        this.lore.add(StringColor.translateColors(line));
+    public IconBuilder addLore(String... loreLines) {
+        for (String loreLine : loreLines) {
+            lore.add(StringColor.translateColors("&f" + loreLine));
+        }
+        return this;
+    }
+
+    public IconBuilder addLore(List<String> loreLines) {
+        for (String loreLine : loreLines) {
+            lore.add(StringColor.translateColors("&f" + loreLine));
+        }
         return this;
     }
 

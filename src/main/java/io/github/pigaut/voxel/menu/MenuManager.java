@@ -7,7 +7,6 @@ import io.github.pigaut.voxel.plugin.manager.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.inventory.*;
-import org.bukkit.event.player.*;
 
 import java.util.*;
 
@@ -55,14 +54,32 @@ public class MenuManager extends Manager implements Listener {
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
         final PlayerState player = plugin.getPlayerState((Player) event.getPlayer());
+        final MenuView view = player.getOpenMenu();
+        if (view == null) {
+            return;
+        }
+
+        player.setOpenMenu(null);
         if (player.isAwaitingInput(InputType.MENU)) {
             player.setAwaitingInput(null);
+            return;
         }
-        final MenuView view = player.getOpenMenu();
-        if (view != null) {
+
+        if (!view.isForcedClose()) {
+            final Menu menu = view.getMenu();
+            if (menu.keepOpen()) {
+                plugin.getScheduler().runTaskLater(1, view::open);
+                return;
+            }
+            else if (menu.backOnClose()) {
+                final MenuView previousView = view.getPreviousView();
+                if (previousView != null) {
+                    plugin.getScheduler().runTaskLater(1, previousView::open);
+                }
+            }
             view.getMenu().onClose(view);
         }
-        player.setOpenView(null);
+
     }
 
 }

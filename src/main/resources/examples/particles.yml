@@ -1,9 +1,0 @@
-
-simple-particle:
-  particle: crit
-  count: 1
-  offset: { x: 0, y: 0, z: 0 }
-  force: false
-  player-only: false
-
-

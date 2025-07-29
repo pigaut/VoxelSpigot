@@ -28,6 +28,11 @@ public class RepeatedMessage implements Message {
     }
 
     @Override
+    public @NotNull MessageType getType() {
+        return message.getType();
+    }
+
+    @Override
     public @NotNull ItemStack getIcon() {
         return message.getIcon();
     }
@@ -38,7 +43,7 @@ public class RepeatedMessage implements Message {
     }
 
     @Override
-    public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
+    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
         for (int i = 0; i < repetitions; i++) {
             message.send(player, placeholderSuppliers);
         }

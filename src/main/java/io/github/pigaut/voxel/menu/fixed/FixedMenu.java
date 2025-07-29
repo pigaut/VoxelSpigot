@@ -38,8 +38,18 @@ public class FixedMenu implements Menu {
     }
 
     @Override
-    public @Nullable Button[] createButtons() {
+    public @NotNull Button[] createButtons() {
         return new Button[size];
+    }
+
+    @Override
+    public boolean keepOpen() {
+        return false;
+    }
+
+    @Override
+    public boolean backOnClose() {
+        return false;
     }
 
     @Override

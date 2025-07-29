@@ -742,7 +742,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
 
         final PlaceholderSupplier errorCount = PlaceholderSupplier.of("{error_count}", errors.size());
-        errors.forEach(error -> logger.severe(error.getLogMessage()));
+        errors.forEach(error -> logger.severe(error.getLogMessage(getDataFolder().getPath())));
 
         if (player == null) {
             return;
@@ -750,7 +750,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
         if (debug) {
             sendMessage(player, "debug-configuration-errors", errorCount);
-            errors.forEach(error -> player.sendMessage(ChatColor.RED + error.getLogMessage()));
+            errors.forEach(error -> player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + error.getLogMessage()));
             return;
         }
 

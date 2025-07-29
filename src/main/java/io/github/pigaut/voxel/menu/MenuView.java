@@ -17,6 +17,12 @@ public interface MenuView {
 
     @NotNull MenuView getFirstView();
 
+    boolean isForcedClose();
+
+    boolean isOpen();
+
+    void open();
+
     void close();
 
     void update();

@@ -22,7 +22,9 @@ public class ChatInput extends PlayerInput {
         final MenuView previousView = playerState.getOpenMenu();
 
         final Player player = playerState.asPlayer();
-        player.closeInventory();
+        if (previousView != null) {
+            previousView.close();
+        }
         player.sendTitle(inputDescription, "Type ESC to cancel", 10, 3600, 10);
 
         new PluginRunnable(playerState.getPlugin()) {
@@ -30,7 +32,7 @@ public class ChatInput extends PlayerInput {
             public void run() {
                 if (!playerState.isAwaitingInput(InputType.CHAT)) {
                     player.resetTitle();
-                    playerState.setOpenView(previousView);
+                    playerState.setOpenMenu(previousView);
                     onCancel.run();
                     cancel();
                     return;

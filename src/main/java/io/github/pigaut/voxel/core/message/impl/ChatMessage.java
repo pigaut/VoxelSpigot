@@ -1,6 +1,7 @@
 package io.github.pigaut.voxel.core.message.impl;
 
 import io.github.pigaut.voxel.bukkit.*;
+import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.yaml.*;
@@ -19,12 +20,17 @@ public class ChatMessage extends GenericMessage {
     }
 
     @Override
+    public @NotNull MessageType getType() {
+        return MessageType.CHAT;
+    }
+
+    @Override
     public @NotNull ItemStack getIcon() {
         return IconBuilder.of(Material.BOOK).buildIcon();
     }
 
     @Override
-    public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
+    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
         Chat.send(player, message, placeholderSuppliers);
     }
 

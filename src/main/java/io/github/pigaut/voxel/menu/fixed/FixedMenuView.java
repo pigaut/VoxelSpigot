@@ -16,6 +16,7 @@ public class FixedMenuView implements MenuView {
     protected Button[] buttons;
     protected final Inventory inventory;
     private final MenuView previousView;
+    private boolean forceClose = false;
 
     public FixedMenuView(FixedMenu menu, PlayerState viewer, MenuView previousView) {
         this.menu = menu;
@@ -58,17 +59,38 @@ public class FixedMenuView implements MenuView {
     }
 
     @Override
+    public boolean isForcedClose() {
+        return forceClose;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return viewer.getOpenMenu() == this;
+    }
+
+    @Override
+    public void open() {
+        forceClose = false;
+        final MenuView openMenu = viewer.getOpenMenu();
+        if (openMenu != null) {
+            openMenu.getMenu().onClose(openMenu);
+        }
+        viewer.setOpenMenu(null);
+        viewer.openInventory(inventory);
+        update();
+        viewer.setOpenMenu(this);
+        menu.onOpen(this);
+    }
+
+    @Override
     public void close() {
+        forceClose = true;
         viewer.closeInventory();
     }
 
     @Override
     public void update() {
         buttons = menu.createButtons();
-        updateInventory();
-    }
-
-    protected void updateInventory() {
         inventory.clear();
         for (int i = 0; i < menu.getSize(); i++) {
             final Button button = buttons[i];
@@ -76,6 +98,7 @@ public class FixedMenuView implements MenuView {
                 inventory.setItem(i, button.getIcon());
             }
         }
+        viewer.updateInventory();
     }
 
     @Override

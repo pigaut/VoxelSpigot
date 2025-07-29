@@ -3,7 +3,6 @@ package io.github.pigaut.voxel.language;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.formatter.*;
 import io.github.pigaut.yaml.node.*;
 import io.github.pigaut.yaml.node.section.*;
 import io.github.pigaut.yaml.parser.*;
@@ -30,7 +29,7 @@ public class SimpleLanguageManager extends LanguageManager {
         try {
             languageConfig.load();
         } catch (ConfigurationLoadException e) {
-            ConfigErrorMessage.log(plugin, e);
+            logger.severe(e.getLogMessage());
         }
 
         final RootSection languageDefaults = new RootSection();

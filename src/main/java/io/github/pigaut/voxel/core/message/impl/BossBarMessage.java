@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.core.message.impl;
 
+import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
@@ -40,12 +41,17 @@ public class BossBarMessage extends GenericMessage {
 	}
 
 	@Override
+	public @NotNull MessageType getType() {
+		return MessageType.BOSSBAR;
+	}
+
+	@Override
 	public @NotNull ItemStack getIcon() {
 		return IconBuilder.of(Material.DRAGON_HEAD).buildIcon();
 	}
 
 	@Override
-	public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
+	public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
 		final String parsedTitle = StringPlaceholders.parseAll(player, title, placeholderSuppliers);
 		BossBar bossBar = Bukkit.getServer().createBossBar(parsedTitle, color, style);
 

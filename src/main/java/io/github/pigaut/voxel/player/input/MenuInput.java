@@ -57,7 +57,10 @@ public class MenuInput extends PlayerInput {
             @Override
             public void run() {
                 if (!playerState.isAwaitingInput(InputType.MENU)) {
-                    playerState.setOpenView(selectionView.getPreviousView());
+                    final MenuView previousView = selectionView.getPreviousView();
+                    if (previousView != null) {
+                        previousView.open();
+                    }
                     onCancel.run();
                     cancel();
                     return;

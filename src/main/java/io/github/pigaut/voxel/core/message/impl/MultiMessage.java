@@ -26,6 +26,11 @@ public class MultiMessage implements Message {
     }
 
     @Override
+    public @NotNull MessageType getType() {
+        return MessageType.MULTI;
+    }
+
+    @Override
     public @NotNull String getName() {
         return name;
     }
@@ -46,7 +51,7 @@ public class MultiMessage implements Message {
     }
 
     @Override
-    public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
+    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
         for (Message message : messages) {
             message.send(player, placeholderSuppliers);
         }

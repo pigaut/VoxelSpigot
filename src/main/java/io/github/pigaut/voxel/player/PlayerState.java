@@ -5,13 +5,11 @@ import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.input.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.yaml.util.ConfigurationException;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
-import javax.naming.*;
 import java.util.*;
 
 public interface PlayerState {
@@ -89,7 +87,7 @@ public interface PlayerState {
 
     @Nullable MenuView getOpenMenu();
 
-    void setOpenView(@Nullable MenuView view);
+    void setOpenMenu(@Nullable MenuView view);
 
     /**
      * Opens the player's ender chest inventory.

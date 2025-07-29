@@ -2,9 +2,9 @@ package io.github.pigaut.voxel.hologram.config;
 
 import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
-import io.github.pigaut.yaml.formatter.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -28,8 +28,8 @@ public class HologramLoader implements ConfigLoader<Hologram> {
         final Hologram hologram;
         if (animated) {
             final List<String> frames = config.getStringList("frames", StringColor.FORMATTER);
-            if (frames.size() < 2) {
-                throw new InvalidConfigurationException(config, "frames", "Animation needs to be at least two frames long");
+            while (frames.size() < 2) {
+                frames.add("none");
             }
             final int update = config.getOptionalInteger("update").orElse(3);
             if (update < 1) {
@@ -38,7 +38,7 @@ public class HologramLoader implements ConfigLoader<Hologram> {
             hologram = new AnimatedHologram(plugin, frames, update);
         }
         else {
-            final String text = config.getString("text", StringColor.FORMATTER);
+            final String text = config.getOptionalString("text", StringColor.FORMATTER).orElse("none");
             final int update = config.getOptionalInteger("update").orElse(0);
             hologram = new SimpleHologram(plugin, text, update);
         }

@@ -23,12 +23,17 @@ public class TitleMessage extends GenericMessage {
     }
 
     @Override
+    public @NotNull MessageType getType() {
+        return MessageType.TITLE;
+    }
+
+    @Override
     public @NotNull ItemStack getIcon() {
         return IconBuilder.of(Material.MAP).buildIcon();
     }
 
     @Override
-    public void send(Player player, PlaceholderSupplier... placeholderSuppliers) {
+    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
         title.send(player, placeholderSuppliers);
     }
 
