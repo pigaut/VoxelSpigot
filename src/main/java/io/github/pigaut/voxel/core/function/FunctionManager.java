@@ -27,9 +27,13 @@ public class FunctionManager extends ManagerContainer<Function> {
         config.setPrefix("Function");
         config.load();
 
-        for (String key : config.getKeys()) {
-            final Function function = config.get(key, Function.class);
-            this.add(function);
+        for (String functionName : config.getKeys()) {
+            final Function function = config.get(functionName, Function.class);
+            try {
+                add(function);
+            } catch (DuplicateElementException e) {
+                throw new InvalidConfigurationException(config, functionName, e.getMessage());
+            }
         }
     }
 

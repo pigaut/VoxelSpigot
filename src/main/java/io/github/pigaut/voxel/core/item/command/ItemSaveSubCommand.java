@@ -12,12 +12,12 @@ import org.jetbrains.annotations.*;
 
 import java.io.*;
 
-public class ItemAddSubCommand extends SubCommand {
+public class ItemSaveSubCommand extends SubCommand {
 
-    public ItemAddSubCommand(@NotNull EnhancedPlugin plugin) {
-        super("add", plugin);
-        withPermission(plugin.getPermission("item.add"));
-        withDescription(plugin.getLang("item-add-command"));
+    public ItemSaveSubCommand(@NotNull EnhancedPlugin plugin) {
+        super("save", plugin);
+        withPermission(plugin.getPermission("item.save"));
+        withDescription(plugin.getLang("item-save-command"));
         addParameter(new FilePathParameter(plugin, "items"));
         addParameter(new ItemNameParameter(plugin));
         withPlayerExecution((player, args, placeholders) -> {
@@ -44,7 +44,7 @@ public class ItemAddSubCommand extends SubCommand {
                 config.save();
                 plugin.getItems().reload();
             });
-            plugin.sendMessage(player, "adding-item", placeholders);
+            plugin.sendMessage(player, "saved-item", placeholders);
         });
     }
 

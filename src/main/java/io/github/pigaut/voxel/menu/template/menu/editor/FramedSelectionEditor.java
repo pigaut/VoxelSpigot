@@ -8,15 +8,15 @@ import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.yaml.*;
 import org.jetbrains.annotations.*;
 
-public class FramedEditorMenu extends FramedMenu {
+public class FramedSelectionEditor extends FramedSelectionMenu {
 
     private final ConfigRoot config;
 
-    public FramedEditorMenu(ConfigRoot config, String title, int size) {
+    public FramedSelectionEditor(ConfigRoot config, String title, int size) {
         this(null, config, title, size);
     }
 
-    public FramedEditorMenu(@Nullable EnhancedPlugin plugin, ConfigRoot config, String title, int size) {
+    public FramedSelectionEditor(@Nullable EnhancedPlugin plugin, ConfigRoot config, String title, int size) {
         super(plugin, title, size);
         this.config = config;
     }
@@ -29,11 +29,6 @@ public class FramedEditorMenu extends FramedMenu {
     @Override
     public void onClose(MenuView view) {
         config.save();
-    }
-
-    @Override
-    public Button getToolbarButton4() {
-        return Buttons.GRAY_PANEL;
     }
 
     @Override

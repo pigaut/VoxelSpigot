@@ -2,6 +2,7 @@ package io.github.pigaut.voxel.core.sound;
 
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
+import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.section.*;
 import org.jetbrains.annotations.*;
 
@@ -26,7 +27,11 @@ public class SoundManager extends ManagerContainer<SoundEffect> {
 
         for (String soundName : config.getKeys()) {
             final SoundEffect sound = config.get(soundName, SoundEffect.class);
-            this.add(sound);
+            try {
+                add(sound);
+            } catch (DuplicateElementException e) {
+                throw new InvalidConfigurationException(config, soundName, e.getMessage());
+            }
         }
     }
 

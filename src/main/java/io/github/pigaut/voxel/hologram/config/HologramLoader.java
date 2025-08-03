@@ -27,10 +27,12 @@ public class HologramLoader implements ConfigLoader<Hologram> {
         final boolean animated = config.contains("frames");
         final Hologram hologram;
         if (animated) {
-            final List<String> frames = config.getStringList("frames", StringColor.FORMATTER);
+            final List<String> frames = new ArrayList<>();
+            frames.addAll(config.getStringList("frames", StringColor.FORMATTER));
             while (frames.size() < 2) {
                 frames.add("none");
             }
+
             final int update = config.getOptionalInteger("update").orElse(3);
             if (update < 1) {
                 throw new InvalidConfigurationException(config, "update", "Animation update interval must be at least 1 tick");

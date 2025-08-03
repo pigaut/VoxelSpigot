@@ -2,6 +2,7 @@ package io.github.pigaut.voxel.core.message;
 
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
+import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.section.*;
 import org.jetbrains.annotations.*;
 
@@ -26,7 +27,11 @@ public class MessageManager extends ManagerContainer<Message> {
 
         for (String messageName : config.getKeys()) {
             final Message message = config.get(messageName, Message.class);
-            this.add(message);
+            try {
+                add(message);
+            } catch (DuplicateElementException e) {
+                throw new InvalidConfigurationException(config, messageName, e.getMessage());
+            }
         }
     }
 

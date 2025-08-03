@@ -78,7 +78,7 @@ public class FramedSelectionMenu extends PagedMenu {
     }
 
     public Button getToolbarButton4() {
-        return Buttons.MAIN_MENU;
+        return Buttons.GRAY_PANEL;
     }
 
     public Button getToolbarButton5() {

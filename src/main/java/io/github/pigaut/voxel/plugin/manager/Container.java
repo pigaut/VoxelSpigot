@@ -6,9 +6,11 @@ import java.util.*;
 
 public interface Container<T extends Identifiable> {
 
+    boolean contains(@NotNull String name);
+
     @Nullable T get(@NotNull String name);
 
-    void add(@NotNull T value);
+    void add(@NotNull T value) throws DuplicateElementException;
 
     void remove(@NotNull String name);
 

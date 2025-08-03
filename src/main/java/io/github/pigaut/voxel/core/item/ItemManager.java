@@ -35,7 +35,11 @@ public class ItemManager extends ManagerContainer<Item> {
             final String itemGroup = PathGroup.byItemFile(file);
             final ConfigField itemField = config.getField(itemName);
             final ItemStack itemStack = itemField.load(ItemStack.class);
-            this.add(new Item(itemName, itemGroup, itemField, itemStack));
+            try {
+                add(new Item(itemName, itemGroup, itemField, itemStack));
+            } catch (DuplicateElementException e) {
+                throw new InvalidConfigurationException(config, itemName, e.getMessage());
+            }
         }
     }
 

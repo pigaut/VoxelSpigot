@@ -72,7 +72,7 @@ public class FramedMenu extends FixedMenu {
     }
 
     public Button getToolbarButton4() {
-        return Buttons.MAIN_MENU;
+        return Buttons.GRAY_PANEL;
     }
 
     public Button getToolbarButton5() {

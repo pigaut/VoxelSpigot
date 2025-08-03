@@ -11,7 +11,7 @@ public class ItemSubCommand extends SubCommand {
         this.withPermission(plugin.getPermission("item"));
         this.withDescription(plugin.getLang("item-command"));
 
-        this.addSubCommand(new ItemAddSubCommand(plugin));
+        this.addSubCommand(new ItemSaveSubCommand(plugin));
         this.addSubCommand(new ItemGetSubCommand(plugin));
         this.addSubCommand(new ItemGetGroupSubCommand(plugin));
     }

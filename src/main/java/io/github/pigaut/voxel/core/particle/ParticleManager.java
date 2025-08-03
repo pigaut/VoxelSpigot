@@ -2,6 +2,7 @@ package io.github.pigaut.voxel.core.particle;
 
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
+import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.section.*;
 import org.jetbrains.annotations.*;
 
@@ -25,7 +26,11 @@ public class ParticleManager extends ManagerContainer<ParticleEffect> {
         config.load();
         for (String particleName : config.getKeys()) {
             final ParticleEffect particle = config.get(particleName, ParticleEffect.class);
-            this.add(particle);
+            try {
+                add(particle);
+            } catch (DuplicateElementException e) {
+                throw new InvalidConfigurationException(config, particleName, e.getMessage());
+            }
         }
     }
 

@@ -2,9 +2,6 @@ package io.github.pigaut.voxel.core.item.config;
 
 import com.cryptomorin.xseries.*;
 import com.cryptomorin.xseries.profiles.builder.*;
-import com.cryptomorin.xseries.profiles.objects.*;
-import com.mojang.authlib.*;
-import com.mojang.authlib.properties.*;
 import de.tr7zw.changeme.nbtapi.*;
 import de.tr7zw.changeme.nbtapi.iface.*;
 import io.github.pigaut.voxel.bukkit.*;
@@ -65,9 +62,8 @@ public class ItemStackMapper implements SectionMapper<ItemStack> {
                 section.set("flags", itemFlags);
             }
 
-            final ConfigSection enchantsConfig = section.getSectionOrCreate("enchants");
             meta.getEnchants().forEach((enchant, level) -> {
-                enchantsConfig.set(XEnchantment.of(enchant).name(), level);
+                section.set("enchants." + XEnchantment.of(enchant).name(), level);
             });
 
             final PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
@@ -75,9 +71,11 @@ public class ItemStackMapper implements SectionMapper<ItemStack> {
                 section.set("persistent-data", dataContainer);
             }
 
-            final String headTexture = XSkull.of(meta).getProfileValue();
-            if (headTexture != null) {
-                section.set("head-texture|head", headTexture);
+            if (meta instanceof SkullMeta skullMeta) {
+                final String headTexture = XSkull.of(skullMeta).getProfileValue();
+                if (headTexture != null) {
+                    section.set("head-texture|head", headTexture);
+                }
             }
         }
 

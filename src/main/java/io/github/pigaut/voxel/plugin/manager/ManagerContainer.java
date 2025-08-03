@@ -17,6 +17,11 @@ public class ManagerContainer<T extends Identifiable> extends Manager implements
     }
 
     @Override
+    public boolean contains(@NotNull String name) {
+        return valuesByName.containsKey(name);
+    }
+
+    @Override
     public @Nullable T get(@NotNull String name) {
         return valuesByName.get(name);
     }
@@ -32,8 +37,12 @@ public class ManagerContainer<T extends Identifiable> extends Manager implements
     }
 
     @Override
-    public void add(@NotNull T value) {
-        valuesByName.put(StringFormatter.toSnakeCase(value.getName()), value);
+    public void add(@NotNull T value) throws DuplicateElementException {
+        final String name = StringFormatter.toSnakeCase(value.getName());
+        if (valuesByName.containsKey(name)) {
+            throw new DuplicateElementException(name);
+        }
+        valuesByName.put(name, value);
         final String group = value.getGroup();
         if (group != null) {
             valuesByGroup.put(StringFormatter.toSnakeCase(group), value);

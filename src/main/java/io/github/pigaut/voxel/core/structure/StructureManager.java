@@ -62,7 +62,11 @@ public class StructureManager extends ManagerContainer<BlockStructure> implement
         config.setPrefix("Structure");
         config.load();
         final BlockStructure structure = config.load(BlockStructure.class);
-        this.add(structure);
+        try {
+            add(structure);
+        } catch (DuplicateElementException e) {
+            throw new InvalidConfigurationException(config, e.getMessage());
+        }
     }
 
     @Override
