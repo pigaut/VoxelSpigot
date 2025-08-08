@@ -29,6 +29,8 @@ import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.*;
 import io.github.pigaut.yaml.node.section.*;
 import io.github.pigaut.yaml.util.*;
+import org.bstats.bukkit.*;
+import org.bstats.charts.*;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
@@ -204,6 +206,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
             if (forceMetrics() || config.getOptionalBoolean("metrics").orElse(true)) {
                 logger.info("Created bStats metrics with id: " + metricsId);
                 metrics = new PluginMetrics(this, metricsId);
+                metrics.addCustomChart(new SimplePie("premium", () -> Boolean.toString(isPremium())));
             }
         }
 
@@ -243,7 +246,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
 
         reloading = true;
-        this.createHooks();
+        createHooks();
 
         logger.info("Generating directories and files...");
         for (String directory : getPluginDirectories()) {
@@ -379,10 +382,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         return reloading;
     }
 
-    public void setReloading(boolean reloading) {
-        this.reloading = reloading;
-    }
-
     public boolean forceMetrics() {
         return false;
     }
@@ -434,10 +433,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         final File file = getFile(databaseName);
         database = new FileDatabase(file);
         database.openConnection();
-    }
-
-    private void loadManagers() {
-
     }
 
     @Override
@@ -689,6 +684,10 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     public @NotNull List<Manager> getLoadedManagers() {
         return new ArrayList<>(loadedManagers);
+    }
+
+    public boolean isPremium() {
+        return false;
     }
 
     public @Nullable Integer getMetricsId() {
