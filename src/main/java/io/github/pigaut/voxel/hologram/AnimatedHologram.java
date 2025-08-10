@@ -1,26 +1,25 @@
-package io.github.pigaut.voxel.hologram.legacy;
+package io.github.pigaut.voxel.hologram;
 
+import eu.decentsoftware.holograms.api.*;
 import io.github.pigaut.voxel.*;
-import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.util.Rotation;
 import org.bukkit.*;
 import org.bukkit.block.*;
-import org.bukkit.entity.*;
 import org.bukkit.scheduler.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-public class AnimatedHologramLegacy implements Hologram {
+public class AnimatedHologram implements Hologram {
 
     private final EnhancedPlugin plugin;
     private final List<String> frames;
     private final int update;
     private final int intervals;
 
-    public AnimatedHologramLegacy(EnhancedPlugin plugin, List<String> frames, int update) {
+    public AnimatedHologram(EnhancedPlugin plugin, List<String> frames, int update) {
         this.plugin = plugin;
         this.frames = frames;
         this.update = update;
@@ -31,36 +30,36 @@ public class AnimatedHologramLegacy implements Hologram {
     }
 
     @Override
-    public HologramDisplay spawn(Location location, Rotation rotation, PlaceholderSupplier... placeholders) {
+    public @Nullable HologramDisplay spawn(Location location, Rotation rotation, PlaceholderSupplier... placeholders) {
         final World world = SpigotLibs.getWorldOrDefault(location);
         final Block block = world.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         if (block.getType() != Material.AIR) {
             return null;
         }
 
-        final HologramDisplay hologram = new GenericHologramDisplay(plugin, new Location(world, location.getX(), location.getY(), location.getZ())) {
-            @Override
-            public @NotNull Entity create() {
-                final ArmorStand display = SpigotLibs.createEmptyHologram(location, false);
+        final HologramDisplay spawnedHologram = new DecentHologramDisplay(plugin, new Location(world, location.getX(), location.getY(), location.getZ())) {
+            {
+                final String parsedText = StringPlaceholders.parseAll(frames.get(0), placeholders);
+                DHAPI.addHologramLine(display, 0, parsedText);
+                display.showAll();
+
                 updateTask = new BukkitRunnable() {
-                    int interval = 0;
+                    int interval = 1;
                     @Override
                     public void run() {
                         if (!exists()) {
-                            despawn();
+                            cancel();
                             return;
                         }
-                        display.setCustomName(StringPlaceholders.parseAll(frames.get(interval), placeholders));
+                        final String parsedText = StringPlaceholders.parseAll(frames.get(interval), placeholders);
+                        DHAPI.setHologramLine(display, 0, parsedText);
                         interval = interval >= intervals ? 0 : interval + 1;
                     }
-                }.runTaskTimer(plugin, 0, update);
-                return display;
+                }.runTaskTimer(plugin, update, update);
             }
         };
 
-        plugin.getHolograms().registerHologram(location.getChunk(), hologram);
-        hologram.spawn();
-        return hologram;
+        return spawnedHologram;
     }
 
 }

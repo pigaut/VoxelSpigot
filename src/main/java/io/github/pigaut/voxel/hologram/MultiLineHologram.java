@@ -41,23 +41,16 @@ public class MultiLineHologram implements Hologram {
         }
 
         @Override
-        public void spawn() {
+        public void update() {
             for (HologramDisplay display : displays) {
-                display.spawn();
+                display.update();
             }
         }
 
         @Override
-        public void despawn() {
+        public void destroy() {
             for (HologramDisplay display: displays) {
-                display.despawn();
-            }
-        }
-
-        @Override
-        public void remove() {
-            for (HologramDisplay display: displays) {
-                display.remove();
+                display.destroy();
             }
         }
 

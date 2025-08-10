@@ -1,8 +1,7 @@
-package io.github.pigaut.voxel.hologram.modern;
+package io.github.pigaut.voxel.hologram;
 
-import io.github.pigaut.voxel.hologram.*;
-import io.github.pigaut.voxel.hologram.modern.options.*;
 import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
@@ -13,9 +12,6 @@ import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-/*
- * Hologram Loader 1.19.4+
- */
 public class HologramLoader implements ConfigLoader<Hologram> {
 
     private final EnhancedPlugin plugin;
@@ -31,15 +27,18 @@ public class HologramLoader implements ConfigLoader<Hologram> {
 
     @Override
     public @NotNull Hologram loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
+        if (!SpigotServer.isPluginEnabled("DecentHolograms")) {
+            throw new InvalidConfigurationException(section, "Holograms require DecentHolograms installed (https://www.spigotmc.org/resources/decentholograms.96927/)");
+        }
+
         final String type = section.getString("type", StringStyle.CONSTANT);
 
         Hologram hologram;
         switch (type) {
             case "STATIC" -> {
                 final String text = section.getOptionalString("text|title", StringColor.FORMATTER).orElse("none");
-                final TextDisplayOptions options = section.getOptional("options", TextDisplayOptions.class).orElse(new TextDisplayOptions());
                 final int update = section.getOptionalInteger("update").orElse(0);
-                hologram = new StaticHologram(plugin, text, options, update);
+                hologram = new StaticHologram(plugin, text, update);
             }
 
             case "ANIMATED" -> {
@@ -49,30 +48,25 @@ public class HologramLoader implements ConfigLoader<Hologram> {
                     frames.add("none");
                 }
 
-                final TextDisplayOptions options = section.getOptional("options|text-options", TextDisplayOptions.class).orElse(new TextDisplayOptions());
                 final int update = section.getOptionalInteger("update").orElse(3);
                 if (update < 1) {
                     throw new InvalidConfigurationException(section, "update", "Animation update interval must be at least 1 tick");
                 }
 
-                hologram = new AnimatedHologram(plugin, frames, options, update);
+                hologram = new AnimatedHologram(plugin, frames, update);
             }
 
             case "ITEM_DISPLAY" -> {
                 final ItemStack item = section.getOptional("item", ItemStack.class).orElse(new ItemStack(Material.GRASS_BLOCK));
-                final ItemDisplayOptions options = section.getOptional("options", ItemDisplayOptions.class).orElse(new ItemDisplayOptions());
-                hologram = new ItemHologram(plugin, item, options);
+                hologram = new ItemHologram(plugin, item);
             }
 
             case "BLOCK_DISPLAY" -> {
                 final Material material = section.getOptional("block", Material.class).orElse(Material.DIRT);
-                final DisplayOptions options = section.getOptional("options", DisplayOptions.class).orElse(new DisplayOptions());
-
                 if (!material.isBlock()) {
                     throw new InvalidConfigurationException(section, "block", "Material is not a block");
                 }
-
-                hologram = new BlockHologram(plugin, material, options);
+                hologram = new BlockHologram(plugin, material);
             }
 
             default -> {
@@ -93,6 +87,9 @@ public class HologramLoader implements ConfigLoader<Hologram> {
 
     @Override
     public @NotNull Hologram loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
+        if (!SpigotServer.isPluginEnabled("DecentHolograms")) {
+            throw new InvalidConfigurationException(sequence, "Holograms require DecentHolograms installed (https://www.spigotmc.org/resources/decentholograms.96927/)");
+        }
         return new MultiLineHologram(sequence.getAll(Hologram.class));
     }
 

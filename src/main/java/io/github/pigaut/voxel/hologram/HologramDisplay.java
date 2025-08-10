@@ -4,10 +4,8 @@ public interface HologramDisplay {
 
     boolean exists();
 
-    void spawn();
+    void update();
 
-    void despawn();
-
-    void remove();
+    void destroy();
 
 }

@@ -1,12 +1,10 @@
 package io.github.pigaut.voxel;
 
 import io.github.pigaut.voxel.config.deserializer.*;
-import io.github.pigaut.voxel.hologram.modern.options.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.yaml.parser.*;
 import io.github.pigaut.yaml.parser.deserializer.*;
 import org.bukkit.*;
-import org.bukkit.block.data.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
 import org.bukkit.util.*;
@@ -15,17 +13,18 @@ import org.jetbrains.annotations.*;
 public class SpigotLibs {
 
     private static final Deserializer<Material> materialDeserializer = new MaterialDeserializer();
-    private static DisplayFactory DISPLAY_FACTORY = null;
 
-    static {
-        try {
-            Class.forName("org.bukkit.entity.TextDisplay");
-            Class.forName("org.bukkit.entity.ItemDisplay");
-            Class.forName("org.bukkit.entity.BlockDisplay");
-            DISPLAY_FACTORY = new DisplayFactory();
-        } catch (ClassNotFoundException e) {}
-
-    }
+//    private static DisplayFactory DISPLAY_FACTORY = null;
+//
+//    static {
+//        try {
+//            Class.forName("org.bukkit.entity.TextDisplay");
+//            Class.forName("org.bukkit.entity.ItemDisplay");
+//            Class.forName("org.bukkit.entity.BlockDisplay");
+//            DISPLAY_FACTORY = new DisplayFactory();
+//        } catch (ClassNotFoundException e) {}
+//
+//    }
 
     public static @Nullable Material getMaterial(String value) {
         try {
@@ -84,59 +83,59 @@ public class SpigotLibs {
         return createHologram("&7", location, persistent);
     }
 
-    public static @NotNull Entity createTextDisplay(@NotNull Location location, String text, TextDisplayOptions options, boolean persistent) {
-        if (DISPLAY_FACTORY == null) {
-            throw new IllegalStateException("Text displays can only be created in spigot version 1.19.4+");
-        }
-        return DISPLAY_FACTORY.createTextDisplay(location, text, options, persistent);
-    }
-
-    public static @NotNull Entity createEmptyTextDisplay(@NotNull Location location, TextDisplayOptions options, boolean persistent) {
-        return createTextDisplay(location, "", options, persistent);
-    }
-
-    public static @NotNull Entity createItemDisplay(@NotNull Location location, @NotNull ItemStack item, DisplayOptions options, boolean persistent) {
-        if (DISPLAY_FACTORY == null) {
-            throw new IllegalStateException("Item displays can only be created in spigot version 1.19.4+");
-        }
-        return DISPLAY_FACTORY.createItemDisplay(location, item, options, persistent);
-    }
-
-    public static @NotNull Entity createBlockDisplay(@NotNull Location location, @NotNull BlockData blockData, DisplayOptions options, boolean persistent) {
-        if (DISPLAY_FACTORY == null) {
-            throw new IllegalStateException("Block displays can only be created in spigot version 1.19.4+");
-        }
-        return DISPLAY_FACTORY.createBlockDisplay(location, blockData, options, persistent);
-    }
-
-
-    private static class DisplayFactory {
-
-        public Entity createTextDisplay(Location location, String text, TextDisplayOptions options, boolean persistent) {
-            final TextDisplay display = (TextDisplay) location.getWorld().spawnEntity(location, EntityType.TEXT_DISPLAY);
-            options.apply(display);
-            display.setPersistent(persistent);
-            display.setText(text);
-            return display;
-        }
-
-        public Entity createItemDisplay(Location location, ItemStack item, DisplayOptions options, boolean persistent) {
-            final ItemDisplay display = (ItemDisplay) location.getWorld().spawnEntity(location, EntityType.ITEM_DISPLAY);
-            options.apply(display);
-            display.setPersistent(persistent);
-            display.setItemStack(item);
-            return display;
-        }
-
-        public Entity createBlockDisplay(Location location, BlockData blockData, DisplayOptions options, boolean persistent) {
-            final BlockDisplay display = (BlockDisplay) location.getWorld().spawnEntity(location, EntityType.BLOCK_DISPLAY);
-            options.apply(display);
-            display.setPersistent(persistent);
-            display.setBlock(blockData);
-            return display;
-        }
-
-    }
+//    public static @NotNull Entity createTextDisplay(@NotNull Location location, String text, TextDisplayOptions options, boolean persistent) {
+//        if (DISPLAY_FACTORY == null) {
+//            throw new IllegalStateException("Text displays can only be created in spigot version 1.19.4+");
+//        }
+//        return DISPLAY_FACTORY.createTextDisplay(location, text, options, persistent);
+//    }
+//
+//    public static @NotNull Entity createEmptyTextDisplay(@NotNull Location location, TextDisplayOptions options, boolean persistent) {
+//        return createTextDisplay(location, "", options, persistent);
+//    }
+//
+//    public static @NotNull Entity createItemDisplay(@NotNull Location location, @NotNull ItemStack item, DisplayOptions options, boolean persistent) {
+//        if (DISPLAY_FACTORY == null) {
+//            throw new IllegalStateException("Item displays can only be created in spigot version 1.19.4+");
+//        }
+//        return DISPLAY_FACTORY.createItemDisplay(location, item, options, persistent);
+//    }
+//
+//    public static @NotNull Entity createBlockDisplay(@NotNull Location location, @NotNull BlockData blockData, DisplayOptions options, boolean persistent) {
+//        if (DISPLAY_FACTORY == null) {
+//            throw new IllegalStateException("Block displays can only be created in spigot version 1.19.4+");
+//        }
+//        return DISPLAY_FACTORY.createBlockDisplay(location, blockData, options, persistent);
+//    }
+//
+//
+//    private static class DisplayFactory {
+//
+//        public Entity createTextDisplay(Location location, String text, TextDisplayOptions options, boolean persistent) {
+//            final TextDisplay display = (TextDisplay) location.getWorld().spawnEntity(location, EntityType.TEXT_DISPLAY);
+//            options.apply(display);
+//            display.setPersistent(persistent);
+//            display.setText(text);
+//            return display;
+//        }
+//
+//        public Entity createItemDisplay(Location location, ItemStack item, DisplayOptions options, boolean persistent) {
+//            final ItemDisplay display = (ItemDisplay) location.getWorld().spawnEntity(location, EntityType.ITEM_DISPLAY);
+//            options.apply(display);
+//            display.setPersistent(persistent);
+//            display.setItemStack(item);
+//            return display;
+//        }
+//
+//        public Entity createBlockDisplay(Location location, BlockData blockData, DisplayOptions options, boolean persistent) {
+//            final BlockDisplay display = (BlockDisplay) location.getWorld().spawnEntity(location, EntityType.BLOCK_DISPLAY);
+//            options.apply(display);
+//            display.setPersistent(persistent);
+//            display.setBlock(blockData);
+//            return display;
+//        }
+//
+//    }
 
 
 }

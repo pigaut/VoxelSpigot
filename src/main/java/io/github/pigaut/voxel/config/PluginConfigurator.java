@@ -9,7 +9,6 @@ import io.github.pigaut.voxel.core.function.condition.config.*;
 import io.github.pigaut.voxel.core.function.config.*;
 import io.github.pigaut.voxel.core.function.interact.block.*;
 import io.github.pigaut.voxel.core.function.interact.inventory.*;
-import io.github.pigaut.voxel.core.item.*;
 import io.github.pigaut.voxel.core.item.config.*;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.message.config.*;
@@ -20,14 +19,9 @@ import io.github.pigaut.voxel.core.sound.config.*;
 import io.github.pigaut.voxel.core.structure.*;
 import io.github.pigaut.voxel.core.structure.config.*;
 import io.github.pigaut.voxel.hologram.*;
-import io.github.pigaut.voxel.hologram.legacy.*;
-import io.github.pigaut.voxel.hologram.modern.*;
-import io.github.pigaut.voxel.hologram.modern.options.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
-import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
 import io.github.pigaut.yaml.configurator.mapper.*;
@@ -64,16 +58,7 @@ public class PluginConfigurator extends SpigotConfigurator {
         addLoader(Message.class, new MessageLoader(plugin));
         addLoader(ParticleEffect.class, new ParticleEffectLoader(plugin));
         addLoader(SoundEffect.class, new SoundEffectLoader(plugin));
-        if (SpigotServer.getVersion().equalsOrIsNewerThan(SpigotVersion.V1_19_4)) {
-            addLoader(Hologram.class, new HologramLoader(plugin));
-            addLoader(DisplayOptions.class, new DisplayOptions.Loader());
-            addLoader(TextDisplayOptions.class, new TextDisplayOptions.Loader());
-            addLoader(ItemDisplayOptions.class, new ItemDisplayOptions.Loader());
-        }
-
-        addLoader(Hologram.class, SpigotServer.getVersion().equalsOrIsNewerThan(SpigotVersion.V1_19_4) ?
-                new HologramLoader(plugin) : new HologramLoaderLegacy(plugin));
-        addLoader(TextDisplayOptions.class, new TextDisplayOptions.Loader());
+        addLoader(Hologram.class, new HologramLoader(plugin));
 
         addLoader(Condition.class, conditionLoader);
         addLoader(NegativeCondition.class, new NegativeConditionLoader());
