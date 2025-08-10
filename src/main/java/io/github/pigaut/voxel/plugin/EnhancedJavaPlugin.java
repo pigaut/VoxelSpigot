@@ -14,6 +14,7 @@ import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.core.structure.*;
+import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.hook.*;
 import io.github.pigaut.voxel.language.*;
 import io.github.pigaut.voxel.menu.*;
@@ -26,10 +27,8 @@ import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.node.*;
 import io.github.pigaut.yaml.node.section.*;
 import io.github.pigaut.yaml.util.*;
-import org.bstats.bukkit.*;
 import org.bstats.charts.*;
 import org.bukkit.*;
 import org.bukkit.command.*;
@@ -64,6 +63,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final FunctionManager functionManager = new FunctionManager(this);
     private final StructureManager structureManager = new StructureManager(this);
     private final MenuManager menuManager = new MenuManager(this);
+    private final HologramManager hologramManager = new HologramManager(this);
 
     private final List<Manager> loadedManagers = new ArrayList<>();
 
@@ -113,7 +113,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
             final SpigotVersion currentVersion = SpigotServer.getVersion();
             final Map<SpigotVersion, List<String>> examplesByVersion = getExamplesByVersion();
             for (SpigotVersion requiredVersion : examplesByVersion.keySet()) {
-                if (currentVersion.isNewerThan(requiredVersion)) {
+                if (currentVersion.equalsOrIsNewerThan(requiredVersion)) {
                     for (String resourcePath : examplesByVersion.get(requiredVersion)) {
                         saveResource(resourcePath);
                     }
@@ -142,6 +142,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         loadedManagers.add(soundManager);
         loadedManagers.add(functionManager);
         loadedManagers.add(structureManager);
+        loadedManagers.add(hologramManager);
 
         for (Field field : getClass().getDeclaredFields()) {
             final Manager manager = ReflectionUtil.accessField(field, Manager.class, this);
@@ -268,7 +269,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
             final SpigotVersion currentVersion = SpigotServer.getVersion();
             final Map<SpigotVersion, List<String>> examplesByVersion = getExamplesByVersion();
             for (SpigotVersion requiredVersion : examplesByVersion.keySet()) {
-                if (currentVersion.isNewerThan(requiredVersion)) {
+                if (currentVersion.equalsOrIsNewerThan(requiredVersion)) {
                     for (String resourcePath : examplesByVersion.get(requiredVersion)) {
                         saveResource(resourcePath);
                     }
@@ -369,7 +370,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         final SpigotVersion currentVersion = SpigotServer.getVersion();
         final Map<SpigotVersion, List<String>> examplesByVersion = getExamplesByVersion();
         for (SpigotVersion requiredVersion : examplesByVersion.keySet()) {
-            if (currentVersion.isNewerThan(requiredVersion)) {
+            if (currentVersion.equalsOrIsNewerThan(requiredVersion)) {
                 for (String resourcePath : examplesByVersion.get(requiredVersion)) {
                     saveResource(resourcePath);
                 }
@@ -573,6 +574,16 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public @Nullable Menu getMenu(@NotNull String name) {
         return menuManager.getMenu(name);
+    }
+
+    @Override
+    public @NotNull HologramManager getHolograms() {
+        return hologramManager;
+    }
+
+    @Override
+    public @NotNull Collection<HologramDisplay> getHolograms(@NotNull Chunk chunk) {
+        return hologramManager.getAllHolograms(chunk);
     }
 
     @Override

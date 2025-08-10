@@ -8,4 +8,6 @@ public interface HologramDisplay {
 
     void despawn();
 
+    void remove();
+
 }

@@ -1,7 +1,6 @@
 package io.github.pigaut.voxel.version;
 
 import java.util.*;
-import java.util.regex.*;
 
 public enum SpigotVersion {
 
@@ -78,12 +77,20 @@ public enum SpigotVersion {
         return nmsVersion;
     }
 
-    public boolean isOlderThan(SpigotVersion other) {
+    public boolean equalsOrIsOlderThan(SpigotVersion other) {
         return this.ordinal() <= other.ordinal();
     }
 
-    public boolean isNewerThan(SpigotVersion other) {
+    public boolean isOlderThan(SpigotVersion other) {
+        return this.ordinal() < other.ordinal();
+    }
+
+    public boolean equalsOrIsNewerThan(SpigotVersion other) {
         return this.ordinal() >= other.ordinal();
+    }
+
+    public boolean isNewerThan(SpigotVersion other) {
+        return this.ordinal() > other.ordinal();
     }
 
     @Override
@@ -94,7 +101,7 @@ public enum SpigotVersion {
     public static List<SpigotVersion> getVersionsNewerThan(SpigotVersion thresholdVersion) {
         final List<SpigotVersion> versions = new ArrayList<>();
         for (SpigotVersion version : values()) {
-            if (version.isNewerThan(thresholdVersion)) {
+            if (version.equalsOrIsNewerThan(thresholdVersion)) {
                 versions.add(version);
             }
         }
@@ -104,7 +111,7 @@ public enum SpigotVersion {
     public static List<SpigotVersion> getVersionsOlderThan(SpigotVersion thresholdVersion) {
         final List<SpigotVersion> versions = new ArrayList<>();
         for (SpigotVersion version : values()) {
-            if (version.isOlderThan(thresholdVersion)) {
+            if (version.equalsOrIsOlderThan(thresholdVersion)) {
                 versions.add(version);
             }
         }

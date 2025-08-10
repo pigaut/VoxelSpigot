@@ -8,11 +8,11 @@ import org.jetbrains.annotations.*;
 public interface Hologram {
 
     @Nullable
-    HologramDisplay spawn(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholders);
+    HologramDisplay spawn(Location location, Rotation rotation, PlaceholderSupplier... placeholders);
 
     @Nullable
-    default HologramDisplay spawn(Location location, boolean persistent, PlaceholderSupplier... placeholders) {
-        return spawn(location, Rotation.NONE, persistent, placeholders);
+    default HologramDisplay spawn(Location location, PlaceholderSupplier... placeholders) {
+        return spawn(location, Rotation.NONE, placeholders);
     }
 
 }

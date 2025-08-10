@@ -41,7 +41,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -97,6 +97,12 @@
             <artifactId>SpigotUpdateChecker</artifactId>
             <version>3.0.4</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.decentsoftware-eu</groupId>
+            <artifactId>decentholograms</artifactId>
+            <version>2.9.6</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

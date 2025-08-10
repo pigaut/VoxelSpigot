@@ -83,7 +83,7 @@ public class MessageLoader implements ConfigLoader<Message> {
             }
 
             default -> {
-                throw new InvalidConfigurationException(section, "type", "Could not find message type with name: '" + type + "'");
+                throw new InvalidConfigurationException(section, "type", "Found invalid message type: '" + type + "'");
             }
         }
 

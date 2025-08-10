@@ -16,9 +16,8 @@ public class MultiLineHologram implements Hologram {
     }
 
     @Override
-    public HologramDisplay spawn(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholders) {
-        final HologramDisplay hologram = new MultiLineHologramDisplay(location, rotation, persistent, placeholders);
-        hologram.spawn();
+    public HologramDisplay spawn(Location location, Rotation rotation, PlaceholderSupplier... placeholders) {
+        final HologramDisplay hologram = new MultiLineHologramDisplay(location, rotation, placeholders);
         return hologram;
     }
 
@@ -26,9 +25,9 @@ public class MultiLineHologram implements Hologram {
 
         private final List<HologramDisplay> displays;
 
-        protected MultiLineHologramDisplay(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholderSuppliers) {
-            this.displays = holograms.stream()
-                    .map(hologram -> hologram.spawn(location, rotation, persistent, placeholderSuppliers))
+        protected MultiLineHologramDisplay(Location location, Rotation rotation, PlaceholderSupplier[] placeholderSuppliers) {
+            displays = holograms.stream()
+                    .map(hologram -> hologram.spawn(location, rotation, placeholderSuppliers))
                     .filter(Objects::nonNull)
                     .toList();
         }
@@ -43,7 +42,7 @@ public class MultiLineHologram implements Hologram {
 
         @Override
         public void spawn() {
-            for (HologramDisplay display: displays) {
+            for (HologramDisplay display : displays) {
                 display.spawn();
             }
         }
@@ -52,6 +51,13 @@ public class MultiLineHologram implements Hologram {
         public void despawn() {
             for (HologramDisplay display: displays) {
                 display.despawn();
+            }
+        }
+
+        @Override
+        public void remove() {
+            for (HologramDisplay display: displays) {
+                display.remove();
             }
         }
 

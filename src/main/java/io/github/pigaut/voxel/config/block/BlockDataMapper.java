@@ -1,4 +1,4 @@
-package io.github.pigaut.voxel.core.structure.config;
+package io.github.pigaut.voxel.config.block;
 
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.*;

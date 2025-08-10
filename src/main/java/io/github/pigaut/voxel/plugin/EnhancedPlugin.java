@@ -10,6 +10,7 @@ import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.core.structure.*;
+import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.language.*;
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.placeholder.*;
@@ -121,6 +122,12 @@ public interface EnhancedPlugin extends Plugin {
 
     @Nullable
     Menu getMenu(@NotNull String name);
+
+    @NotNull
+    HologramManager getHolograms();
+
+    @NotNull
+    Collection<HologramDisplay> getHolograms(@NotNull Chunk chunk);
 
     @NotNull
     RootSection getConfiguration();

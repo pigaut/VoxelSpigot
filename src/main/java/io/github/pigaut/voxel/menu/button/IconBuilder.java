@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.menu.button;
 
+import com.cryptomorin.xseries.*;
 import io.github.pigaut.voxel.util.*;
 import org.bukkit.*;
 import org.bukkit.enchantments.*;
@@ -42,7 +43,7 @@ public class IconBuilder {
                 meta.setLore(lore);
             }
             if (enchanted) {
-                meta.addEnchant(Enchantment.ARROW_DAMAGE, 1, false);
+                meta.addEnchant(XEnchantment.RESPIRATION.get(), 1, false);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
 

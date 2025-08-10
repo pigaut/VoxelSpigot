@@ -18,9 +18,9 @@ public class OffsetHologram implements Hologram {
     }
 
     @Override
-    public HologramDisplay spawn(Location location, Rotation rotation, boolean persistent, PlaceholderSupplier... placeholders) {
+    public HologramDisplay spawn(Location location, Rotation rotation, PlaceholderSupplier... placeholders) {
         final Location offsetLocation = rotation.apply(location.clone(), offsetX, offsetY, offsetZ);
-        return hologram.spawn(offsetLocation, persistent, placeholders);
+        return hologram.spawn(offsetLocation, placeholders);
     }
 
 }

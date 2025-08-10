@@ -59,7 +59,7 @@ public class HologramMessage extends GenericMessage {
             location.add(0, 0, ThreadLocalRandom.current().nextDouble(-radiusZ, radiusZ));
         }
 
-        final HologramDisplay display = hologram.spawn(location, false, placeholderSuppliers);
+        final HologramDisplay display = hologram.spawn(location, placeholderSuppliers);
 
         if (display != null) {
             plugin.getScheduler().runTaskLater(duration, display::despawn);
