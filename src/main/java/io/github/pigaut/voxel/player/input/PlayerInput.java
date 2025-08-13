@@ -1,6 +1,5 @@
 package io.github.pigaut.voxel.player.input;
 
-import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.player.*;
 import org.jetbrains.annotations.*;
 
@@ -10,6 +9,7 @@ public abstract class PlayerInput {
 
     protected final SimplePlayerState playerState;
     protected @NotNull String inputDescription;
+    protected @NotNull InputValidator inputValidator = input -> null;
     protected @NotNull Consumer<String> inputCollector = input -> {};
     protected @NotNull Runnable onCancel = () -> {};
 
@@ -23,7 +23,12 @@ public abstract class PlayerInput {
         return this;
     }
 
-    public PlayerInput onInput(@NotNull Consumer<String> inputCollector) {
+    public PlayerInput checkInput(@NotNull InputValidator inputValidator) {
+        this.inputValidator = inputValidator;
+        return this;
+    }
+
+    public PlayerInput collectInput(@NotNull Consumer<String> inputCollector) {
         this.inputCollector = inputCollector;
         return this;
     }
@@ -33,6 +38,6 @@ public abstract class PlayerInput {
         return this;
     }
 
-    public abstract void collect();
+    public abstract void beginCollection();
 
 }

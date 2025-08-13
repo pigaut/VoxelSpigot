@@ -27,6 +27,15 @@ public class SpigotLibs {
 
     }
 
+    public static boolean isMaterial(String value) {
+        try {
+            materialDeserializer.deserialize(value);
+            return true;
+        } catch (DeserializationException e) {
+            return false;
+        }
+    }
+
     public static @Nullable Material getMaterial(String value) {
         try {
             return materialDeserializer.deserialize(value);

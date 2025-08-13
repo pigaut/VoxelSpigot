@@ -24,8 +24,8 @@ public class MenuInput extends PlayerInput {
     }
 
     @Override
-    public MenuInput onInput(@NotNull Consumer<String> inputCollector) {
-        return (MenuInput) super.onInput(inputCollector);
+    public MenuInput collectInput(@NotNull Consumer<String> inputCollector) {
+        return (MenuInput) super.collectInput(inputCollector);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MenuInput extends PlayerInput {
     }
 
     @Override
-    public void collect() {
+    public void beginCollection() {
         if (playerState.isAwaitingInput()) {
             throw new IllegalStateException("Player is already being asked for input.");
         }
