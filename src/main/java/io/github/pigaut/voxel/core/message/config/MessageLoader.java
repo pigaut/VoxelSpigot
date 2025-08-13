@@ -5,6 +5,7 @@ import io.github.pigaut.voxel.core.message.impl.*;
 import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
+import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.loader.*;
@@ -74,7 +75,7 @@ public class MessageLoader implements ConfigLoader<Message> {
 
             case "HOLOGRAM" -> {
                 message = new HologramMessage(plugin, messageName, messageGroup, section,
-                        section.get("hologram", Hologram.class),
+                        SpigotServer.isPluginLoaded("DecentHolograms") ? section.get("hologram", Hologram.class) : null,
                         section.getOptionalInteger("duration").orElse(40),
                         section.getOptionalDouble("radius.x").orElse(null),
                         section.getOptionalDouble("radius.y").orElse(null),

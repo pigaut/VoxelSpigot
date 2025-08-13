@@ -1,14 +1,12 @@
-package io.github.pigaut.voxel.hologram.modern;
+package io.github.pigaut.voxel.hologram;
 
+import eu.decentsoftware.holograms.api.*;
 import io.github.pigaut.voxel.*;
-import io.github.pigaut.voxel.hologram.*;
-import io.github.pigaut.voxel.hologram.modern.options.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.util.Rotation;
 import org.bukkit.*;
 import org.bukkit.block.*;
-import org.bukkit.entity.*;
 import org.bukkit.scheduler.*;
 import org.jetbrains.annotations.*;
 
@@ -16,13 +14,11 @@ public class StaticHologram implements Hologram {
 
     private final EnhancedPlugin plugin;
     private final String text;
-    private final TextDisplayOptions options;
     private final int update;
 
-    public StaticHologram(EnhancedPlugin plugin, String text, TextDisplayOptions options, int update) {
+    public StaticHologram(EnhancedPlugin plugin, String text, int update) {
         this.plugin = plugin;
         this.text = text;
-        this.options = options;
         this.update = update;
     }
 
@@ -34,31 +30,29 @@ public class StaticHologram implements Hologram {
             return null;
         }
 
-        final HologramDisplay hologram = new GenericHologramDisplay(plugin, new Location(world, location.getX(), location.getY(), location.getZ())) {
-            @Override
-            public @NotNull Display create() {
+        final HologramDisplay hologram = new DecentHologramDisplay(plugin, new Location(world, location.getX(), location.getY(), location.getZ())) {
+            {
                 final String parsedText = StringPlaceholders.parseAll(text, placeholders);
-                final TextDisplay display = (TextDisplay) SpigotLibs.createTextDisplay(location, parsedText, options, false);
+                DHAPI.addHologramLine(display, parsedText);
+                display.showAll();
 
                 if (update > 0) {
                     updateTask = new BukkitRunnable() {
                         @Override
                         public void run() {
                             if (!exists()) {
-                                despawn();
+                                cancel();
                                 return;
                             }
-                            display.setText(StringPlaceholders.parseAll(text, placeholders));
+                            final String parsedText = StringPlaceholders.parseAll(text, placeholders);
+                            DHAPI.setHologramLine(display, 0, parsedText);
                         }
-                    }.runTaskTimer(plugin, update, update);
+                    }.runTaskTimer(plugin, 0, update);
                 }
 
-                return display;
             }
         };
 
-        plugin.getHolograms().registerHologram(location.getChunk(), hologram);
-        hologram.spawn();
         return hologram;
     }
 

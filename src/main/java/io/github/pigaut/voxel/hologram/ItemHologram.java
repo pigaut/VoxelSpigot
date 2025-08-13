@@ -1,14 +1,12 @@
-package io.github.pigaut.voxel.hologram.modern;
+package io.github.pigaut.voxel.hologram;
 
+import eu.decentsoftware.holograms.api.*;
 import io.github.pigaut.voxel.*;
-import io.github.pigaut.voxel.hologram.*;
-import io.github.pigaut.voxel.hologram.modern.options.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.util.Rotation;
 import org.bukkit.*;
 import org.bukkit.block.*;
-import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
@@ -16,12 +14,10 @@ public class ItemHologram implements Hologram {
 
     private final EnhancedPlugin plugin;
     private final ItemStack item;
-    private final ItemDisplayOptions options;
 
-    public ItemHologram(EnhancedPlugin plugin, ItemStack item, ItemDisplayOptions options) {
+    public ItemHologram(EnhancedPlugin plugin, ItemStack item) {
         this.plugin = plugin;
         this.item = item;
-        this.options = options;
     }
 
     @Override
@@ -32,15 +28,13 @@ public class ItemHologram implements Hologram {
             return null;
         }
 
-        final HologramDisplay hologram = new GenericHologramDisplay(plugin, new Location(world, location.getX(), location.getY(), location.getZ())) {
-            @Override
-            public @NotNull Display create() {
-                return (ItemDisplay) SpigotLibs.createItemDisplay(location, item, options, false);
+        final HologramDisplay hologram = new DecentHologramDisplay(plugin, new Location(world, location.getX(), location.getY(), location.getZ())) {
+            {
+                DHAPI.addHologramLine(display, item);
+                display.showAll();
             }
         };
 
-        plugin.getHolograms().registerHologram(location.getChunk(), hologram);
-        hologram.spawn();
         return hologram;
     }
 

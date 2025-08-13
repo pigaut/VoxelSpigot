@@ -124,12 +124,6 @@ public interface EnhancedPlugin extends Plugin {
     Menu getMenu(@NotNull String name);
 
     @NotNull
-    HologramManager getHolograms();
-
-    @NotNull
-    Collection<HologramDisplay> getHolograms(@NotNull Chunk chunk);
-
-    @NotNull
     RootSection getConfiguration();
 
     @NotNull

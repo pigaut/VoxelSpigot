@@ -16,12 +16,12 @@ import java.util.concurrent.*;
 public class HologramMessage extends GenericMessage {
 
     private final EnhancedPlugin plugin;
-    private final Hologram hologram;
+    private final @Nullable Hologram hologram;
     private final int duration;
     private final Double radiusX, radiusY, radiusZ;
 
     public HologramMessage(@NotNull EnhancedPlugin plugin, String name, @Nullable String group,
-                           ConfigSection section, @NotNull Hologram hologram, int duration,
+                           ConfigSection section, @Nullable Hologram hologram, int duration,
                            @Nullable Double radiusX, @Nullable Double radiusY, @Nullable Double radiusZ) {
         super(name, group, section);
         this.plugin = plugin;
@@ -44,6 +44,11 @@ public class HologramMessage extends GenericMessage {
 
     @Override
     public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
+        if (hologram == null) {
+            player.sendMessage(ChatColor.RED + "DecentHolograms needs to be installed to use holograms.");
+            return;
+        }
+
         final Location location = player.getLocation();
         location.add(player.getFacing().getDirection().multiply(2));
 
@@ -62,7 +67,7 @@ public class HologramMessage extends GenericMessage {
         final HologramDisplay display = hologram.spawn(location, placeholderSuppliers);
 
         if (display != null) {
-            plugin.getScheduler().runTaskLater(duration, display::despawn);
+            plugin.getScheduler().runTaskLater(duration, display::destroy);
         }
     }
 

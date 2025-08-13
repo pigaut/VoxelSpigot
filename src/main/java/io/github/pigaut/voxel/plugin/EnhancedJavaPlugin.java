@@ -1,6 +1,7 @@
 package io.github.pigaut.voxel.plugin;
 
 import com.jeff_media.updatechecker.*;
+import eu.decentsoftware.holograms.api.holograms.*;
 import io.github.pigaut.sql.*;
 import io.github.pigaut.sql.database.*;
 import io.github.pigaut.voxel.bukkit.*;
@@ -63,7 +64,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final FunctionManager functionManager = new FunctionManager(this);
     private final StructureManager structureManager = new StructureManager(this);
     private final MenuManager menuManager = new MenuManager(this);
-    private final HologramManager hologramManager = new HologramManager(this);
 
     private final List<Manager> loadedManagers = new ArrayList<>();
 
@@ -76,6 +76,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     private EconomyHook economy = null;
     private boolean papi = false;
+    private boolean decentHolograms = false;
 
     @Override
     public void onEnable() {
@@ -142,7 +143,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         loadedManagers.add(soundManager);
         loadedManagers.add(functionManager);
         loadedManagers.add(structureManager);
-        loadedManagers.add(hologramManager);
 
         for (Field field : getClass().getDeclaredFields()) {
             final Manager manager = ReflectionUtil.accessField(field, Manager.class, this);
@@ -327,6 +327,14 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         } else {
             logger.info("PlaceholderAPI Hook: plugin not loaded");
         }
+
+        if (SpigotServer.isPluginLoaded("DecentHolograms")) {
+            decentHolograms = true;
+            logger.info("DecentHolograms Hook: created successfully");
+        }
+        else {
+            logger.info("DecentHolograms Hook: plugin not loaded");
+        }
     }
 
     public @Nullable EconomyHook getEconomy() {
@@ -335,6 +343,10 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     public boolean isPlaceholderAPI() {
         return papi;
+    }
+
+    public boolean isDecentHolograms() {
+        return decentHolograms;
     }
 
     public void generateFiles() {
@@ -574,16 +586,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public @Nullable Menu getMenu(@NotNull String name) {
         return menuManager.getMenu(name);
-    }
-
-    @Override
-    public @NotNull HologramManager getHolograms() {
-        return hologramManager;
-    }
-
-    @Override
-    public @NotNull Collection<HologramDisplay> getHolograms(@NotNull Chunk chunk) {
-        return hologramManager.getAllHolograms(chunk);
     }
 
     @Override
