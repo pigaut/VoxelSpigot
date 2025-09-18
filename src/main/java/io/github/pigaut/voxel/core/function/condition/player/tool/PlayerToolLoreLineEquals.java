@@ -11,14 +11,13 @@ import java.util.*;
 
 public class PlayerToolLoreLineEquals implements PlayerCondition {
 
-    private final int line;
     private final String lore;
+    private final int line;
 
-    public PlayerToolLoreLineEquals(int line, String lore) {
-        this.line = line;
+    public PlayerToolLoreLineEquals(String lore, int line) {
         this.lore = lore;
+        this.line = line;
     }
-
 
     @Override
     public boolean isMet(@NotNull PlayerState player) {

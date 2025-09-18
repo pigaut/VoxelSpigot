@@ -1,7 +1,8 @@
 package io.github.pigaut.voxel.config.persistent.data;
 
+import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.*;
-import io.github.pigaut.yaml.configurator.mapper.*;
+import io.github.pigaut.yaml.configurator.map.*;
 import org.bukkit.persistence.*;
 import org.jetbrains.annotations.*;
 
@@ -15,52 +16,63 @@ public class PersistentDataTypeMapper implements ConfigMapper<PersistentDataType
     }
 
     @Override
-    public @NotNull Object createScalar(@NotNull PersistentDataType dataType) {
+    public void mapToScalar(@NotNull ConfigScalar scalar, @NotNull PersistentDataType dataType) {
         if (dataType == BYTE) {
-            return "byte";
+            scalar.setValue("byte");
+            return;
         }
 
         if (dataType == SHORT) {
-            return "short";
+            scalar.setValue("short");
+            return;
         }
 
         if (dataType == INTEGER) {
-            return "integer";
+            scalar.setValue("integer");
+            return;
         }
 
         if (dataType == LONG) {
-            return "long";
+            scalar.setValue("long");
+            return;
         }
 
         if (dataType == FLOAT) {
-            return "float";
+            scalar.setValue("float");
+            return;
         }
 
         if (dataType == DOUBLE) {
-            return "double";
+            scalar.setValue("double");
+            return;
         }
 
         if (dataType == BYTE_ARRAY) {
-            return "byte_array";
+            scalar.setValue("byte_array");
+            return;
         }
 
         if (dataType == INTEGER_ARRAY) {
-            return "integer_array";
+            scalar.setValue("integer_array");
+            return;
         }
 
         if (dataType == LONG_ARRAY) {
-            return "long_array";
+            scalar.setValue("long_array");
+            return;
         }
 
         if (dataType == TAG_CONTAINER_ARRAY) {
-            return "tag_container_array";
+            scalar.setValue("tag_container_array");
+            return;
         }
 
         if (dataType == TAG_CONTAINER) {
-            return "tag_container";
+            scalar.setValue("tag_container");
+            return;
         }
 
-        return "string";
+        scalar.setValue("string");
     }
 
 }

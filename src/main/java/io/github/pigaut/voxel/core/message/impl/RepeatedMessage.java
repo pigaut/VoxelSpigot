@@ -38,11 +38,6 @@ public class RepeatedMessage implements Message {
     }
 
     @Override
-    public @NotNull ConfigField getField() {
-        return message.getField();
-    }
-
-    @Override
     public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
         for (int i = 0; i < repetitions; i++) {
             message.send(player, placeholderSuppliers);

@@ -2,27 +2,24 @@ package io.github.pigaut.voxel.core.item.config;
 
 import com.cryptomorin.xseries.*;
 import com.cryptomorin.xseries.profiles.builder.*;
-import de.tr7zw.changeme.nbtapi.*;
-import de.tr7zw.changeme.nbtapi.iface.*;
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.mapper.*;
+import io.github.pigaut.yaml.configurator.map.*;
 import org.bukkit.*;
+import org.bukkit.attribute.*;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.*;
 
 import java.util.*;
 
-/*
- / ItemStack config mapper
-*/
-public class ItemStackMapper implements SectionMapper<ItemStack> {
+public class ItemStackMapper implements ConfigMapper.Section<ItemStack> {
 
     @Override
-    public void mapSection(ConfigSection section, ItemStack item) {
+    public void mapToSection(ConfigSection section, ItemStack item) {
         Material type = item.getType();
-        section.set("type", type);
+        section.set("material|type", type);
+
         int amount = item.getAmount();
         if (amount != 1) {
             section.set("amount", item.getAmount());
@@ -32,7 +29,7 @@ public class ItemStackMapper implements SectionMapper<ItemStack> {
             ItemMeta meta = item.getItemMeta();
 
             if (meta.hasDisplayName()) {
-                section.set("name", meta.getDisplayName());
+                section.set("name|display", meta.getDisplayName());
             }
 
             if (meta.hasLore()) {
@@ -77,33 +74,16 @@ public class ItemStackMapper implements SectionMapper<ItemStack> {
                     section.set("head-texture|head", headTexture);
                 }
             }
-        }
 
-        NBT.get(item, nbt -> {
-            mapAttributes(section, nbt);
-        });
-
-    }
-
-    protected void mapAttributes(ConfigSection section, ReadableNBT itemNBT) {
-        final ReadableNBTList<ReadWriteNBT> attributesCompound = itemNBT.getCompoundList("AttributeModifiers");
-        final List<Attribute> foundAttributes = new ArrayList<>();
-        if (attributesCompound != null) {
-            for (ReadWriteNBT attributeCompound : attributesCompound) {
-                final String attribute = attributeCompound.getString("AttributeName")
-                        .replace("minecraft:", "");
-                final String name = attributeCompound.getString("Name");
-                final double amount = attributeCompound.getDouble("Amount");
-                final String slot = attributeCompound.getString("Slot");
-                final int operation = attributeCompound.getInteger("Operation");
-
-                foundAttributes.add(new Attribute(attribute, name, amount, slot, operation));
+            if (meta.hasAttributeModifiers()) {
+                final ConfigSequence attributeSequence = section.getSequenceOrCreate("attributes");
+                for (Map.Entry<Attribute, AttributeModifier> entry : meta.getAttributeModifiers().entries()) {
+                    attributeSequence.add(new ItemAttribute(entry.getKey(), entry.getValue()));
+                }
             }
+
         }
 
-        if (!foundAttributes.isEmpty()) {
-            section.set("attributes", foundAttributes);
-        }
     }
 
 }

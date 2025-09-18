@@ -9,12 +9,10 @@ public abstract class GenericMessage implements Message, Identifiable {
 
     private final String name;
     private final String group;
-    private final ConfigSection section;
 
-    protected GenericMessage(String name, @Nullable String group, ConfigSection section) {
+    protected GenericMessage(String name, @Nullable String group) {
         this.name = name;
         this.group = group;
-        this.section = section;
     }
 
     @Override
@@ -25,11 +23,6 @@ public abstract class GenericMessage implements Message, Identifiable {
     @Override
     public @Nullable String getGroup() {
         return group;
-    }
-
-    @Override
-    public @NotNull ConfigField getField() {
-        return section;
     }
 
 }

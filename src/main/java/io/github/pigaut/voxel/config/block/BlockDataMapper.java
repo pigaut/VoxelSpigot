@@ -2,11 +2,11 @@ package io.github.pigaut.voxel.config.block;
 
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.*;
-import io.github.pigaut.yaml.configurator.mapper.*;
+import io.github.pigaut.yaml.configurator.map.*;
 import org.bukkit.block.*;
 import org.bukkit.block.data.*;
-import org.bukkit.block.data.type.*;
 import org.bukkit.block.data.type.Bed;
+import org.bukkit.block.data.type.*;
 import org.jetbrains.annotations.*;
 
 public class BlockDataMapper implements ConfigMapper<Block> {
@@ -17,7 +17,7 @@ public class BlockDataMapper implements ConfigMapper<Block> {
     }
 
     @Override
-    public void mapSection(@NotNull ConfigSection section, @NotNull Block block) {
+    public void mapToSection(@NotNull ConfigSection section, @NotNull Block block) {
         section.set("block", block.getType());
 
         final BlockData blockData = block.getBlockData();

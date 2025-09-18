@@ -11,12 +11,19 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
+import java.util.*;
+
 public class ActionBarMessage extends GenericMessage {
 
     private final String message;
 
-    public ActionBarMessage(String name, @Nullable String group, ConfigSection section, String message) {
-        super(name, group, section);
+    public ActionBarMessage(String message) {
+        super(UUID.randomUUID().toString(), null);
+        this.message = message;
+    }
+
+    public ActionBarMessage(String name, @Nullable String group, String message) {
+        super(name, group);
         this.message = message;
     }
 

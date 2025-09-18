@@ -14,9 +14,9 @@ public class SpawnParticle implements Action {
     private final ParticleEffect particle;
     private final Location location;
 
-    public SpawnParticle(ParticleEffect particle, Location location) {
+    public SpawnParticle(ParticleEffect particle, World world, double x, double y, double z) {
         this.particle = particle;
-        this.location = location;
+        this.location = new Location(world, x, y, z);
     }
 
     @Override

@@ -9,7 +9,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-import java.io.*;
 import java.util.*;
 
 public class MultiFunction implements Function {
@@ -34,11 +33,6 @@ public class MultiFunction implements Function {
     @Override
     public @Nullable String getGroup() {
         return group;
-    }
-
-    @Override
-    public @NotNull ConfigSequence getField() {
-        return sequence;
     }
 
     @Override

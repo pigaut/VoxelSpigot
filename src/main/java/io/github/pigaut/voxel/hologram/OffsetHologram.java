@@ -1,7 +1,6 @@
 package io.github.pigaut.voxel.hologram;
 
 import io.github.pigaut.voxel.placeholder.*;
-
 import io.github.pigaut.voxel.util.Rotation;
 import org.bukkit.*;
 

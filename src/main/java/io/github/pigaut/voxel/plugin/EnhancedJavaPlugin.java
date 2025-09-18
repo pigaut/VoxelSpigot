@@ -1,21 +1,19 @@
 package io.github.pigaut.voxel.plugin;
 
 import com.jeff_media.updatechecker.*;
-import eu.decentsoftware.holograms.api.holograms.*;
 import io.github.pigaut.sql.*;
 import io.github.pigaut.sql.database.*;
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.config.*;
-import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.voxel.core.function.Function;
-import io.github.pigaut.voxel.core.item.*;
+import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.voxel.core.item.Item;
+import io.github.pigaut.voxel.core.item.*;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.core.structure.*;
-import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.hook.*;
 import io.github.pigaut.voxel.language.*;
 import io.github.pigaut.voxel.menu.*;
@@ -25,7 +23,7 @@ import io.github.pigaut.voxel.player.input.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
 import io.github.pigaut.voxel.server.*;
-import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.voxel.util.reflection.*;
 import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.section.*;
@@ -41,7 +39,7 @@ import org.bukkit.plugin.java.*;
 import org.jetbrains.annotations.*;
 
 import java.io.*;
-import java.lang.reflect.Field;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.logging.*;
@@ -67,6 +65,8 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     private final List<Manager> loadedManagers = new ArrayList<>();
 
+    private final Settings settings = new Settings();
+
     private RootSection config;
     private UpdateChecker updateChecker = null;
     private PluginMetrics metrics = null;
@@ -77,6 +77,19 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private EconomyHook economy = null;
     private boolean papi = false;
     private boolean decentHolograms = false;
+
+    @Override
+    public void onDisable() {
+        logger.info("Saving data to database...");
+        for (Manager manager : loadedManagers) {
+            manager.disable();
+            manager.saveData();
+        }
+        loadedManagers.clear();
+        if (database != null) {
+            database.closeConnection();
+        }
+    }
 
     @Override
     public void onEnable() {
@@ -101,11 +114,11 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
             saveResource(resource);
         }
 
-        config = new RootSection(this.getFile("config.yml"), this.getConfigurator());
+        config = YamlConfig.loadSection(getFile("config.yml"), getConfigurator());
         config.load();
-        debug = config.getOptionalBoolean("debug").orElse(true);
+        debug = config.getBoolean("debug").throwOrElse(true);
 
-        if (config.getOptionalBoolean("generate-examples").orElse(true)) {
+        if (config.getBoolean("generate-examples").orElse(true)) {
             logger.info("Generating example files...");
             for (String resourcePath : getExampleResources()) {
                 saveResource(resourcePath);
@@ -126,8 +139,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         final String databaseName = getDatabaseName();
         if (database != null) {
             database.openConnection();
-        }
-        else if (databaseName != null) {
+        } else if (databaseName != null) {
             final File file = getFile(databaseName);
             database = new FileDatabase(file);
             database.openConnection();
@@ -153,26 +165,14 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
         loadedManagers.add(menuManager);
 
-        getCommand("");
+        getCommand("");  // Initialize command manager
         final List<ConfigurationException> errorsFound = new ArrayList<>();
         for (Manager manager : loadedManagers) {
             manager.enable();
+            manager.loadData();
 
-            try {
-                manager.loadData();
-            } catch (ConfigurationException e) {
-                errorsFound.add(e);
-            }
-
-            final String filesDirectory = manager.getFilesDirectory();
-            if (filesDirectory != null) {
-                for (File file : getFiles(filesDirectory)) {
-                    try {
-                        manager.loadFile(file);
-                    } catch (ConfigurationException e) {
-                        errorsFound.add(e);
-                    }
-                }
+            if (manager instanceof ConfigBacked configBackedManager) {
+                errorsFound.addAll(configBackedManager.loadConfigurationData());
             }
 
             if (manager instanceof Listener listener) {
@@ -181,7 +181,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
         logConfigurationErrors(null, errorsFound);
 
-        final int autoSave = config.getOptionalInteger("auto-save").orElse(0);
+        final int autoSave = config.getInteger("auto-save").orElse(0);
         if (autoSave > 0) {
             scheduler.runTaskTimerAsync(autoSave, () -> {
                 logger.info("Saving plugin data to database...");
@@ -204,7 +204,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
         final Integer metricsId = getMetricsId();
         if (metricsId != null) {
-            if (forceMetrics() || config.getOptionalBoolean("metrics").orElse(true)) {
+            if (forceMetrics() || config.getBoolean("metrics").orElse(true)) {
                 logger.info("Created bStats metrics with id: " + metricsId);
                 metrics = new PluginMetrics(this, metricsId);
                 metrics.addCustomChart(new SimplePie("premium", () -> Boolean.toString(isPremium())));
@@ -214,7 +214,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         if (updateChecker != null) {
             updateChecker.stop();
         }
-        final boolean checkForUpdates = config.getOptionalBoolean("check-for-updates").orElse(true);
+        final boolean checkForUpdates = config.getBoolean("check-for-updates").orElse(true);
         final Integer spigotId = getResourceId();
         if (checkForUpdates && spigotId != null) {
             updateChecker = new UpdateChecker(this, UpdateCheckSource.SPIGET, Integer.toString(spigotId))
@@ -226,19 +226,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
                     .checkNow();
         }
 
-    }
-
-    @Override
-    public void onDisable() {
-        logger.info("Saving data to database...");
-        for (Manager manager : loadedManagers) {
-            manager.disable();
-            manager.saveData();
-        }
-        loadedManagers.clear();
-        if (database != null) {
-            database.closeConnection();
-        }
     }
 
     public void reload(Consumer<List<ConfigurationException>> errorCollector) throws PluginReloadInProgressException {
@@ -258,9 +245,9 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
 
         config.load();
-        debug = config.getOptionalBoolean("debug").orElse(true);
+        debug = config.getBoolean("debug").orElse(true);
 
-        if (config.getOptionalBoolean("generate-examples").orElse(true)) {
+        if (config.getBoolean("generate-examples").orElse(true)) {
             logger.info("Generating example files...");
             for (String resourcePath : getExampleResources()) {
                 saveResource(resourcePath);
@@ -290,16 +277,8 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
             final List<ConfigurationException> errorsFound = new ArrayList<>();
             for (Manager manager : loadedManagers) {
                 manager.loadData();
-
-                final String filesDirectory = manager.getFilesDirectory();
-                if (filesDirectory != null) {
-                    for (File file : getFiles(filesDirectory)) {
-                        try {
-                            manager.loadFile(file);
-                        } catch (ConfigurationException e) {
-                            errorsFound.add(e);
-                        }
-                    }
+                if (manager instanceof ConfigBacked configBackedManager) {
+                    errorsFound.addAll(configBackedManager.loadConfigurationData());
                 }
             }
             errorCollector.accept(errorsFound);
@@ -331,8 +310,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         if (SpigotServer.isPluginLoaded("DecentHolograms")) {
             decentHolograms = true;
             logger.info("DecentHolograms Hook: created successfully");
-        }
-        else {
+        } else {
             logger.info("DecentHolograms Hook: plugin not loaded");
         }
     }
@@ -359,18 +337,8 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
     }
 
-    @Override
-    public @NotNull String getPermission(@NotNull String permission) {
-        return this.getName().toLowerCase() + "." + permission;
-    }
-
-    @Override
-    public @NotNull NamespacedKey getNamespacedKey(@NotNull String key) {
-        return new NamespacedKey(this, key);
-    }
-
     public void generateExamples() {
-        if (!config.getOptionalBoolean("generate-examples").orElse(true)) {
+        if (!config.getBoolean("generate-examples").orElse(true)) {
             return;
         }
 
@@ -399,13 +367,17 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         return false;
     }
 
+    public boolean forceUpdates() {
+        return false;
+    }
+
     public void createMetrics() {
         final Integer metricsId = getMetricsId();
         if (metricsId == null || metrics != null) {
             return;
         }
 
-        if (!forceMetrics() && !config.getOptionalBoolean("metrics").orElse(true)) {
+        if (!forceMetrics() && !config.getBoolean("metrics").orElse(true)) {
             return;
         }
 
@@ -414,17 +386,20 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     public void createUpdateChecker() {
-        if (!config.getOptionalBoolean("check-for-updates").orElse(true)) {
+        if (!forceUpdates() && !config.getBoolean("check-for-updates").orElse(true)) {
             return;
         }
+
         if (updateChecker != null) {
             updateChecker.checkNow();
             return;
         }
+
         final Integer spigotId = getResourceId();
         if (spigotId == null) {
             return;
         }
+
         updateChecker = new UpdateChecker(this, UpdateCheckSource.SPIGET, Integer.toString(spigotId))
                 .setDownloadLink("https://www.spigotmc.org/resources/" + spigotId)
                 .setChangelogLink("https://www.spigotmc.org/resources/" + spigotId + "/updates")
@@ -466,6 +441,16 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public @NotNull PluginScheduler getScheduler() {
         return scheduler;
+    }
+
+    @Override
+    public @NotNull String getPermission(@NotNull String permission) {
+        return this.getName().toLowerCase() + "." + permission;
+    }
+
+    @Override
+    public @NotNull NamespacedKey getNamespacedKey(@NotNull String key) {
+        return new NamespacedKey(this, key);
     }
 
     @Override
@@ -591,7 +576,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public @NotNull RootSection getConfiguration() {
         if (config == null) {
-            config = new RootSection(getFile("config.yml"), getConfigurator());
+            config = YamlConfig.loadSection(getFile("config.yml"), getConfigurator());
             config.load();
             return config;
         }
@@ -691,6 +676,38 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
                 .toList();
     }
 
+    @Override
+    public void logConfigurationErrors(@Nullable Player player, @NotNull List<ConfigurationException> errors) {
+        if (errors.isEmpty()) {
+            return;
+        }
+
+        for (ConfigurationException error : errors) {
+            final String message = error.getLogMessage(getDataFolder().getPath());
+            logger.severe(message);
+        }
+
+        if (player == null) {
+            return;
+        }
+
+        final PlaceholderSupplier errorCount = PlaceholderSupplier.of("{error_count}", errors.size());
+        if (debug) {
+            sendMessage(player, "debug-configuration-errors", errorCount);
+            for (ConfigurationException error : errors) {
+                final String message = error.getLogMessage(getDataFolder().getPath());
+                player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + message);
+            }
+            return;
+        }
+
+        sendMessage(player, "configuration-errors", errorCount);
+    }
+
+    public @NotNull Settings getSettings() {
+        return settings;
+    }
+
     public @NotNull List<SpigotVersion> getCompatibleVersions() {
         return List.of(SpigotVersion.values());
     }
@@ -745,28 +762,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     public @Nullable String getDatabaseName() {
         return null;
-    }
-
-    @Override
-    public void logConfigurationErrors(@Nullable Player player, @NotNull List<ConfigurationException> errors) {
-        if (errors.isEmpty()) {
-            return;
-        }
-
-        final PlaceholderSupplier errorCount = PlaceholderSupplier.of("{error_count}", errors.size());
-        errors.forEach(error -> logger.severe(error.getLogMessage(getDataFolder().getPath())));
-
-        if (player == null) {
-            return;
-        }
-
-        if (debug) {
-            sendMessage(player, "debug-configuration-errors", errorCount);
-            errors.forEach(error -> player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + error.getLogMessage()));
-            return;
-        }
-
-        sendMessage(player, "configuration-errors", errorCount);
     }
 
     private void collectYamlFiles(File directory, List<File> yamlFiles) {

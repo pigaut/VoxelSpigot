@@ -4,6 +4,7 @@ import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.player.input.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
+import io.github.pigaut.yaml.util.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.inventory.*;

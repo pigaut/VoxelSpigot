@@ -9,285 +9,317 @@ import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.hook.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
-import io.github.pigaut.yaml.parser.*;
+import io.github.pigaut.yaml.amount.*;
+import io.github.pigaut.yaml.configurator.load.*;
+import io.github.pigaut.yaml.convert.format.*;
+import io.github.pigaut.yaml.util.*;
 import org.bukkit.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
-import java.util.*;
-import java.util.function.*;
-import java.util.regex.*;
-
 public class ActionLoader extends AbstractLoader<SystemAction> {
 
-    public ActionLoader() {
+    private final EnhancedPlugin plugin;
+
+    public ActionLoader(EnhancedPlugin plugin) {
+        this.plugin = plugin;
+
         //server
+        addLoader("BROADCAST", (Line<SystemAction>) line ->
+                new ServerBroadcast(line.getRequiredString(1)));
 
-        addLoader("BROADCAST", (BranchLoader<SystemAction>) branch ->
-                new ServerBroadcast(branch.getString("text", 1)));
-
-        addLoader("LIGHTNING", (BranchLoader<SystemAction>) branch ->
+        addLoader("LIGHTNING", (Line<SystemAction>) line ->
                 new StrikeLightning(
-                        branch.get("location", 1, Location.class),
-                        branch.getOptionalBoolean("do-damage", 2).orElse(true)
+                        line.get("world", World.class).throwOrElse(SpigotServer.getDefaultWorld()),
+                        line.getRequiredDouble("x"),
+                        line.getRequiredDouble("y"),
+                        line.getRequiredDouble("z"),
+                        line.getBoolean("doDamage|damage").throwOrElse(true)
                 ));
 
-        addLoader("CONSOLE_COMMAND", (BranchLoader<SystemAction>) branch ->
-                new ExecuteConsoleCommand(branch.getString("command", 1)));
+        addLoader("CONSOLE_COMMAND", (Line<SystemAction>) line ->
+                new ExecuteConsoleCommand(line.getRequiredString(1)));
 
-        addLoader("DROP_ITEM", (BranchLoader<SystemAction>) branch ->
+        addLoader("DROP_ITEM", (Line<SystemAction>) line ->
                 new DropItem(
-                        branch.get("item", 1, ItemStack.class),
-                        branch.get("location", 2, Location.class)
+                        line.getRequired(1, ItemStack.class),
+                        line.get("world", World.class).throwOrElse(SpigotServer.getDefaultWorld()),
+                        line.getRequiredDouble("x"),
+                        line.getRequiredDouble("y"),
+                        line.getRequiredDouble("z")
                 ));
 
-        addLoader("DROP_EXP", (BranchLoader<SystemAction>) branch ->
+        addLoader("DROP_EXP", (Line<SystemAction>) line ->
                 new DropExp(
-                        branch.get("exp", 1, Amount.class),
-                        branch.get("orbs", 2, Amount.class),
-                        branch.get("location", 3, Location.class)
+                        line.getRequired(1, Amount.class),
+                        line.get("world", World.class).throwOrElse(SpigotServer.getDefaultWorld()),
+                        line.getRequiredDouble("x"),
+                        line.getRequiredDouble("y"),
+                        line.getRequiredDouble("z"),
+                        line.get("orbs|orbCount", Amount.class).throwOrElse(Amount.ONE)
                 ));
 
-        addLoader("SPAWN_PARTICLE", (BranchLoader<SystemAction>) branch ->
+        addLoader("SPAWN_PARTICLE", (Line<SystemAction>) line ->
                 new SpawnParticle(
-                        branch.get("particle", 1, ParticleEffect.class),
-                        branch.get("location", 2, Location.class)
+                        line.getRequired(1, ParticleEffect.class),
+                        line.get("world", World.class).throwOrElse(SpigotServer.getDefaultWorld()),
+                        line.getRequiredDouble("x"),
+                        line.getRequiredDouble("y"),
+                        line.getRequiredDouble("z")
                 ));
 
-        addLoader("PARTICLE", (BranchLoader<SystemAction>) branch ->
+        addLoader("PARTICLE", (Line<SystemAction>) line ->
                 new SpawnParticle(
-                        branch.get("particle", 1, ParticleEffect.class),
-                        branch.get("location", 2, Location.class)
+                        line.getRequired(1, ParticleEffect.class),
+                        line.get("world", World.class).throwOrElse(SpigotServer.getDefaultWorld()),
+                        line.getRequiredDouble("x"),
+                        line.getRequiredDouble("y"),
+                        line.getRequiredDouble("z")
                 ));
 
-        addLoader("PLAY_SOUND", (BranchLoader<SystemAction>) branch ->
+        addLoader("PLAY_SOUND", (Line<SystemAction>) line ->
                 new PlaySound(
-                        branch.get("sound", 1, SoundEffect.class),
-                        branch.get("location", 2, Location.class)
+                        line.getRequired(1, SoundEffect.class),
+                        line.get("world", World.class).orElse(SpigotServer.getDefaultWorld()),
+                        line.getRequiredDouble("x"),
+                        line.getRequiredDouble("y"),
+                        line.getRequiredDouble("z")
                 ));
 
-        addLoader("SOUND", (BranchLoader<SystemAction>) branch ->
+        addLoader("SOUND", (Line<SystemAction>) line ->
                 new PlaySound(
-                        branch.get("sound", 1, SoundEffect.class),
-                        branch.get("location", 2, Location.class)
+                        line.getRequired(1, SoundEffect.class),
+                        line.get("world", World.class).orElse(SpigotServer.getDefaultWorld()),
+                        line.getRequiredDouble("x"),
+                        line.getRequiredDouble("y"),
+                        line.getRequiredDouble("z")
                 ));
 
         //Function Actions
 
-        addLoader("RETURN", (BranchLoader<SystemAction>) branch ->
+        addLoader("RETURN", (Line<SystemAction>) line ->
                 new ReturnAction());
 
-        addLoader("STOP", (BranchLoader<SystemAction>) branch ->
+        addLoader("STOP", (Line<SystemAction>) line ->
                 new StopAction());
 
-        addLoader("GOTO", (BranchLoader<SystemAction>) branch ->
-                new GotoAction(branch.getInteger("line", 1)));
+        addLoader("GOTO", (Line<SystemAction>) line ->
+                new GotoAction(line.getRequiredInteger(1)));
 
         //Event Actions
 
-        addLoader("CANCEL_EVENT", (BranchLoader<SystemAction>) branch ->
+        addLoader("CANCEL_EVENT", (Line<SystemAction>) line ->
                 new CancelEventAction(true));
 
-        addLoader("CANCEL", (BranchLoader<SystemAction>) branch ->
+        addLoader("CANCEL", (Line<SystemAction>) line ->
                 new CancelEventAction(true));
 
-        addLoader("SET_CANCELLED", (BranchLoader<SystemAction>) branch ->
-                new CancelEventAction(branch.getBoolean("cancelled", 1)));
+        addLoader("SET_CANCELLED", (Line<SystemAction>) line ->
+                new CancelEventAction(line.getRequiredBoolean(1)));
 
         //Block Actions
-        addLoader("STRIKE_BLOCK", (BranchLoader<SystemAction>) branch ->
-                new StrikeBlockWithLightning(branch.getOptionalBoolean("do-damage", 1).orElse(true)));
+        addLoader("STRIKE_BLOCK", (Line<SystemAction>) line ->
+                new StrikeBlockWithLightning(line.getBoolean("doDamage|damage").orElse(true)));
 
-        addLoader("DROP_AT_BLOCK", (BranchLoader<SystemAction>) branch ->
-                new DropItemAtBlock(branch.get("item", 1, ItemStack.class)));
+        addLoader("DROP_AT_BLOCK", (Line<SystemAction>) line ->
+                new DropItemAtBlock(line.getRequired(1, ItemStack.class)));
 
-        addLoader("DROP_ITEM_AT_BLOCK", (BranchLoader<SystemAction>) branch ->
-                new DropItemAtBlock(branch.get("item", 1, ItemStack.class)));
+        addLoader("DROP_ITEM_AT_BLOCK", (Line<SystemAction>) line ->
+                new DropItemAtBlock(line.getRequired(1, ItemStack.class)));
 
-        addLoader("DROP_EXP_AT_BLOCK", (BranchLoader<SystemAction>) branch ->
+        addLoader("DROP_EXP_AT_BLOCK", (Line<SystemAction>) line ->
                 new DropExpAtBlock(
-                        branch.get("exp", 1, Amount.class),
-                        branch.get("orbs", 2, Amount.class)
+                        line.getRequired(1, Amount.class),
+                        line.get("orbs|orbCount", Amount.class).orElse(Amount.ONE)
                 ));
 
-        addLoader("PARTICLE_AT_BLOCK", (BranchLoader<SystemAction>) branch ->
-                new SpawnParticleOnBlock(branch.get("particle", 1, ParticleEffect.class)));
+        addLoader("PARTICLE_AT_BLOCK", (Line<SystemAction>) line ->
+                new SpawnParticleOnBlock(line.getRequired(1, ParticleEffect.class)));
 
-        addLoader("SPAWN_PARTICLE_AT_BLOCK", (BranchLoader<SystemAction>) branch ->
-                new SpawnParticleOnBlock(branch.get("particle", 1, ParticleEffect.class)));
+        addLoader("SPAWN_PARTICLE_AT_BLOCK", (Line<SystemAction>) line ->
+                new SpawnParticleOnBlock(line.getRequired(1, ParticleEffect.class)));
 
-        addLoader("SOUND_AT_BLOCK", (BranchLoader<SystemAction>) branch ->
-                new PlaySoundOnBlock(branch.get("sound", 1, SoundEffect.class)));
+        addLoader("SOUND_AT_BLOCK", (Line<SystemAction>) line ->
+                new PlaySoundOnBlock(line.getRequired(1, SoundEffect.class)));
 
-        addLoader("PLAY_SOUND_AT_BLOCK", (BranchLoader<SystemAction>) branch ->
-                new PlaySoundOnBlock(branch.get("sound", 1, SoundEffect.class)));
+        addLoader("PLAY_SOUND_AT_BLOCK", (Line<SystemAction>) line ->
+                new PlaySoundOnBlock(line.getRequired(1, SoundEffect.class)));
 
         //player actions
 
-        addLoader("DROP_AT_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new DropItemAtPlayer(branch.get("item", 1, ItemStack.class)));
+        addLoader("DROP_AT_PLAYER", (Line<SystemAction>) line ->
+                new DropItemAtPlayer(line.getRequired(1, ItemStack.class)));
 
-        addLoader("DROP_ITEM_AT_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new DropItemAtPlayer(branch.get("item", 1, ItemStack.class)));
+        addLoader("DROP_ITEM_AT_PLAYER", (Line<SystemAction>) line ->
+                new DropItemAtPlayer(line.getRequired(1, ItemStack.class)));
 
-        addLoader("DROP_EXP_AT_PLAYER", (BranchLoader<SystemAction>) branch ->
+        addLoader("DROP_EXP_AT_PLAYER", (Line<SystemAction>) line ->
                 new DropExpAtPlayer(
-                        branch.get("exp", 1, Amount.class),
-                        branch.get("orbs", 2, Amount.class)
+                        line.getRequired(1, Amount.class),
+                        line.get("orbs|orbCount", Amount.class).orElse(Amount.ONE)
                 ));
 
-        addLoader("PARTICLE_AT_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new SpawnParticleOnPlayer(branch.get("particle", 1, ParticleEffect.class)));
+        addLoader("PARTICLE_AT_PLAYER", (Line<SystemAction>) line ->
+                new SpawnParticleOnPlayer(line.getRequired(1, ParticleEffect.class)));
 
-        addLoader("SPAWN_PARTICLE_AT_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new SpawnParticleOnPlayer(branch.get("particle", 1, ParticleEffect.class)));
+        addLoader("SPAWN_PARTICLE_AT_PLAYER", (Line<SystemAction>) line ->
+                new SpawnParticleOnPlayer(line.getRequired(1, ParticleEffect.class)));
 
-        addLoader("SOUND_AT_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new PlaySoundOnPlayer(branch.get("sound", 1, SoundEffect.class)));
+        addLoader("SOUND_AT_PLAYER", (Line<SystemAction>) line ->
+                new PlaySoundOnPlayer(line.getRequired(1, SoundEffect.class)));
 
-        addLoader("PLAY_SOUND_AT_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new PlaySoundOnPlayer(branch.get("sound", 1, SoundEffect.class)));
+        addLoader("PLAY_SOUND_AT_PLAYER", (Line<SystemAction>) line ->
+                new PlaySoundOnPlayer(line.getRequired(1, SoundEffect.class)));
 
-        addLoader("GIVE_EXP", (BranchLoader<SystemAction>) branch ->
-                new GiveExpToPlayer(branch.get("amount", 1, Amount.class)));
+        addLoader("GIVE_EXP", (Line<SystemAction>) line ->
+                new GiveExpToPlayer(line.getRequired(1, Amount.class)));
 
-        addLoader("GIVE_EXP_TO_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new GiveExpToPlayer(branch.get("amount", 1, Amount.class)));
+        addLoader("GIVE_EXP_TO_PLAYER", (Line<SystemAction>) line ->
+                new GiveExpToPlayer(line.getRequired(1, Amount.class)));
 
-        addLoader("GIVE_FLAG", (BranchLoader<SystemAction>) branch ->
-                new GiveFlagToPlayer(branch.getString("flag", 1)));
+        addLoader("GIVE_FLAG", (Line<SystemAction>) line ->
+                new GiveFlagToPlayer(line.getRequiredString(1)));
 
-        addLoader("GIVE_FLAG_TO_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new GiveFlagToPlayer(branch.getString("flag", 1)));
+        addLoader("GIVE_FLAG_TO_PLAYER", (Line<SystemAction>) line ->
+                new GiveFlagToPlayer(line.getRequiredString(1)));
 
-        addLoader("GIVE_ITEM", (BranchLoader<SystemAction>) branch ->
-                new GiveItemToPlayer(branch.get("item", 1, ItemStack.class)));
+        addLoader("GIVE_ITEM", (Line<SystemAction>) line ->
+                new GiveItemToPlayer(line.getRequired(1, ItemStack.class)));
 
-        addLoader("GIVE_ITEM_TO_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new GiveItemToPlayer(branch.get("item", 1, ItemStack.class)));
+        addLoader("GIVE_ITEM_TO_PLAYER", (Line<SystemAction>) line ->
+                new GiveItemToPlayer(line.getRequired(1, ItemStack.class)));
 
         final EconomyHook economy = SpigotServer.getEconomyHook();
-        addLoader("GIVE_MONEY", (BranchLoader<SystemAction>) branch -> {
+        addLoader("GIVE_MONEY", (Line<SystemAction>) line -> {
             if (economy == null) {
-                throw new InvalidConfigurationException(branch, "Missing Vault or economy plugin");
+                throw new InvalidConfigurationException(line, "Missing Vault or economy plugin");
             }
-            return new GiveMoneyToPlayer(economy, branch.get("amount", 1, Amount.class));
+            return new GiveMoneyToPlayer(economy, line.getRequired(1, Amount.class));
         });
 
-        addLoader("GIVE_MONEY_TO_PLAYER", (BranchLoader<SystemAction>) branch -> {
+        addLoader("GIVE_MONEY_TO_PLAYER", (Line<SystemAction>) line -> {
             if (economy == null) {
-                throw new InvalidConfigurationException(branch, "Missing Vault or economy plugin");
+                throw new InvalidConfigurationException(line, "Missing Vault or economy plugin");
             }
-            return new GiveMoneyToPlayer(economy, branch.get("amount", 1, Amount.class));
+            return new GiveMoneyToPlayer(economy, line.getRequired(1, Amount.class));
         });
 
-        addLoader("TAKE_EXP", (BranchLoader<SystemAction>) branch ->
-                new TakeExpFromPlayer(branch.get("amount", 1, Amount.class)));
+        addLoader("TAKE_EXP", (Line<SystemAction>) line ->
+                new TakeExpFromPlayer(line.getRequired(1, Amount.class)));
 
-        addLoader("TAKE_EXP_FROM_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new TakeExpFromPlayer(branch.get("amount", 1, Amount.class)));
+        addLoader("TAKE_EXP_FROM_PLAYER", (Line<SystemAction>) line ->
+                new TakeExpFromPlayer(line.getRequired(1, Amount.class)));
 
-        addLoader("TAKE_FLAG", (BranchLoader<SystemAction>) branch ->
-                new TakeFlagFromPlayer(branch.getString("flag", 1)));
+        addLoader("TAKE_FLAG", (Line<SystemAction>) line ->
+                new TakeFlagFromPlayer(line.getRequiredString(1)));
 
-        addLoader("TAKE_FLAG_FROM_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new TakeFlagFromPlayer(branch.getString("flag", 1)));
+        addLoader("TAKE_FLAG_FROM_PLAYER", (Line<SystemAction>) line ->
+                new TakeFlagFromPlayer(line.getRequiredString(1)));
 
-        addLoader("TAKE_ITEM", (BranchLoader<SystemAction>) branch ->
-                new TakeItemFromPlayer(branch.get("item", 1, ItemStack.class)));
+        addLoader("TAKE_ITEM", (Line<SystemAction>) line ->
+                new TakeItemFromPlayer(line.getRequired(1, ItemStack.class)));
 
-        addLoader("TAKE_ITEM_FROM_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new TakeItemFromPlayer(branch.get("item", 1, ItemStack.class)));
+        addLoader("TAKE_ITEM_FROM_PLAYER", (Line<SystemAction>) line ->
+                new TakeItemFromPlayer(line.getRequired(1, ItemStack.class)));
 
-        addLoader("TAKE_MONEY", (BranchLoader<SystemAction>) branch -> {
+        addLoader("TAKE_MONEY", (Line<SystemAction>) line -> {
             if (economy == null) {
-                throw new InvalidConfigurationException(branch, "Missing Vault or economy plugin");
+                throw new InvalidConfigurationException(line, "Missing Vault or economy plugin");
             }
-            return new TakeMoneyFromPlayer(economy, branch.get("amount", 1, Amount.class));
+            return new TakeMoneyFromPlayer(economy, line.getRequired(1, Amount.class));
         });
 
-        addLoader("TAKE_MONEY_FROM_PLAYER", (BranchLoader<SystemAction>) branch -> {
+        addLoader("TAKE_MONEY_FROM_PLAYER", (Line<SystemAction>) line -> {
             if (economy == null) {
-                throw new InvalidConfigurationException(branch, "Missing Vault or economy plugin");
+                throw new InvalidConfigurationException(line, "Missing Vault or economy plugin");
             }
-            return new TakeMoneyFromPlayer(economy, branch.get("amount", 1, Amount.class));
+            return new TakeMoneyFromPlayer(economy, line.getRequired(1, Amount.class));
         });
 
-        addLoader("SET_EXP", (BranchLoader<SystemAction>) branch ->
-                new SetPlayerExp(branch.get("amount", 1, Amount.class)));
+        addLoader("SET_EXP", (Line<SystemAction>) line ->
+                new SetPlayerExp(line.getRequired(1, Amount.class)));
 
-        addLoader("SET_PLAYER_EXP", (BranchLoader<SystemAction>) branch ->
-                new SetPlayerExp(branch.get("amount", 1, Amount.class)));
+        addLoader("SET_PLAYER_EXP", (Line<SystemAction>) line ->
+                new SetPlayerExp(line.getRequired(1, Amount.class)));
 
-        addLoader("HEAL", (BranchLoader<SystemAction>) branch ->
-                new HealPlayer(branch.getOptional("amount", 1, Amount.class).orElse(Amount.of(20))));
+        addLoader("HEAL", (Line<SystemAction>) line ->
+                new HealPlayer(line.get(1, Amount.class).orElse(Amount.fixed(20))));
 
-        addLoader("HEAL_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new HealPlayer(branch.getOptional("amount", 1, Amount.class).orElse(Amount.of(20))));
+        addLoader("HEAL_PLAYER", (Line<SystemAction>) line ->
+                new HealPlayer(line.get(1, Amount.class).orElse(Amount.fixed(20))));
 
-        addLoader("DAMAGE", (BranchLoader<SystemAction>) branch ->
-                new DamagePlayer(branch.getOptional("amount", 1, Amount.class).orElse(Amount.of(2))));
+        addLoader("DAMAGE", (Line<SystemAction>) line ->
+                new DamagePlayer(line.get(1, Amount.class).orElse(Amount.fixed(2))));
 
-        addLoader("DAMAGE_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new DamagePlayer(branch.getOptional("amount", 1, Amount.class).orElse(Amount.of(2))));
+        addLoader("DAMAGE_PLAYER", (Line<SystemAction>) line ->
+                new DamagePlayer(line.get(1, Amount.class).orElse(Amount.fixed(2))));
 
-        addLoader("COMMAND", (BranchLoader<SystemAction>) branch ->
-                new ExecutePlayerCommand(branch.getString("command", 1)));
+        addLoader("COMMAND", (Line<SystemAction>) line ->
+                new ExecutePlayerCommand(line.getRequiredString(1)));
 
-        addLoader("CHAT_MESSAGE", (BranchLoader<SystemAction>) branch ->
-                new SendChatMessage(branch.getString("message", 1)));
+        addLoader("CHAT_MESSAGE", (Line<SystemAction>) line ->
+                new SendChatToPlayer(line.getRequiredString(1, StringColor.FORMATTER)));
 
-        addLoader("SEND_CHAT_TO_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new SendChatMessage(branch.getString("message", 1)));
+        addLoader("SEND_CHAT", (Line<SystemAction>) line ->
+                new SendChatToPlayer(line.getRequiredString(1, StringColor.FORMATTER)));
 
-        addLoader("MESSAGE", (BranchLoader<SystemAction>) branch ->
-                new SendMessage(branch.get("message", 1, Message.class)));
+        addLoader("SEND_ACTIONBAR", (Line<SystemAction>) line ->
+                new SendActionbarToPlayer(line.getRequiredString(1, StringColor.FORMATTER)));
 
-        addLoader("SEND_MESSAGE_TO_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new SendMessage(branch.get("message", 1, Message.class)));
+        addLoader("SEND_TITLE", (Line<SystemAction>) line ->
+                new SendTitleToPlayer(
+                        line.getRequiredString(1, StringColor.FORMATTER),
+                        line.getString("subtitle", StringColor.FORMATTER).throwOrElse(""),
+                        line.getInteger("fadeIn|fade-in").throwOrElse(10),
+                        line.getInteger("stay").throwOrElse(70),
+                        line.getInteger("fadeOut|fade-out").throwOrElse(20)
+                ));
 
-        addLoader("CUSTOM_MESSAGE", (BranchLoader<SystemAction>) branch ->
-                new SendMessage(branch.get("message", 1, Message.class)));
+        addLoader("SEND_HOLOGRAM", (Line<SystemAction>) line ->
+                new SendHologramToPlayer(plugin,
+                        line.getRequiredString(1, StringColor.FORMATTER),
+                        line.getInteger("duration").throwOrElse(60),
+                        line.getDouble("radiusX|radius-x|xRadius").throwOrElse(null),
+                        line.getDouble("radiusY|radius-y|yRadius").throwOrElse(null),
+                        line.getDouble("radiusZ|radius-z|zRadius").throwOrElse(null)
+                ));
 
-        addLoader("STRIKE_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new StrikePlayerWithLightning(branch.getOptionalBoolean("do-damage", 1).orElse(true)));
+        addLoader("MESSAGE", (Line<SystemAction>) line ->
+                new SendMessage(line.getRequired(1, Message.class)));
 
-        addLoader("SET_FLIGHT", (BranchLoader<SystemAction>) branch ->
-                new SetPlayerFlight(branch.getOptionalBoolean("enabled", 1).orElse(true)));
+        addLoader("SEND_MESSAGE", (Line<SystemAction>) line ->
+                new SendMessage(line.getRequired(1, Message.class)));
 
-        addLoader("TELEPORT", (BranchLoader<SystemAction>) branch ->
-                new TeleportPlayer(branch.get("location", 1, Location.class)));
+        addLoader("LIGHTNING_AT_PLAYER", (Line<SystemAction>) line ->
+                new StrikePlayerWithLightning(line.getBoolean("doDamage|damage").orElse(true)));
 
-        addLoader("TELEPORT_PLAYER", (BranchLoader<SystemAction>) branch ->
-                new TeleportPlayer(branch.get("location", 1, Location.class)));
+        addLoader("SET_FLIGHT", (Line<SystemAction>) line ->
+                new SetPlayerFlight(line.getBoolean(1).orElse(true)));
 
-        addLoader("SET_CURSOR_ITEM", (BranchLoader<SystemAction>) branch ->
-                new SetPlayerCursorItem(branch.get("item", 1, ItemStack.class)));
+        addLoader("TELEPORT", (Line<SystemAction>) line ->
+                new TeleportPlayer(line.getRequired(1, Location.class)));
 
-        addLoader("OPEN_ENDER_CHEST", (BranchLoader<SystemAction>) branch ->
+        addLoader("TELEPORT_PLAYER", (Line<SystemAction>) line ->
+                new TeleportPlayer(line.getRequired(1, Location.class)));
+
+        addLoader("SET_CURSOR_ITEM", (Line<SystemAction>) line ->
+                new SetPlayerCursorItem(line.getRequired(1, ItemStack.class)));
+
+        addLoader("OPEN_ENDER_CHEST", (Line<SystemAction>) line ->
                 new OpenEnderChest());
 
-        addLoader("CLOSE_INVENTORY", (BranchLoader<SystemAction>) branch ->
+        addLoader("CLOSE_INVENTORY", (Line<SystemAction>) line ->
                 new CloseInventory());
 
-        addLoader("PLAYER_CACHE", (BranchLoader<SystemAction>) branch ->
+        addLoader("PLAYER_CACHE", (Line<SystemAction>) line ->
                 new CachePlayerValue(
-                        branch.getString("id", 1),
-                        branch.getString("value", 2)
+                        line.getRequiredString(1),
+                        line.getRequiredString(2)
                 ));
-    }
-
-    public ConfigLoader<? extends SystemAction> getLoader(ConfigField field, String id) throws InvalidConfigurationException {
-        final ConfigLoader<? extends SystemAction> loader = getLoader(id);
-        if (loader == null) {
-            throw new InvalidConfigurationException(field,
-                    "Could not find action with name: " + StringFormatter.toCamelCase(id));
-        }
-        return loader;
     }
 
     @Override
@@ -295,19 +327,52 @@ public class ActionLoader extends AbstractLoader<SystemAction> {
         return "invalid action";
     }
 
-    private static final Pattern INLINE_ACTION_PATTERN = Pattern.compile("<([^>]*)>|(\\S+)");
-
     @Override
     public @NotNull SystemAction loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
-        final ConfigSequence splitString = scalar.split(INLINE_ACTION_PATTERN);
-        final ConfigLoader<? extends SystemAction> loader = getLoader(splitString, splitString.getString(0));
-        return loader.loadFromSequence(splitString);
-    }
+        final ConfigLine line = scalar.toLine();
+        final String actionId = line.getRequiredString(0);
 
-    @Override
-    public @NotNull SystemAction loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        final ConfigLoader<? extends SystemAction> loader = getLoader(section, section.getString("action"));
-        return loader.loadFromSection(section);
+        final ConfigLoader<? extends SystemAction> loader = getLoader(actionId);
+        if (loader == null) {
+            throw new InvalidConfigurationException(line,
+                    "Could not find action with name: " + CaseFormatter.toCamelCase(actionId));
+        }
+
+        SystemAction action = loader.loadFromScalar(scalar);
+
+        final Integer repetitions = line.getInteger("repetitions|loops")
+                .filter(Predicates.isPositive(), "Repetitions must be greater than 0")
+                .throwOrElse(null);
+
+        final Integer interval = line.getInteger("interval|period")
+                .filter(Predicates.notNull(repetitions), "Repetitions must be set to use interval delay")
+                .filter(Predicates.isPositive(), "Interval must be greater than 0")
+                .throwOrElse(null);
+
+        if (interval != null) {
+            action = new PeriodicAction(plugin, action, interval, repetitions);
+        }
+        else if (repetitions != null) {
+            action = new RepeatedAction(action, repetitions);
+        }
+
+        final Integer delay = line.getInteger("delay")
+                .filter(Predicates.isPositive(), "Delay must be greater than 0")
+                .throwOrElse(null);
+
+        if (delay != null) {
+            action = new DelayedAction(plugin, action, delay);
+        }
+
+        final Double chance = line.getDouble("chance")
+                .filter(Predicates.range(0, 1), "Chance must be a value between 0.0 to 1.0")
+                .throwOrElse(null);
+
+        if (chance != null) {
+            action = new ChanceAction(action, chance);
+        }
+
+        return action;
     }
 
     @Override

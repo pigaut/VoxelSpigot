@@ -34,11 +34,6 @@ public class MultiSoundEffect implements SoundEffect {
     }
 
     @Override
-    public @NotNull ConfigSequence getField() {
-        return sequence;
-    }
-
-    @Override
     public void play(@Nullable Player player, @NotNull Location location) {
         for (SoundEffect sound : sounds) {
             sound.play(player, location);

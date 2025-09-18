@@ -10,7 +10,6 @@ import org.bukkit.*;
 import org.bukkit.boss.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
-import org.bukkit.scheduler.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -27,9 +26,9 @@ public class BossBarMessage extends GenericMessage {
 	private final int frequency;
 	private final List<Double> progress;
 
-	public BossBarMessage(EnhancedPlugin plugin, String name, @Nullable String group, ConfigSection section,
+	public BossBarMessage(EnhancedPlugin plugin, String name, @Nullable String group,
 						  String title, BarStyle style, BarColor color, int duration, List<Double> progress) {
-        super(name, group, section);
+        super(name, group);
 		this.plugin = plugin;
         this.title = title;
 		this.color = color;

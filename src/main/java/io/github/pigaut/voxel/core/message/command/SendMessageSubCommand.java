@@ -1,9 +1,8 @@
 package io.github.pigaut.voxel.core.message.command;
 
+import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.command.node.*;
-import io.github.pigaut.voxel.command.parameter.*;
 import io.github.pigaut.voxel.core.message.*;
-import io.github.pigaut.voxel.core.message.command.parameter.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -15,8 +14,7 @@ public class SendMessageSubCommand extends SubCommand {
         super("send", plugin);
         withPermission(plugin.getPermission("message.send"));
         withDescription(plugin.getLang("message-send-command"));
-        addParameter(new OnlinePlayerParameter());
-        addParameter(new MessageNameParameter(plugin));
+        withParameter(CommandParameters.messageName(plugin));
         withCommandExecution((sender, args, placeholders) -> {
             final Player player = Bukkit.getPlayer(args[0]);
             if (player == null) {

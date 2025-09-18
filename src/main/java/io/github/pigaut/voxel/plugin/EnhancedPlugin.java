@@ -4,22 +4,19 @@ import io.github.pigaut.sql.*;
 import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.core.function.*;
-import io.github.pigaut.voxel.core.item.*;
 import io.github.pigaut.voxel.core.item.Item;
+import io.github.pigaut.voxel.core.item.*;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.core.structure.*;
-import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.language.*;
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
-import io.github.pigaut.yaml.node.*;
-import io.github.pigaut.yaml.node.scalar.*;
+import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.node.section.*;
-import io.github.pigaut.yaml.node.sequence.*;
 import io.github.pigaut.yaml.util.*;
 import org.bukkit.*;
 import org.bukkit.command.*;
@@ -29,7 +26,6 @@ import org.bukkit.inventory.*;
 import org.bukkit.plugin.*;
 import org.jetbrains.annotations.*;
 
-import javax.xml.crypto.*;
 import java.io.*;
 import java.util.*;
 
@@ -41,6 +37,9 @@ public interface EnhancedPlugin extends Plugin {
 
     @Nullable
     Database getDatabase();
+
+    @NotNull
+    Settings getSettings();
 
     @NotNull
     PluginScheduler getScheduler();

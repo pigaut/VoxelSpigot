@@ -1,7 +1,6 @@
 package io.github.pigaut.voxel.command;
 
 import com.google.common.base.*;
-import io.github.pigaut.voxel.command.util.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import org.bukkit.command.defaults.*;

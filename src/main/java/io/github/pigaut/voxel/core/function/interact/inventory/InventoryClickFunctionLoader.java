@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.core.function.interact.inventory;
 
 import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
+import io.github.pigaut.yaml.configurator.load.*;
 import org.bukkit.event.inventory.*;
 import org.jetbrains.annotations.*;
 
@@ -20,14 +20,14 @@ public class InventoryClickFunctionLoader implements ConfigLoader<InventoryClick
         final Set<ClickType> clickTypes = new HashSet<>();
 
         if (config.isSet("click")) {
-            clickTypes.add(config.get("click", ClickType.class));
+            clickTypes.add(config.getRequired("click", ClickType.class));
         }
 
         if (config.isSequence("click")) {
-            clickTypes.addAll(config.getList("click", ClickType.class));
+            clickTypes.addAll(config.getAll("click", ClickType.class));
         }
 
-        final InventoryAction action = config.getOptional("click-action", InventoryAction.class).orElse(null);
+        final InventoryAction action = config.get("click-action", InventoryAction.class).throwOrElse(null);
 
         if (action != null && !clickTypes.isEmpty()) {
             throw new InvalidConfigurationException(config, "click-action", "Both a click type an inventory action are set. Please specify only one of these options");
@@ -38,7 +38,7 @@ public class InventoryClickFunctionLoader implements ConfigLoader<InventoryClick
             clickTypes.add(ClickType.RIGHT);
         }
 
-        final Function function = config.load(Function.class);
+        final Function function = config.loadRequired(Function.class);
         if (action != null) {
             return new InventoryActionFunction(action, function);
         }

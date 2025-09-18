@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.config.persistent.data;
 
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.*;
-import io.github.pigaut.yaml.configurator.mapper.*;
+import io.github.pigaut.yaml.configurator.map.*;
 import org.bukkit.*;
 import org.bukkit.persistence.*;
 import org.jetbrains.annotations.*;
@@ -15,7 +15,7 @@ public class PersistentDataContainerMapper implements ConfigMapper<PersistentDat
     }
 
     @Override
-    public void mapSequence(@NotNull ConfigSequence sequence, @NotNull PersistentDataContainer container) {
+    public void mapToSequence(@NotNull ConfigSequence sequence, @NotNull PersistentDataContainer container) {
         for (NamespacedKey persistentKey : container.getKeys()) {
             final PersistentDataType<?, ?> dataType = PersistentData.getDataType(container, persistentKey);
             if (dataType == null)
@@ -25,7 +25,7 @@ public class PersistentDataContainerMapper implements ConfigMapper<PersistentDat
             if (value == null)
                 continue;
 
-            final ConfigSection dataSection = sequence.addSection();
+            final ConfigSection dataSection = sequence.addEmptySection();
             dataSection.set("key", persistentKey.toString());
             dataSection.set("type", dataType);
             dataSection.set("value", value);

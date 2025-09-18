@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.core.function.action.player;
 
 import io.github.pigaut.voxel.hook.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.yaml.amount.*;
 import org.jetbrains.annotations.*;
 
 public class TakeMoneyFromPlayer implements PlayerAction {

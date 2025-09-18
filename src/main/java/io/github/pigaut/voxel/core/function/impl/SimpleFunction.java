@@ -14,13 +14,11 @@ public class SimpleFunction implements Function {
 
     private final String name;
     private final String group;
-    private final ConfigSection section;
     private final SystemAction action;
 
-    public SimpleFunction(String name, String group, ConfigSection section, SystemAction action) {
+    public SimpleFunction(String name, String group, SystemAction action) {
         this.name = name;
         this.group = group;
-        this.section = section;
         this.action = action;
     }
 
@@ -32,11 +30,6 @@ public class SimpleFunction implements Function {
     @Override
     public @Nullable String getGroup() {
         return group;
-    }
-
-    @Override
-    public @NotNull ConfigField getField() {
-        return section;
     }
 
     @Override

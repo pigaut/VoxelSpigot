@@ -1,16 +1,13 @@
 package io.github.pigaut.voxel.player;
 
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.plugin.manager.Manager;
-import io.github.pigaut.yaml.util.*;
-import org.bukkit.*;
+import io.github.pigaut.voxel.plugin.manager.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.player.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
-import java.util.function.*;
 
 public class PlayerStateManager<P extends PlayerState> extends Manager implements Listener {
 

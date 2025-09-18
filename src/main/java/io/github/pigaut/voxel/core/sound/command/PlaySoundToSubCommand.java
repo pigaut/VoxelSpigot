@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.core.sound.command;
 
+import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.command.node.*;
-import io.github.pigaut.voxel.command.parameter.*;
 import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.*;
@@ -14,8 +14,8 @@ public class PlaySoundToSubCommand extends SubCommand {
         super("play-to", plugin);
         withPermission(plugin.getPermission("sound.play-to"));
         withDescription(plugin.getLang("sound-play-to-command"));
-        addParameter(new OnlinePlayerParameter());
-        addParameter(new SoundNameParameter(plugin));
+        withParameter(CommandParameters.ONLINE_PLAYER);
+        withParameter(CommandParameters.soundName(plugin));
         withCommandExecution((sender, args, placeholders) -> {
             final Player player = Bukkit.getPlayer(args[0]);
             if (player == null) {

@@ -2,7 +2,6 @@ package io.github.pigaut.voxel.command;
 
 import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.yaml.parser.*;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.command.defaults.*;

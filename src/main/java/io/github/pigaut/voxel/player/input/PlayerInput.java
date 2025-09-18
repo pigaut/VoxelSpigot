@@ -1,43 +1,40 @@
 package io.github.pigaut.voxel.player.input;
 
 import io.github.pigaut.voxel.player.*;
+import io.github.pigaut.yaml.configurator.deserialize.*;
 import org.jetbrains.annotations.*;
 
 import java.util.function.*;
 
-public abstract class PlayerInput {
+public abstract class PlayerInput<T> {
 
     protected final SimplePlayerState playerState;
+    protected final @NotNull Deserializer<T> deserializer;
     protected @NotNull String inputDescription;
-    protected @NotNull InputValidator inputValidator = input -> null;
-    protected @NotNull Consumer<String> inputCollector = input -> {};
+    protected @NotNull Consumer<T> inputCollector = input -> {};
     protected @NotNull Runnable onCancel = () -> {};
 
-    public PlayerInput(@NotNull SimplePlayerState player, @NotNull String defaultDescription) {
+    public PlayerInput(@NotNull SimplePlayerState player, @NotNull Deserializer<T> deserializer, String defaultDescription) {
         this.playerState = player;
         this.inputDescription = defaultDescription;
+        this.deserializer = deserializer;
     }
 
-    public PlayerInput withDescription(@NotNull String inputDescription) {
+    public PlayerInput<T> withDescription(@NotNull String inputDescription) {
         this.inputDescription = inputDescription;
         return this;
     }
 
-    public PlayerInput checkInput(@NotNull InputValidator inputValidator) {
-        this.inputValidator = inputValidator;
-        return this;
-    }
-
-    public PlayerInput collectInput(@NotNull Consumer<String> inputCollector) {
+    public PlayerInput<T> withInputCollector(@NotNull Consumer<T> inputCollector) {
         this.inputCollector = inputCollector;
         return this;
     }
 
-    public PlayerInput onCancel(@NotNull Runnable onCancel) {
+    public PlayerInput<T> withCancelTask(@NotNull Runnable onCancel) {
         this.onCancel = onCancel;
         return this;
     }
 
-    public abstract void beginCollection();
+    public abstract void collect();
 
 }

@@ -8,29 +8,20 @@ import org.jetbrains.annotations.*;
 
 import java.io.*;
 
-public class ParticleManager extends ManagerContainer<ParticleEffect> {
+public class ParticleManager extends ConfigBackedManager.SectionKey<ParticleEffect> {
 
     public ParticleManager(@NotNull EnhancedJavaPlugin plugin) {
-        super(plugin);
+        super(plugin, "Particle", "effects/particles");
     }
 
     @Override
-    public @Nullable String getFilesDirectory() {
-        return "effects/particles";
-    }
-
-    @Override
-    public void loadFile(@NotNull File file) {
-        final RootSection config = new RootSection(file, plugin.getConfigurator());
-        config.setPrefix("Particle");
-        config.load();
-        for (String particleName : config.getKeys()) {
-            final ParticleEffect particle = config.get(particleName, ParticleEffect.class);
-            try {
-                add(particle);
-            } catch (DuplicateElementException e) {
-                throw new InvalidConfigurationException(config, particleName, e.getMessage());
-            }
+    public void loadFromSectionKey(ConfigSection section, String key) throws InvalidConfigurationException {
+        final ParticleEffect particle = section.getRequired(key, ParticleEffect.class);
+        try {
+            add(particle);
+        }
+        catch (DuplicateElementException e) {
+            throw new InvalidConfigurationException(section, key, e.getMessage());
         }
     }
 

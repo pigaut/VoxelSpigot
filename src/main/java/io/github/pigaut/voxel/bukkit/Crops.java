@@ -7,7 +7,6 @@ import org.jetbrains.annotations.*;
 import java.util.*;
 
 import static org.bukkit.Material.*;
-import static org.bukkit.Material.MELON_SEEDS;
 
 public class Crops {
 

@@ -13,6 +13,7 @@ public class ParticleSubCommand extends SubCommand {
         addSubCommand(new SpawnParticleSubCommand(plugin));
         addSubCommand(new SpawnParticleToSubCommand(plugin));
         addSubCommand(new ShowMeParticleSubCommand(plugin));
+        addSubCommand(new ShowMeGroupParticleSubCommand(plugin));
     }
 
 }

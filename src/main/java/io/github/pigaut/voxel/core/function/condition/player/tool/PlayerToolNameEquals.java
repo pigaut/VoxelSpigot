@@ -1,6 +1,5 @@
 package io.github.pigaut.voxel.core.function.condition.player.tool;
 
-import io.github.pigaut.voxel.core.function.action.player.*;
 import io.github.pigaut.voxel.core.function.condition.player.*;
 import io.github.pigaut.voxel.player.*;
 import org.bukkit.*;

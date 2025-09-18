@@ -1,14 +1,13 @@
 package io.github.pigaut.voxel.core.item.config;
 
 import com.cryptomorin.xseries.*;
-import de.tr7zw.changeme.nbtapi.*;
-import de.tr7zw.changeme.nbtapi.iface.*;
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.config.deserializer.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
-import io.github.pigaut.yaml.parser.*;
+import io.github.pigaut.yaml.configurator.load.*;
+import io.github.pigaut.yaml.convert.format.*;
+import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
@@ -17,12 +16,9 @@ import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-/*
- / ItemStack config loader for 1.8.8+
-*/
-public class ItemStackLoader implements SectionLoader<ItemStack> {
+public class ItemStackLoader implements ConfigLoader.Section<ItemStack> {
 
-    private final EnchantmentDeserializer enchantDeserializer = new EnchantmentDeserializer();
+    private static final EnchantmentDeserializer enchantDeserializer = new EnchantmentDeserializer();
 
     @Override
     public @NotNull String getProblemDescription() {
@@ -30,80 +26,78 @@ public class ItemStackLoader implements SectionLoader<ItemStack> {
     }
 
     @Override
-    public @NotNull ItemStack loadFromSection(@NotNull ConfigSection config) throws InvalidConfigurationException {
-        final Material type = config.get("type|material", Material.class);
-        final int amount = config.getOptionalInteger("amount").orElse(1);
+    public @NotNull ItemStack loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
+        final Material type = section.getRequired("type|material", Material.class);
+        final int amount = section.getInteger("amount").throwOrElse(1);
         final ItemStack item = new ItemStack(type, amount);
 
         {
-            final ItemMeta meta = item.getItemMeta();
+            ItemMeta meta = item.getItemMeta();
 
-            final Optional<String> nameField = config.getOptionalString("name|display", StringColor.FORMATTER);
-            nameField.ifPresent(meta::setDisplayName);
+            section.getString("name|display", StringColor.FORMATTER)
+                    .ifPresent(meta::setDisplayName);
 
-            final Optional<Integer> repairCostField = config.getOptionalInteger("repair-cost");
-            repairCostField.ifPresent(repairCost -> {
-                if (meta instanceof Repairable repairable) {
-                    repairable.setRepairCost(repairCost);
-                }
-            });
-
-            final List<String> lore = config.getStringList("lore", StringColor.FORMATTER);
+            List<String> lore = section.getStringList("lore", StringColor.FORMATTER);
             if (!lore.isEmpty()) {
                 meta.setLore(lore);
             }
 
-            final List<ItemFlag> itemFlags = config.getList("flags", ItemFlag.class);
+            List<ItemFlag> itemFlags = section.getAll("flags", ItemFlag.class);
             meta.addItemFlags(itemFlags.toArray(new ItemFlag[0]));
 
-            final boolean shouldGlow = config.getOptionalBoolean("glow").orElse(false);
+            final boolean shouldGlow = section.getBoolean("glow").throwOrElse(false);
             if (shouldGlow) {
                 meta.addEnchant(XEnchantment.LUCK_OF_THE_SEA.get(), 1, true);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
 
-            final Optional<Integer> optionalModelData = config.getOptionalInteger("model-data|custom-model-data");
-            optionalModelData.ifPresent(meta::setCustomModelData);
+            section.getInteger("model-data|custom-model-data")
+                    .ifPresent(meta::setCustomModelData);
 
-            final Optional<Boolean> optionalUnbreakable = config.getOptionalBoolean("unbreakable");
-            optionalUnbreakable.ifPresent(meta::setUnbreakable);
+            section.getBoolean("unbreakable")
+                    .ifPresent(meta::setUnbreakable);
 
-            final Optional<Integer> optionalDurability = config.getOptionalInteger("damage|durability");
-            optionalDurability.ifPresent(damage -> {
-                if (meta instanceof Damageable damageable) {
-                    damageable.setDamage(10);
+            section.getInteger("repair-cost").ifPresent(repairCost -> {
+                if (!(meta instanceof Repairable repairable)) {
+                    throw new InvalidConfigurationException(section, "repair-cost", "Current item type cannot be repaired");
                 }
-                else {
-                    throw new InvalidConfigurationException(config, "damage", "Current item type does not support durability");
-                }
+                repairable.setRepairCost(repairCost);
             });
 
-            final ConfigSection enchantsConfig = config.getSectionOrCreate("enchantments|enchants");
-            for (String key : enchantsConfig.getKeys()) {
+            section.getInteger("damage|durability").ifPresent(damage -> {
+                if (!(meta instanceof Damageable damageable)) {
+                    throw new InvalidConfigurationException(section, "damage", "Current item type cannot be damaged");
+                }
+                damageable.setDamage(10);
+            });
+
+            final ConfigSection enchantsSection = section.getSectionOrCreate("enchantments|enchants");
+            for (String key : enchantsSection.getKeys()) {
                 try {
-                    meta.addEnchant(enchantDeserializer.deserialize(key), enchantsConfig.getInteger(key), true);
-                } catch (DeserializationException e) {
-                    throw new InvalidConfigurationException(config, "enchantments", e.getMessage());
+                    meta.addEnchant(enchantDeserializer.deserialize(key), enchantsSection.getRequiredInteger(key), true);
+                }
+                catch (StringParseException e) {
+                    throw new InvalidConfigurationException(section, "enchantments", e.getMessage());
                 }
             }
 
             final PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
-            for (ConfigSection dataConfig : config.getNestedSections("persistent-data")) {
-                final String key = dataConfig.getString("key");
+            for (ConfigSection dataConfig : section.getNestedSections("persistent-data")) {
+                final String key = dataConfig.getRequiredString("key");
                 final NamespacedKey namespacedKey = NamespacedKey.fromString(key);
                 if (namespacedKey == null) {
                     throw new InvalidConfigurationException(dataConfig, "Could not create namespaced key from: '" + key + "'");
                 }
 
-                final String dataType = dataConfig.getString("type", StringStyle.SNAKE);
+                final String dataType = dataConfig.getRequiredString("type", CaseStyle.SNAKE);
                 switch (dataType) {
-                    case "byte" -> dataContainer.set(namespacedKey, PersistentDataType.BYTE, (byte) dataConfig.getInteger("value"));
-                    case "short" -> dataContainer.set(namespacedKey, PersistentDataType.SHORT, (short) dataConfig.getInteger("value"));
-                    case "integer" -> dataContainer.set(namespacedKey, PersistentDataType.INTEGER, dataConfig.getInteger("value"));
-                    case "long" -> dataContainer.set(namespacedKey, PersistentDataType.LONG, dataConfig.getLong("value"));
-                    case "float" -> dataContainer.set(namespacedKey, PersistentDataType.FLOAT, (float) dataConfig.getDouble("value"));
-                    case "double" -> dataContainer.set(namespacedKey, PersistentDataType.DOUBLE, dataConfig.getDouble("value"));
-                    case "string" -> dataContainer.set(namespacedKey, PersistentDataType.STRING, dataConfig.getString("value"));
+                    case "byte" -> dataContainer.set(namespacedKey, PersistentDataType.BYTE, dataConfig.getRequiredInteger("value").byteValue());
+                    case "short" -> dataContainer.set(namespacedKey, PersistentDataType.SHORT, dataConfig.getRequiredInteger("value").shortValue());
+                    case "integer" -> dataContainer.set(namespacedKey, PersistentDataType.INTEGER, dataConfig.getRequiredInteger("value"));
+                    case "long" -> dataContainer.set(namespacedKey, PersistentDataType.LONG, dataConfig.getRequiredLong("value"));
+                    case "float" -> dataContainer.set(namespacedKey, PersistentDataType.FLOAT, dataConfig.getRequiredFloat("value"));
+                    case "double" -> dataContainer.set(namespacedKey, PersistentDataType.DOUBLE, dataConfig.getRequiredDouble("value"));
+                    case "string" -> dataContainer.set(namespacedKey, PersistentDataType.STRING, dataConfig.getRequiredString("value"));
                     case "byte_array" -> {
                         List<Integer> intList = dataConfig.getIntegerList("value");
                         byte[] byteArray = new byte[intList.size()];
@@ -124,26 +118,15 @@ public class ItemStackLoader implements SectionLoader<ItemStack> {
                 }
             }
 
+            for (ItemAttribute itemAttribute : section.getAll("attributes", ItemAttribute.class)) {
+                meta.addAttributeModifier(itemAttribute.attribute(), itemAttribute.modifier());
+            }
+
             item.setItemMeta(meta);
         }
 
-        final Optional<String> optionalHeadTexture = config.getOptionalString("head-texture|head-data|head");
-        optionalHeadTexture.ifPresent(texture -> HeadTexture.apply(item, texture));
-
-        NBT.modify(item, itemNBT -> {
-            final ReadWriteNBTCompoundList attributeCompounds = itemNBT.getCompoundList("AttributeModifiers");
-            for (Attribute attribute : config.getAll("attributes", Attribute.class)) {
-                final ReadWriteNBT attributeCompound = attributeCompounds.addCompound();
-                attributeCompound.setString("AttributeName", attribute.getAttributeType());
-                attributeCompound.setString("Name", attribute.getName());
-                attributeCompound.setDouble("Amount", attribute.getAmount());
-                attributeCompound.setString("Slot", attribute.getSlot());
-                attributeCompound.setInteger("Operation", attribute.getOperation());
-                final UUID uuid = UUID.randomUUID();
-                attributeCompound.setLong("UUIDLeast", uuid.getLeastSignificantBits());
-                attributeCompound.setLong("UUIDMost", uuid.getMostSignificantBits());
-            }
-        });
+        section.getString("head-texture|head-data|head").ifPresent(texture ->
+                HeadTexture.apply(item, texture));
 
         return item;
     }

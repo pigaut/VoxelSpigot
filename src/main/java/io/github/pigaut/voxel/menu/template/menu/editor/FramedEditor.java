@@ -11,14 +11,16 @@ import org.jetbrains.annotations.*;
 public class FramedEditor extends FramedMenu {
 
     private final ConfigRoot config;
+    protected final ConfigSection section;
 
-    public FramedEditor(ConfigRoot config, String title, int size) {
-        this(null, config, title, size);
+    public FramedEditor(ConfigSection section, String title, int size) {
+        this(null, section, title, size);
     }
 
-    public FramedEditor(@Nullable EnhancedPlugin plugin, ConfigRoot config, String title, int size) {
+    public FramedEditor(@Nullable EnhancedPlugin plugin, ConfigSection section, String title, int size) {
         super(plugin, title, size);
-        this.config = config;
+        this.config = section.getRoot();
+        this.section = section;
     }
 
     @Override

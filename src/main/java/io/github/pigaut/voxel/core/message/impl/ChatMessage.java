@@ -14,8 +14,8 @@ public class ChatMessage extends GenericMessage {
 
     private final String message;
 
-    public ChatMessage(String name, @Nullable String group, ConfigSection section, String message) {
-        super(name, group, section);
+    public ChatMessage(String name, @Nullable String group, String message) {
+        super(name, group);
         this.message = message;
     }
 

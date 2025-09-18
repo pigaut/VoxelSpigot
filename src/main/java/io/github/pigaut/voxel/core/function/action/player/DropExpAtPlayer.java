@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.core.function.action.player;
 
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.yaml.amount.*;
 import org.jetbrains.annotations.*;
 
 public class DropExpAtPlayer implements PlayerAction {
@@ -17,7 +17,7 @@ public class DropExpAtPlayer implements PlayerAction {
 
     @Override
     public void execute(@NotNull PlayerState player) {
-        ExpOrb.spawn(player.getLocation(), expAmount, orbCount.getInt());
+        ExpOrb.spawn(player.getLocation(), expAmount, orbCount.getInteger());
     }
 
 }

@@ -8,30 +8,20 @@ import org.jetbrains.annotations.*;
 
 import java.io.*;
 
-public class MessageManager extends ManagerContainer<Message> {
+public class MessageManager extends ConfigBackedManager.SectionKey<Message> {
 
     public MessageManager(EnhancedJavaPlugin plugin) {
-        super(plugin);
+        super(plugin, "Message", "messages");
     }
 
     @Override
-    public @Nullable String getFilesDirectory() {
-        return "messages";
-    }
-
-    @Override
-    public void loadFile(@NotNull File file) {
-        final RootSection config = new RootSection(file, plugin.getConfigurator());
-        config.setPrefix("Message");
-        config.load();
-
-        for (String messageName : config.getKeys()) {
-            final Message message = config.get(messageName, Message.class);
-            try {
-                add(message);
-            } catch (DuplicateElementException e) {
-                throw new InvalidConfigurationException(config, messageName, e.getMessage());
-            }
+    public void loadFromSectionKey(ConfigSection section, String key) throws InvalidConfigurationException {
+        final Message message = section.getRequired(key, Message.class);
+        try {
+            add(message);
+        }
+        catch (DuplicateElementException e) {
+            throw new InvalidConfigurationException(section, key, e.getMessage());
         }
     }
 

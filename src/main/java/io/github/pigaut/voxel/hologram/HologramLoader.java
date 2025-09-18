@@ -4,8 +4,8 @@ import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
-import io.github.pigaut.yaml.parser.*;
+import io.github.pigaut.yaml.configurator.load.*;
+import io.github.pigaut.yaml.convert.format.*;
 import org.bukkit.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
@@ -31,13 +31,13 @@ public class HologramLoader implements ConfigLoader<Hologram> {
             throw new InvalidConfigurationException(section, "Holograms require DecentHolograms installed (https://www.spigotmc.org/resources/decentholograms.96927/)");
         }
 
-        final String type = section.getString("type", StringStyle.CONSTANT);
+        final String type = section.getString("type", CaseStyle.CONSTANT).throwOrElse("STATIC");
 
         Hologram hologram;
         switch (type) {
             case "STATIC" -> {
-                final String text = section.getOptionalString("text|title", StringColor.FORMATTER).orElse("none");
-                final int update = section.getOptionalInteger("update").orElse(0);
+                final String text = section.getString("text|title", StringColor.FORMATTER).throwOrElse("none");
+                final int update = section.getInteger("update").throwOrElse(0);
                 hologram = new StaticHologram(plugin, text, update);
             }
 
@@ -48,7 +48,7 @@ public class HologramLoader implements ConfigLoader<Hologram> {
                     frames.add("none");
                 }
 
-                final int update = section.getOptionalInteger("update").orElse(3);
+                final int update = section.getInteger("update").throwOrElse(3);
                 if (update < 1) {
                     throw new InvalidConfigurationException(section, "update", "Animation update interval must be at least 1 tick");
                 }
@@ -57,12 +57,12 @@ public class HologramLoader implements ConfigLoader<Hologram> {
             }
 
             case "ITEM_DISPLAY" -> {
-                final ItemStack item = section.getOptional("item", ItemStack.class).orElse(new ItemStack(Material.GRASS_BLOCK));
+                final ItemStack item = section.get("item", ItemStack.class).throwOrElse(new ItemStack(Material.GRASS_BLOCK));
                 hologram = new ItemHologram(plugin, item);
             }
 
             case "BLOCK_DISPLAY" -> {
-                final Material material = section.getOptional("block", Material.class).orElse(Material.DIRT);
+                final Material material = section.get("block", Material.class).throwOrElse(Material.DIRT);
                 if (!material.isBlock()) {
                     throw new InvalidConfigurationException(section, "block", "Material is not a block");
                 }
@@ -70,14 +70,13 @@ public class HologramLoader implements ConfigLoader<Hologram> {
             }
 
             default -> {
-                throw new InvalidConfigurationException(section, "type", "Found invalid hologram type: '" + type + "'");
+                throw new InvalidConfigurationException(section, "type", "Found unknown hologram type: '" + type + "'");
             }
-
         }
 
-        final double offsetX = section.getOptionalDouble("offset.x").orElse(0d);
-        final double offsetY = section.getOptionalDouble("offset.y").orElse(0d);
-        final double offsetZ = section.getOptionalDouble("offset.z").orElse(0d);
+        final double offsetX = section.getDouble("offset.x").throwOrElse(0d);
+        final double offsetY = section.getDouble("offset.y").orElse(0d);
+        final double offsetZ = section.getDouble("offset.z").orElse(0d);
         if (offsetX != 0 || offsetY != 0 || offsetZ != 0) {
             return new OffsetHologram(hologram, offsetX, offsetY, offsetZ);
         }

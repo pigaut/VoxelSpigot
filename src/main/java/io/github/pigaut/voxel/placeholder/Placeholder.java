@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.placeholder;
 
 import io.github.pigaut.voxel.util.*;
-import io.github.pigaut.yaml.parser.*;
+import io.github.pigaut.yaml.convert.format.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
@@ -17,7 +17,7 @@ public class Placeholder implements StringFormatter {
         this.id = Pattern.quote(id);
         this.value = Matcher.quoteReplacement(value);
         final String idName = StringUtil.removeParentheses(id);
-        for (StringStyle style : StringStyle.values()) {
+        for (CaseStyle style : CaseStyle.values()) {
             final String styleId = StringUtil.buildString(id.charAt(0), idName, "_", style.getTagName(), id.charAt(id.length() - 1));
             formatIds.put(Pattern.quote(styleId), style);
         }

@@ -6,11 +6,7 @@ import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
-import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.node.*;
-import io.github.pigaut.yaml.node.section.*;
-import io.github.pigaut.yaml.node.sequence.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -20,10 +16,9 @@ import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
 import org.jetbrains.annotations.*;
 
-import java.io.*;
 import java.util.*;
 
-public class StructureManager extends ManagerContainer<BlockStructure> implements Listener {
+public class StructureManager extends ConfigBackedManager.Sequence<BlockStructure> implements Listener {
 
     public final NamespacedKey wandKey;
 
@@ -31,7 +26,7 @@ public class StructureManager extends ManagerContainer<BlockStructure> implement
     private ItemStack structureWand;
 
     public StructureManager(@NotNull EnhancedJavaPlugin plugin) {
-        super(plugin);
+        super(plugin, "Structure", "structures");
         wandKey = plugin.getNamespacedKey("wand");
     }
 
@@ -52,30 +47,23 @@ public class StructureManager extends ManagerContainer<BlockStructure> implement
     }
 
     @Override
-    public @Nullable String getFilesDirectory() {
-        return "structures";
-    }
-
-    @Override
-    public void loadFile(@NotNull File file) {
-        final RootSequence config = new RootSequence(file, plugin.getConfigurator());
-        config.setPrefix("Structure");
-        config.load();
-        final BlockStructure structure = config.load(BlockStructure.class);
+    public void loadFromSequence(ConfigSequence sequence) throws InvalidConfigurationException {
+        final BlockStructure structure = sequence.loadRequired(BlockStructure.class);
         try {
             add(structure);
-        } catch (DuplicateElementException e) {
-            throw new InvalidConfigurationException(config, e.getMessage());
+        }
+        catch (DuplicateElementException e) {
+            throw new InvalidConfigurationException(sequence, e.getMessage());
         }
     }
 
     @Override
     public void loadData() {
         final ConfigSection config = plugin.getConfiguration();
-        materialBlacklist = new HashSet<>(config.getList("structure-blacklist", Material.class));
+        materialBlacklist = new HashSet<>(config.getAll("structure-blacklist", Material.class));
 
         {
-            structureWand = config.getOptional("structure-wand", ItemStack.class).orElse(null);
+            structureWand = config.get("structure-wand", ItemStack.class).throwOrElse(null);
 
             if (structureWand == null) {
                 structureWand = new IconBuilder()

@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.config.location;
 
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.*;
-import io.github.pigaut.yaml.configurator.mapper.*;
+import io.github.pigaut.yaml.configurator.map.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
 import org.snakeyaml.engine.v2.common.*;
@@ -21,7 +21,7 @@ public class LocationMapper implements ConfigMapper<Location> {
     }
 
     @Override
-    public void mapSequence(@NotNull ConfigSequence sequence, @NotNull Location location) {
+    public void mapToSequence(@NotNull ConfigSequence sequence, @NotNull Location location) {
         final World world = location.getWorld();
         if (world != null) {
             sequence.add(world.getName());
@@ -45,7 +45,7 @@ public class LocationMapper implements ConfigMapper<Location> {
     }
 
     @Override
-    public void mapSection(ConfigSection section, Location location) {
+    public void mapToSection(ConfigSection section, Location location) {
         World world = location.getWorld();
 
         if (world != null) {

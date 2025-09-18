@@ -1,7 +1,8 @@
 package io.github.pigaut.voxel.config.location;
 
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
+import io.github.pigaut.yaml.configurator.load.*;
+import io.github.pigaut.yaml.util.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
 
@@ -13,19 +14,13 @@ public class LocationLoader implements ConfigLoader<Location> {
     }
 
     @Override
-    public @NotNull Location loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
-        return loadFromSequence(scalar.split("\\s*,\\s*"));
-    }
-
-    @Override
     public @NotNull Location loadFromSection(@NotNull ConfigSection config) throws InvalidConfigurationException {
-        World world = config.getOptional("world", World.class).orElse(null);
-        double x = config.getDouble("x");
-        double y = config.getDouble("y");
-        double z = config.getDouble("z");
-        float yaw = config.getOptionalFloat("yaw").orElse(0f);
-        float pitch = config.getOptionalFloat("pitch").orElse(0f);
-
+        World world = config.get("world", World.class).throwOrElse(null);
+        double x = config.getRequiredDouble("x");
+        double y = config.getRequiredDouble("y");
+        double z = config.getRequiredDouble("z");
+        float yaw = config.getFloat("yaw").throwOrElse(0f);
+        float pitch = config.getFloat("pitch").throwOrElse(0f);
         return new Location(world, x, y, z, yaw, pitch);
     }
 
@@ -33,33 +28,33 @@ public class LocationLoader implements ConfigLoader<Location> {
     public @NotNull Location loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
         switch (sequence.size()) {
             case 3 -> {
-                double x = sequence.getDouble(0);
-                double y = sequence.getDouble(1);
-                double z = sequence.getDouble(2);
+                double x = sequence.getRequiredDouble(0);
+                double y = sequence.getRequiredDouble(1);
+                double z = sequence.getRequiredDouble(2);
                 return new Location(null, x, y, z);
             }
             case 4 -> {
-                World world = sequence.get(0, World.class);
-                double x = sequence.getDouble(1);
-                double y = sequence.getDouble(2);
-                double z = sequence.getDouble(3);
+                World world = sequence.getRequired(0, World.class);
+                double x = sequence.getRequiredDouble(1);
+                double y = sequence.getRequiredDouble(2);
+                double z = sequence.getRequiredDouble(3);
                 return new Location(world, x, y, z);
             }
             case 5 -> {
-                double x = sequence.getDouble(0);
-                double y = sequence.getDouble(1);
-                double z = sequence.getDouble(2);
-                float yaw = sequence.getFloat(3);
-                float pitch = sequence.getFloat(4);
+                double x = sequence.getRequiredDouble(0);
+                double y = sequence.getRequiredDouble(1);
+                double z = sequence.getRequiredDouble(2);
+                float yaw = sequence.getRequiredFloat(3);
+                float pitch = sequence.getRequiredFloat(4);
                 return new Location(null, x, y, z, yaw, pitch);
             }
             case 6 -> {
-                World world = sequence.get(0, World.class);
-                double x = sequence.getDouble(1);
-                double y = sequence.getDouble(2);
-                double z = sequence.getDouble(3);
-                float yaw = sequence.getFloat(4);
-                float pitch = sequence.getFloat(5);
+                World world = sequence.getRequired(0, World.class);
+                double x = sequence.getRequiredDouble(1);
+                double y = sequence.getRequiredDouble(2);
+                double z = sequence.getRequiredDouble(3);
+                float yaw = sequence.getRequiredFloat(4);
+                float pitch = sequence.getRequiredFloat(5);
                 return new Location(world, x, y, z, yaw, pitch);
             }
             default -> throw new InvalidConfigurationException(sequence, "[(world), <x>, <y>, <z>, (yaw), (pitch)]");

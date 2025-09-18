@@ -66,19 +66,19 @@ public class FramedSelectionMenu extends PagedMenu {
     }
 
     public Button getToolbarButton1() {
-        return Buttons.GRAY_PANEL;
+        return this.getFrameButton();
     }
 
     public Button getToolbarButton2() {
-        return Buttons.GRAY_PANEL;
+        return this.getFrameButton();
     }
 
     public Button getToolbarButton3() {
-        return Buttons.GRAY_PANEL;
+        return this.getFrameButton();
     }
 
     public Button getToolbarButton4() {
-        return Buttons.GRAY_PANEL;
+        return this.getFrameButton();
     }
 
     public Button getToolbarButton5() {
@@ -86,19 +86,19 @@ public class FramedSelectionMenu extends PagedMenu {
     }
 
     public Button getToolbarButton6() {
-        return Buttons.GRAY_PANEL;
+        return this.getFrameButton();
     }
 
     public Button getToolbarButton7() {
-        return Buttons.GRAY_PANEL;
+        return this.getFrameButton();
     }
 
     public Button getToolbarButton8() {
-        return Buttons.GRAY_PANEL;
+        return this.getFrameButton();
     }
 
     public Button getToolbarButton9() {
-        return Buttons.GRAY_PANEL;
+        return this.getFrameButton();
     }
 
     @Override

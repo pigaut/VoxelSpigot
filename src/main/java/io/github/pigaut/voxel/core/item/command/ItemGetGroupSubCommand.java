@@ -1,8 +1,8 @@
 package io.github.pigaut.voxel.core.item.command;
 
+import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.core.item.*;
-import io.github.pigaut.voxel.core.item.command.parameter.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.jetbrains.annotations.*;
@@ -15,7 +15,7 @@ public class ItemGetGroupSubCommand extends SubCommand {
         super("get-group", plugin);
         withPermission(plugin.getPermission("item.get-group"));
         withDescription(plugin.getLang("item-get-group-command"));
-        addParameter(new ItemGroupParameter(plugin));
+        withParameter(CommandParameters.itemGroup(plugin));
         withPlayerExecution((player, args, placeholders) -> {
             final List<Item> groupItems = plugin.getItems().getAll(args[0]);
             if (groupItems.isEmpty()) {

@@ -3,13 +3,11 @@ package io.github.pigaut.voxel.menu.button;
 import com.cryptomorin.xseries.*;
 import io.github.pigaut.voxel.util.*;
 import org.bukkit.*;
-import org.bukkit.enchantments.*;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
-import java.util.function.*;
 
 public class IconBuilder {
 
@@ -65,6 +63,30 @@ public class IconBuilder {
 
     public IconBuilder withDisplay(String display) {
         this.display = StringColor.translateColors("&f" + display);
+        return this;
+    }
+
+    public IconBuilder addLeftClickLore(String action) {
+        final String line = "&eLeft-Click: &f" + action;
+        lore.add(StringColor.translateColors(line));
+        return this;
+    }
+
+    public IconBuilder addRightClickLore(String action) {
+        final String line = "&6Right-Click: &f" + action;
+        lore.add(StringColor.translateColors(line));
+        return this;
+    }
+
+    public IconBuilder addShiftLeftClickLore(String action) {
+        final String line = "&cShift + Left-Click: &f" + action;
+        lore.add(StringColor.translateColors(line));
+        return this;
+    }
+
+    public IconBuilder addShiftRightClickLore(String action) {
+        final String line = "&4Shift + Right-Click: &f" + action;
+        lore.add(StringColor.translateColors(line));
         return this;
     }
 

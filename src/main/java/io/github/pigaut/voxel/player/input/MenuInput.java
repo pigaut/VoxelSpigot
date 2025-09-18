@@ -5,46 +5,60 @@ import io.github.pigaut.voxel.menu.template.button.*;
 import io.github.pigaut.voxel.menu.template.menu.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
+import io.github.pigaut.yaml.configurator.deserialize.*;
+import io.github.pigaut.yaml.convert.parse.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
 import java.util.function.*;
 
-public class MenuInput extends PlayerInput {
+public class MenuInput<T> extends PlayerInput<T> {
 
     private List<ValueInputButton> valueEntries = new ArrayList<>();
 
-    public MenuInput(SimplePlayerState player) {
-        super(player, "Select a value");
+    public MenuInput(SimplePlayerState player, Deserializer<T> deserializer) {
+        super(player, deserializer, "Select a value");
     }
 
     @Override
-    public MenuInput withDescription(@NotNull String inputDescription) {
-        return (MenuInput) super.withDescription(inputDescription);
+    public MenuInput<T> withDescription(@NotNull String inputDescription) {
+        return (MenuInput<T>) super.withDescription(inputDescription);
     }
 
     @Override
-    public MenuInput collectInput(@NotNull Consumer<String> inputCollector) {
-        return (MenuInput) super.collectInput(inputCollector);
+    public MenuInput<T> withInputCollector(@NotNull Consumer<T> inputCollector) {
+        return (MenuInput<T>) super.withInputCollector(inputCollector);
     }
 
     @Override
-    public MenuInput onCancel(@NotNull Runnable onCancel) {
-        return (MenuInput) super.onCancel(onCancel);
+    public MenuInput<T> withCancelTask(@NotNull Runnable cancelTask) {
+        return (MenuInput<T>) super.withCancelTask(cancelTask);
     }
 
-    public MenuInput withValues(@NotNull List<ValueInputButton> entries) {
+    public MenuInput<T> withValues(@NotNull List<ValueInputButton> entries) {
+        for (ValueInputButton entry : entries) {
+            try {
+                deserializer.deserialize(entry.getValue());
+            } catch (StringParseException e) {
+                throw new IllegalStateException("Invalid menu input selection value. " + e.getMessage());
+            }
+        }
         this.valueEntries = entries;
         return this;
     }
 
-    public MenuInput addValue(@NotNull ValueInputButton entry) {
+    public MenuInput<T> addValue(@NotNull ValueInputButton entry) {
+        try {
+            deserializer.deserialize(entry.getValue());
+        } catch (StringParseException e) {
+            throw new IllegalStateException("Invalid menu input selection value. " + e.getMessage());
+        }
         this.valueEntries.add(entry);
         return this;
     }
 
     @Override
-    public void beginCollection() {
+    public void collect() {
         if (playerState.isAwaitingInput()) {
             throw new IllegalStateException("Player is already being asked for input.");
         }
@@ -67,11 +81,21 @@ public class MenuInput extends PlayerInput {
                 }
 
                 final String input = playerState.getLastInput();
-                if (input != null) {
-                    playerState.setAwaitingInput(null);
-                    inputCollector.accept(input);
-                    cancel();
+                if (input == null) {
+                    return;
                 }
+
+                final T parsedInput;
+                try {
+                    parsedInput = deserializer.deserialize(input);
+                } catch (StringParseException e) {
+                    playerState.setLastInput(null);
+                    return;
+                }
+
+                playerState.setAwaitingInput(null);
+                inputCollector.accept(parsedInput);
+                cancel();
             }
         }.runTaskTimer(0, 5);
 

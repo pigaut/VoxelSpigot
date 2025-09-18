@@ -4,27 +4,24 @@ import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.util.Rotation;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.parser.*;
+import io.github.pigaut.yaml.convert.format.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
-import java.io.*;
 import java.util.*;
 
 public class BlockStructure implements Identifiable {
 
     private final String name;
     private final String group;
-    private final ConfigField field;
     private final List<BlockChange> blockChanges;
     private final Material mostCommonMaterial;
 
-    public BlockStructure(String name, @Nullable String group, ConfigField field, List<BlockChange> blockChanges) {
+    public BlockStructure(String name, @Nullable String group, List<BlockChange> blockChanges) {
         this.name = name;
         this.group = group;
-        this.field = field;
         this.blockChanges = blockChanges;
         this.mostCommonMaterial = this.getMostCommonMaterial();
     }
@@ -40,15 +37,10 @@ public class BlockStructure implements Identifiable {
     }
 
     @Override
-    public @NotNull ConfigField getField() {
-        return field;
-    }
-
-    @Override
     public @NotNull ItemStack getIcon() {
         return new IconBuilder()
                 .withType(mostCommonMaterial)
-                .withDisplay(StringFormatter.toTitleCase(this.getName()))
+                .withDisplay(CaseFormatter.toTitleCase(this.getName()))
                 .buildIcon();
     }
 

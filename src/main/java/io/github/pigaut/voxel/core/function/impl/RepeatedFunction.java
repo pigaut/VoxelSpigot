@@ -30,11 +30,6 @@ public class RepeatedFunction implements Function {
     }
 
     @Override
-    public @NotNull ConfigField getField() {
-        return function.getField();
-    }
-
-    @Override
     public @Nullable FunctionResponse run(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         for (int i = 0; i < repetitions; i++) {
             final FunctionResponse response = function.run(player, event, block, target);

@@ -1,6 +1,7 @@
 package io.github.pigaut.voxel.util;
 
-import io.github.pigaut.yaml.parser.*;
+
+import io.github.pigaut.yaml.convert.format.*;
 import org.bukkit.*;
 
 import java.util.regex.*;
@@ -10,7 +11,7 @@ public class StringColor {
     public static final StringFormatter FORMATTER = StringColor::translateColors;
 
     public static String translateColorsAndStyle(String string) {
-        return StringColor.translateColors(StringStyle.translateTagStyle(string));
+        return StringColor.translateColors(CaseStyle.translateTagStyle(string));
     }
 
     public static String translateColors(String string) {

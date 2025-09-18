@@ -46,11 +46,6 @@ public class MultiMessage implements Message {
     }
 
     @Override
-    public @NotNull ConfigField getField() {
-        return sequence;
-    }
-
-    @Override
     public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
         for (Message message : messages) {
             message.send(player, placeholderSuppliers);

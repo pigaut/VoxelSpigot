@@ -12,17 +12,15 @@ public class SimpleSoundEffect implements SoundEffect {
 
     private final String name;
     private final String group;
-    private final ConfigSection section;
     private final Sound sound;
     private final float volume;
     private final float pitch;
     private final double offsetX, offsetY, offsetZ;
     private final boolean playerOnly;
 
-    public SimpleSoundEffect(String name, @Nullable String group, ConfigSection section, Sound sound, float volume, float pitch, double offsetX, double offsetY, double offsetZ, boolean playerOnly) {
+    public SimpleSoundEffect(String name, @Nullable String group, Sound sound, float volume, float pitch, double offsetX, double offsetY, double offsetZ, boolean playerOnly) {
         this.name = name;
         this.group = group;
-        this.section = section;
         this.sound = sound;
         this.volume = volume;
         this.pitch = pitch;
@@ -40,11 +38,6 @@ public class SimpleSoundEffect implements SoundEffect {
     @Override
     public @Nullable String getGroup() {
         return group;
-    }
-
-    @Override
-    public @NotNull ConfigSection getField() {
-        return section;
     }
 
     public void play(@Nullable Player player, @NotNull Location location) {

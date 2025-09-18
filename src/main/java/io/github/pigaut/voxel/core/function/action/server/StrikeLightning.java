@@ -9,8 +9,8 @@ public class StrikeLightning implements ServerAction {
     private final Location location;
     private final boolean doDamage;
 
-    public StrikeLightning(@NotNull Location location, boolean doDamage) {
-        this.location = location;
+    public StrikeLightning(World world, double x, double y, double z, boolean doDamage) {
+        this.location = new Location(world, x, y, z);
         this.doDamage = doDamage;
     }
 

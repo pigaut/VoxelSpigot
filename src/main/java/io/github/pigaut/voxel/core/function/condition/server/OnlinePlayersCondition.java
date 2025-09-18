@@ -1,6 +1,6 @@
 package io.github.pigaut.voxel.core.function.condition.server;
 
-import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.yaml.amount.*;
 import org.bukkit.*;
 
 public class OnlinePlayersCondition implements ServerCondition {

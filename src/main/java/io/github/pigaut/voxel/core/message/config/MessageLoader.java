@@ -8,8 +8,8 @@ import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
-import io.github.pigaut.yaml.parser.*;
+import io.github.pigaut.yaml.configurator.load.*;
+import io.github.pigaut.yaml.convert.format.*;
 import org.bukkit.boss.*;
 import org.jetbrains.annotations.*;
 
@@ -28,7 +28,7 @@ public class MessageLoader implements ConfigLoader<Message> {
 
     @Override
     public @NotNull Message loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
-        final String messageName = scalar.toString(StringStyle.SNAKE);
+        final String messageName = scalar.toString(CaseStyle.SNAKE);
         final Message message = plugin.getMessage(messageName);
         if (message == null) {
             throw new InvalidConfigurationException(scalar, "Could not find any message with name: '" + messageName + "'");
@@ -39,61 +39,61 @@ public class MessageLoader implements ConfigLoader<Message> {
     @Override
     public @NotNull Message loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
         final String messageName = section.getKey();
-        final String messageGroup = PathGroup.byMessageFile(section.getRoot().getFile());
-        final String type = section.getString("type", StringStyle.CONSTANT);
+        final String messageGroup = Group.byMessageFile(section.getRoot().getFile());
+        final String type = section.getRequiredString("type", CaseStyle.CONSTANT);
         Message message;
         switch (type) {
             case "CHAT" -> {
-                final String chat = section.getOptionalString("message", StringColor.FORMATTER).orElse("none");
-                message = new ChatMessage(messageName, messageGroup, section, chat);
+                final String chat = section.getString("message", StringColor.FORMATTER).throwOrElse("none");
+                message = new ChatMessage(messageName, messageGroup, chat);
             }
 
             case "ACTIONBAR" -> {
-                final String actionbar = section.getOptionalString("message", StringColor.FORMATTER).orElse("none");
-                message = new ActionBarMessage(messageName, messageGroup, section, actionbar);
+                final String actionbar = section.getString("message", StringColor.FORMATTER).throwOrElse("none");
+                message = new ActionBarMessage(messageName, messageGroup, actionbar);
             }
 
             case "BOSSBAR" -> {
-                message = new BossBarMessage(plugin, messageName, messageGroup, section,
-                        section.getOptionalString("title", StringColor.FORMATTER).orElse("none"),
-                        section.getOptional("style", BarStyle.class).orElse(BarStyle.SOLID),
-                        section.getOptional("color", BarColor.class).orElse(BarColor.RED),
-                        section.getOptionalInteger("duration").orElse(100),
+                message = new BossBarMessage(plugin, messageName, messageGroup,
+                        section.getString("title", StringColor.FORMATTER).throwOrElse("none"),
+                        section.get("style", BarStyle.class).throwOrElse(BarStyle.SOLID),
+                        section.get("color", BarColor.class).throwOrElse(BarColor.RED),
+                        section.getInteger("duration").throwOrElse(100),
                         section.getDoubleList("progress")
                 );
             }
 
             case "TITLE" -> {
-                message = new TitleMessage(messageName, messageGroup, section,
-                        section.getOptionalString("title", StringColor.FORMATTER).orElse("none"),
-                        section.getOptionalString("subtitle", StringColor.FORMATTER).orElse(""),
-                        section.getOptionalInteger("fade-in").orElse(20),
-                        section.getOptionalInteger("stay").orElse(60),
-                        section.getOptionalInteger("fade-out").orElse(20)
+                message = new TitleMessage(messageName, messageGroup,
+                        section.getString("title", StringColor.FORMATTER).throwOrElse("none"),
+                        section.getString("subtitle", StringColor.FORMATTER).throwOrElse(""),
+                        section.getInteger("fade-in").throwOrElse(10),
+                        section.getInteger("stay").throwOrElse(70),
+                        section.getInteger("fade-out").throwOrElse(20)
                 );
             }
 
             case "HOLOGRAM" -> {
-                message = new HologramMessage(plugin, messageName, messageGroup, section,
-                        SpigotServer.isPluginLoaded("DecentHolograms") ? section.get("hologram", Hologram.class) : null,
-                        section.getOptionalInteger("duration").orElse(40),
-                        section.getOptionalDouble("radius.x").orElse(null),
-                        section.getOptionalDouble("radius.y").orElse(null),
-                        section.getOptionalDouble("radius.z").orElse(null)
+                message = new HologramMessage(plugin, messageName, messageGroup,
+                        SpigotServer.isPluginLoaded("DecentHolograms") ? section.getRequired("hologram", Hologram.class) : null,
+                        section.getInteger("duration").throwOrElse(40),
+                        section.getDouble("radius.x").throwOrElse(null),
+                        section.getDouble("radius.y").throwOrElse(null),
+                        section.getDouble("radius.z").throwOrElse(null)
                 );
             }
 
             default -> {
-                throw new InvalidConfigurationException(section, "type", "Found invalid message type: '" + type + "'");
+                throw new InvalidConfigurationException(section, "type", "Found unknown message type: '" + type + "'");
             }
         }
 
-        final Integer repetitions = section.getOptionalInteger("repetitions|loops").orElse(null);
+        final Integer repetitions = section.getInteger("repetitions|loops").throwOrElse(null);
         if (repetitions != null && repetitions < 1) {
             throw new InvalidConfigurationException(section, "repetitions", "The message repetitions must be greater than 0");
         }
 
-        final Integer interval = section.getOptionalInteger("interval|period").orElse(null);
+        final Integer interval = section.getInteger("interval|period").throwOrElse(null);
 
         if (interval != null) {
             if (repetitions == null) {
@@ -108,7 +108,7 @@ public class MessageLoader implements ConfigLoader<Message> {
             message = new RepeatedMessage(message, repetitions);
         }
 
-        final Integer delay = section.getOptionalInteger("delay").orElse(null);
+        final Integer delay = section.getInteger("delay").throwOrElse(null);
         if (delay != null) {
             message = new DelayedMessage(plugin, message, delay);
         }
@@ -119,7 +119,7 @@ public class MessageLoader implements ConfigLoader<Message> {
     @Override
     public @NotNull Message loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
         final String messageName = sequence.getKey();
-        final String messageGroup = PathGroup.byMessageFile(sequence.getRoot().getFile());
+        final String messageGroup = Group.byMessageFile(sequence.getRoot().getFile());
         return new MultiMessage(messageName, messageGroup, sequence, sequence.getAll(Message.class));
     }
 

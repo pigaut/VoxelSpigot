@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.server;
 
 import io.github.pigaut.voxel.hook.*;
 import io.github.pigaut.voxel.version.*;
-import io.github.pigaut.yaml.parser.deserializer.*;
+import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -16,15 +16,13 @@ public class SpigotServer {
     private static SpigotServer server;
 
     private final SpigotVersion version;
-    private final World defaultWorld;
 
     private SpigotServer() {
         {
             final String version = "V" + Bukkit.getBukkitVersion().split("-")[0].replaceAll("\\.", "_");
-            SpigotVersion foundVersion = EnumDeserializer.deserializeOrNull(SpigotVersion.class, version);
+            SpigotVersion foundVersion = ParseUtil.parseEnumOrNull(SpigotVersion.class, version);
             this.version = foundVersion != null ? foundVersion : SpigotVersion.UNKNOWN;
         }
-        defaultWorld = Bukkit.getWorlds().get(0);
     }
 
     private static SpigotServer getServer() {
@@ -44,7 +42,7 @@ public class SpigotServer {
     }
 
     public static World getDefaultWorld() {
-        return getServer().defaultWorld;
+        return Bukkit.getWorlds().get(0);
     }
 
     public static List<String> getOnlinePlayerNames() {

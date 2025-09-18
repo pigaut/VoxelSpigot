@@ -8,30 +8,20 @@ import org.jetbrains.annotations.*;
 
 import java.io.*;
 
-public class SoundManager extends ManagerContainer<SoundEffect> {
+public class SoundManager extends ConfigBackedManager.SectionKey<SoundEffect> {
 
     public SoundManager(@NotNull EnhancedJavaPlugin plugin) {
-        super(plugin);
+        super(plugin, "Sound", "effects/sounds");
     }
 
     @Override
-    public @Nullable String getFilesDirectory() {
-        return "effects/sounds";
-    }
-
-    @Override
-    public void loadFile(@NotNull File file) {
-        final RootSection config = new RootSection(file, plugin.getConfigurator());
-        config.setPrefix("Sound");
-        config.load();
-
-        for (String soundName : config.getKeys()) {
-            final SoundEffect sound = config.get(soundName, SoundEffect.class);
-            try {
-                add(sound);
-            } catch (DuplicateElementException e) {
-                throw new InvalidConfigurationException(config, soundName, e.getMessage());
-            }
+    public void loadFromSectionKey(ConfigSection section, String key) throws InvalidConfigurationException {
+        final SoundEffect sound = section.getRequired(key, SoundEffect.class);
+        try {
+            add(sound);
+        }
+        catch (DuplicateElementException e) {
+            throw new InvalidConfigurationException(section, key, e.getMessage());
         }
     }
 

@@ -10,8 +10,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-import java.io.*;
-
 public class ChanceFunction implements Function {
 
     private final Function function;
@@ -30,11 +28,6 @@ public class ChanceFunction implements Function {
     @Override
     public @Nullable String getGroup() {
         return function.getGroup();
-    }
-
-    @Override
-    public @NotNull ConfigField getField() {
-        return function.getField();
     }
 
     @Override

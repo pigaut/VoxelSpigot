@@ -1,11 +1,11 @@
 package io.github.pigaut.voxel.config.deserializer;
 
-import io.github.pigaut.yaml.configurator.parser.*;
-import io.github.pigaut.yaml.parser.*;
+import io.github.pigaut.yaml.configurator.deserialize.*;
+import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
 
-public class WorldDeserializer implements ConfigDeserializer<World> {
+public class WorldDeserializer implements Deserializer<World> {
 
     @Override
     public @Nullable String getProblemDescription() {
@@ -13,11 +13,11 @@ public class WorldDeserializer implements ConfigDeserializer<World> {
     }
 
     @Override
-    public @NotNull World deserialize(@NotNull String worldName) throws DeserializationException {
+    public @NotNull World deserialize(@NotNull String worldName) throws StringParseException {
         World world = Bukkit.getWorld(worldName);
 
         if (world == null) {
-            throw new DeserializationException("Could not find world with name: " + worldName);
+            throw new StringParseException("Could not find world with name: " + worldName);
         }
 
         return world;

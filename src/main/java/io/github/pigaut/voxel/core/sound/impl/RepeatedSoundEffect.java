@@ -27,11 +27,6 @@ public class RepeatedSoundEffect implements SoundEffect {
     }
 
     @Override
-    public @NotNull ConfigField getField() {
-        return sound.getField();
-    }
-
-    @Override
     public void play(@Nullable Player player, @NotNull Location location) {
         for (int i = 0; i < repetitions; i++) {
             sound.play(player, location);

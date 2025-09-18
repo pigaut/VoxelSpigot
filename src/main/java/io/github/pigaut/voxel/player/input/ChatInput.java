@@ -3,16 +3,18 @@ package io.github.pigaut.voxel.player.input;
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
+import io.github.pigaut.yaml.configurator.deserialize.*;
+import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 
-public class ChatInput extends PlayerInput {
+public class ChatInput<T> extends PlayerInput<T> {
 
-    public ChatInput(SimplePlayerState player) {
-        super(player, "Enter a value in chat");
+    public ChatInput(SimplePlayerState player, Deserializer<T> deserializer) {
+        super(player, deserializer, "Enter a value in chat");
     }
 
-    public void beginCollection() {
+    public void collect() {
         if (playerState.isAwaitingInput()) {
             throw new IllegalStateException("Player is already being asked for input.");
         }
@@ -26,7 +28,7 @@ public class ChatInput extends PlayerInput {
         if (previousView != null) {
             previousView.close();
         }
-        player.sendTitle(inputDescription, "Type ESC to cancel", 10, 3600, 10);
+        player.sendTitle(inputDescription, "Type ESC to cancel", 10, Integer.MAX_VALUE, 10);
 
         new PluginRunnable(playerState.getPlugin()) {
             int resetErrorTitle = 0;
@@ -42,10 +44,10 @@ public class ChatInput extends PlayerInput {
                 }
 
                 if (resetErrorTitle > 0) {
-                    if (resetErrorTitle == 1) {
-                        player.sendTitle(inputDescription, "Type ESC to cancel", 10, 3600, 10);
-                    }
                     resetErrorTitle--;
+                    if (resetErrorTitle == 0) {
+                        player.sendTitle(inputDescription, "Type ESC to cancel", 10, Integer.MAX_VALUE, 10);
+                    }
                 }
 
                 final String input = playerState.getLastInput();
@@ -53,16 +55,19 @@ public class ChatInput extends PlayerInput {
                     return;
                 }
 
-                final String errorDescription = inputValidator.validate(input);
-                if (errorDescription != null) {
-                    player.sendTitle(errorDescription, ChatColor.RED + "Type ESC to cancel", 0, 40, 0);
+                final T parsedInput;
+                try {
+                    parsedInput = deserializer.deserialize(input);
+                } catch (StringParseException e) {
+                    player.sendTitle(ChatColor.RED + e.getMessage(), "Type ESC to cancel", 0, 40, 0);
+                    playerState.setLastInput(null);
                     resetErrorTitle = 8;
                     return;
                 }
 
                 player.resetTitle();
                 playerState.setAwaitingInput(null);
-                inputCollector.accept(input);
+                inputCollector.accept(parsedInput);
                 cancel();
             }
         }.runTaskTimer(0, 5);

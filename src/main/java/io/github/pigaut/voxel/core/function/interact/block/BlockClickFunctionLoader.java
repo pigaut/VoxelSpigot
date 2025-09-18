@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.core.function.interact.block;
 
 import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
+import io.github.pigaut.yaml.configurator.load.*;
 import org.bukkit.event.block.*;
 import org.jetbrains.annotations.*;
 
@@ -15,8 +15,8 @@ public class BlockClickFunctionLoader implements ConfigLoader<BlockClickFunction
 
     @Override
     public @NotNull BlockClickFunction loadFromSection(@NotNull ConfigSection config) throws InvalidConfigurationException {
-        final Action action = config.get("action|click", Action.class);
-        final Function function = config.load(Function.class);
+        final Action action = config.getRequired("action|click", Action.class);
+        final Function function = config.loadRequired(Function.class);
         return new SimpleBlockClickFunction(action, function);
     }
 

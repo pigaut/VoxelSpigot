@@ -16,6 +16,10 @@ public class StaticHologram implements Hologram {
     private final String text;
     private final int update;
 
+    public StaticHologram(EnhancedPlugin plugin, String text) {
+        this(plugin, text, 0);
+    }
+
     public StaticHologram(EnhancedPlugin plugin, String text, int update) {
         this.plugin = plugin;
         this.text = text;

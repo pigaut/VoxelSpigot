@@ -1,12 +1,12 @@
 package io.github.pigaut.voxel.config.deserializer;
 
 import com.cryptomorin.xseries.particles.*;
-import io.github.pigaut.yaml.configurator.parser.*;
-import io.github.pigaut.yaml.parser.*;
+import io.github.pigaut.yaml.configurator.deserialize.*;
+import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
 
-public class ParticleDeserializer implements ConfigDeserializer<Particle> {
+public class ParticleDeserializer implements Deserializer<Particle> {
 
     @Override
     public @Nullable String getProblemDescription() {
@@ -14,10 +14,10 @@ public class ParticleDeserializer implements ConfigDeserializer<Particle> {
     }
 
     @Override
-    public @NotNull Particle deserialize(@NotNull String particleName) throws DeserializationException {
+    public @NotNull Particle deserialize(@NotNull String particleName) throws StringParseException {
         final Particle particle = XParticle.of(particleName).map(XParticle::get).orElse(null);
         if (particle == null) {
-            throw new DeserializationException("Expected a particle but found: " + particleName);
+            throw new StringParseException("Expected a particle but found: " + particleName);
         }
         return particle;
     }

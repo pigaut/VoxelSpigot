@@ -35,11 +35,6 @@ public class PeriodicFunction implements Function {
     }
 
     @Override
-    public @NotNull ConfigField getField() {
-        return function.getField();
-    }
-
-    @Override
     public @Nullable FunctionResponse run(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         function.run(player, event, block, target);
         for (int i = 1; i < repetitions; i++) {

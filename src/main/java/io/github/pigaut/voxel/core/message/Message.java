@@ -2,7 +2,6 @@ package io.github.pigaut.voxel.core.message;
 
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.manager.*;
-import io.github.pigaut.yaml.*;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.*;
 

@@ -11,6 +11,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
+import java.util.*;
 import java.util.concurrent.*;
 
 public class HologramMessage extends GenericMessage {
@@ -20,10 +21,15 @@ public class HologramMessage extends GenericMessage {
     private final int duration;
     private final Double radiusX, radiusY, radiusZ;
 
-    public HologramMessage(@NotNull EnhancedPlugin plugin, String name, @Nullable String group,
-                           ConfigSection section, @Nullable Hologram hologram, int duration,
+    public HologramMessage(@NotNull EnhancedPlugin plugin, @Nullable Hologram hologram, int duration,
                            @Nullable Double radiusX, @Nullable Double radiusY, @Nullable Double radiusZ) {
-        super(name, group, section);
+        this(plugin, UUID.randomUUID().toString(), null, hologram, duration, radiusX, radiusY, radiusZ);
+    }
+
+    public HologramMessage(@NotNull EnhancedPlugin plugin, String name, @Nullable String group,
+                           @Nullable Hologram hologram, int duration, @Nullable Double radiusX,
+                           @Nullable Double radiusY, @Nullable Double radiusZ) {
+        super(name, group);
         this.plugin = plugin;
         this.hologram = hologram;
         this.duration = duration;

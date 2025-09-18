@@ -7,7 +7,6 @@ import org.bukkit.*;
 import org.bukkit.event.inventory.*;
 
 import java.util.*;
-import java.util.function.*;
 
 public class ButtonBuilder extends IconBuilder {
 
@@ -71,6 +70,26 @@ public class ButtonBuilder extends IconBuilder {
     @Override
     public ButtonBuilder addLore(List<String> loreLines) {
         return (ButtonBuilder) super.addLore(loreLines);
+    }
+
+    @Override
+    public ButtonBuilder addLeftClickLore(String action) {
+        return (ButtonBuilder) super.addLeftClickLore(action);
+    }
+
+    @Override
+    public ButtonBuilder addRightClickLore(String action) {
+        return (ButtonBuilder) super.addRightClickLore(action);
+    }
+
+    @Override
+    public ButtonBuilder addShiftLeftClickLore(String action) {
+        return (ButtonBuilder) super.addShiftLeftClickLore(action);
+    }
+
+    @Override
+    public ButtonBuilder addShiftRightClickLore(String action) {
+        return (ButtonBuilder) super.addShiftRightClickLore(action);
     }
 
     @Override

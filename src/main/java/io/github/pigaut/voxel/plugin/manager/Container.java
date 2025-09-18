@@ -8,6 +8,8 @@ public interface Container<T extends Identifiable> {
 
     boolean contains(@NotNull String name);
 
+    boolean containsGroup(@NotNull String group);
+
     @Nullable T get(@NotNull String name);
 
     void add(@NotNull T value) throws DuplicateElementException;
@@ -21,6 +23,8 @@ public interface Container<T extends Identifiable> {
     void removeAll(@NotNull String group);
 
     @NotNull List<String> getAllNames();
+
+    @NotNull List<String> getAllNames(String group);
 
     @NotNull List<String> getAllGroups();
 

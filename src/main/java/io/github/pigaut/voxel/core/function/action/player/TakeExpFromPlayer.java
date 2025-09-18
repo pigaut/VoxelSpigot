@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.core.function.action.player;
 
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.yaml.amount.*;
 import org.jetbrains.annotations.*;
 
 public class TakeExpFromPlayer implements PlayerAction {
@@ -14,7 +14,7 @@ public class TakeExpFromPlayer implements PlayerAction {
 
     @Override
     public void execute(@NotNull PlayerState player) {
-        player.addExp(-amount.getInt());
+        player.addExp(-amount.getInteger());
     }
 
 }

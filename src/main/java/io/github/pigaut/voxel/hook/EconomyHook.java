@@ -1,6 +1,6 @@
 package io.github.pigaut.voxel.hook;
 
-import io.github.pigaut.voxel.server.SpigotServer;
+import io.github.pigaut.voxel.server.*;
 import net.milkbowl.vault.economy.*;
 import org.bukkit.*;
 import org.bukkit.plugin.*;

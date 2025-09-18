@@ -30,11 +30,6 @@ public class DelayedSoundEffect implements SoundEffect {
     }
 
     @Override
-    public @NotNull ConfigField getField() {
-        return sound.getField();
-    }
-
-    @Override
     public void play(@Nullable Player player, @NotNull Location location) {
         plugin.getScheduler().runTaskLater(delay, () -> {
             sound.play(player, location);

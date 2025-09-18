@@ -2,50 +2,48 @@ package io.github.pigaut.voxel.config.attribute;
 
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
+import io.github.pigaut.yaml.configurator.load.*;
+import org.bukkit.*;
+import org.bukkit.attribute.*;
+import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
-public class AttributeLoader implements ConfigLoader<Attribute> {
+import java.util.*;
+
+// Attribute Loader for 1.21.3+
+public class AttributeLoader implements ConfigLoader.Line<ItemAttribute> {
 
     @Override
     public @NotNull String getProblemDescription() {
-        return "invalid item attribute";
+        return "invalid item attribute modifier";
     }
 
     @Override
-    public @NotNull Attribute loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        final String attribute = section.getString("type|attribute");
-        final String name = section.getOptionalString("name").orElse("");
-        final double amount = section.getDouble("amount");
-        final String slot = section.getString("slot");
-        final int operation = section.getInteger("operation");
-        return new Attribute(attribute, name, amount, slot, operation);
+    @SuppressWarnings("UnstableApiUsage")
+    public @NotNull ItemAttribute loadFromLine(ConfigLine line) throws InvalidConfigurationException {
+        Attribute attribute = line.getRequired(0, Attribute.class);
+
+        var namespacedKey = NamespacedKey.fromString(line.getString("name").throwOrElse(UUID.randomUUID().toString()));
+        var amount = line.getRequiredDouble(1);
+        var operation = line.get("operation", AttributeOperation.class).throwOrElse(AttributeOperation.ADD_VALUE);
+        var slot = line.get("slot", EquipmentSlotGroup.class).throwOrElse(EquipmentSlotGroup.HAND);
+        AttributeModifier modifier = new AttributeModifier(namespacedKey, amount, operation.getOperation(), slot);
+
+        return new ItemAttribute(attribute, modifier);
     }
 
     @Override
-    public @NotNull Attribute loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
-        String attribute;
-        String name = "";
-        double amount;
-        String slot;
-        int operation;
-        switch (sequence.size()) {
-            case 4 -> {
-                attribute = sequence.getString(0);
-                amount = sequence.getDouble(1);
-                slot = sequence.getString(2);
-                operation = sequence.getInteger(3);
-            }
-            case 5 -> {
-                attribute = sequence.getString(0);
-                name = sequence.getString(1);
-                amount = sequence.getDouble(2);
-                slot = sequence.getString(3);
-                operation = sequence.getInteger(4);
-            }
-            default -> throw new InvalidConfigurationException(sequence, "is not a valid attribute");
-        }
-        return new Attribute(attribute, name, amount, slot, operation);
+    @SuppressWarnings("UnstableApiUsage")
+    public @NotNull ItemAttribute loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
+        Attribute attribute = section.getRequired("type|attribute", Attribute.class);
+
+        var namespacedKey = NamespacedKey.fromString(section.getString("name").throwOrElse(UUID.randomUUID().toString()));
+        var amount = section.getRequiredDouble("amount");
+        var operation = section.get("operation", AttributeOperation.class).throwOrElse(AttributeOperation.ADD_VALUE);
+        var slot = section.get("slot", EquipmentSlotGroup.class).throwOrElse(EquipmentSlotGroup.HAND);
+        AttributeModifier modifier = new AttributeModifier(namespacedKey, amount, operation.getOperation(), slot);
+
+        return new ItemAttribute(attribute, modifier);
     }
 
 }

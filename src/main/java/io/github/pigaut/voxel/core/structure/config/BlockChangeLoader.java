@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.core.structure.config;
 
 import io.github.pigaut.voxel.core.structure.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
+import io.github.pigaut.yaml.configurator.load.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.block.data.*;
@@ -21,18 +21,18 @@ public class BlockChangeLoader implements ConfigLoader<BlockChange> {
 
     @Override
     public @NotNull BlockChange loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        final Material material = section.get("block", Material.class);
-        final Integer age = section.getOptionalInteger("age").orElse(null);
-        final BlockFace direction = section.getOptional("direction|face", BlockFace.class).orElse(null);
-        final List<BlockFace> facingDirections = section.getList("directions|faces", BlockFace.class);
-        final Axis orientation = section.getOptional("orientation", Axis.class).orElse(null);
-        final Boolean open = section.getOptionalBoolean("open").orElse(null);
-        final Bisected.Half half = section.getOptional("half", Bisected.Half.class).orElse(null);
-        final Stairs.Shape stairShape = section.getOptional("stair-shape|stairs-shape|stairs", Stairs.Shape.class).orElse(null);
-        final Slab.Type slabType = section.getOptional("slab-type|slab", Slab.Type.class).orElse(null);
-        final Door.Hinge doorHinge = section.getOptional("door-hinge|door", Door.Hinge.class).orElse(null);
-        final Bed.Part bedPart = section.getOptional("bed-part|bed", Bed.Part.class).orElse(null);
-        final Bamboo.Leaves bambooLeaves = section.getOptional("bamboo-leaves", Bamboo.Leaves.class)
+        final Material material = section.getRequired("block", Material.class);
+        final Integer age = section.getInteger("age").throwOrElse(null);
+        final BlockFace direction = section.get("direction|face", BlockFace.class).throwOrElse(null);
+        final List<BlockFace> facingDirections = section.getAll("directions|faces", BlockFace.class);
+        final Axis orientation = section.get("orientation", Axis.class).throwOrElse(null);
+        final Boolean open = section.getBoolean("open").throwOrElse(null);
+        final Bisected.Half half = section.get("half", Bisected.Half.class).throwOrElse(null);
+        final Stairs.Shape stairShape = section.get("stair-shape|stairs-shape|stairs", Stairs.Shape.class).orElse(null);
+        final Slab.Type slabType = section.get("slab-type|slab", Slab.Type.class).orElse(null);
+        final Door.Hinge doorHinge = section.get("door-hinge|door", Door.Hinge.class).orElse(null);
+        final Bed.Part bedPart = section.get("bed-part|bed", Bed.Part.class).orElse(null);
+        final Bamboo.Leaves bambooLeaves = section.get("bamboo-leaves", Bamboo.Leaves.class)
                 .orElse(material == Material.BAMBOO ? Bamboo.Leaves.NONE : null);
 
         if (!material.isBlock()) {
@@ -111,9 +111,9 @@ public class BlockChangeLoader implements ConfigLoader<BlockChange> {
             throw new InvalidConfigurationException(section, "bamboo-leaves", "The current block is not bamboo, please remove the bamboo-leaves parameter");
         }
 
-        final int offsetX = section.getOptionalInteger("offset.x").orElse(0);
-        final int offsetY = section.getOptionalInteger("offset.y").orElse(0);
-        final int offsetZ = section.getOptionalInteger("offset.z").orElse(0);
+        final int offsetX = section.getInteger("offset.x").orElse(0);
+        final int offsetY = section.getInteger("offset.y").orElse(0);
+        final int offsetZ = section.getInteger("offset.z").orElse(0);
 
         return new BlockChange(material, age, direction, facingDirections, orientation, open, half, stairShape, slabType,
                 doorHinge, bedPart, bambooLeaves, offsetX, offsetY, offsetZ);

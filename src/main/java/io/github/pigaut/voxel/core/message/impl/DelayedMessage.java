@@ -41,11 +41,6 @@ public class DelayedMessage implements Message {
     }
 
     @Override
-    public @NotNull ConfigField getField() {
-        return message.getField();
-    }
-
-    @Override
     public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
         plugin.getScheduler().runTaskLater(delay, () -> {
             message.send(player, placeholderSuppliers);

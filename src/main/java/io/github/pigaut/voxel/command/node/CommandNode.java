@@ -1,9 +1,9 @@
 package io.github.pigaut.voxel.command.node;
 
 import io.github.pigaut.voxel.bukkit.*;
+import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.command.completion.*;
 import io.github.pigaut.voxel.command.execution.*;
-import io.github.pigaut.voxel.command.parameter.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
@@ -123,7 +123,7 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
                 final String[] parameter = StringUtil.removeParentheses(commandPart).split(":");
                 final String parameterName = parameter[0];
                 final String defaultValue = parameter.length == 2 ? parameter[1] : null;
-                currentCommand.addParameter(parameterName, optionalParameter, defaultValue);
+                currentCommand.withParameter(CommandParameter.create(parameterName, optionalParameter, defaultValue));
                 continue;
             }
             currentCommand = currentCommand.getSubCommandOrCreate(commandPart);
@@ -171,33 +171,10 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
         return this;
     }
 
-    public CommandNode addParameter(CommandParameter parameter) {
+    public CommandNode withParameter(CommandParameter parameter) {
         parameters.add(parameter);
         updateParameterBounds();
         return this;
-    }
-
-    public CommandNode addParameter(String name) {
-        parameters.add(new CommandParameter(name, false, null));
-        updateParameterBounds();
-        return this;
-    }
-
-    public CommandNode addParameter(String name, boolean optional) {
-        parameters.add(new CommandParameter(name, optional, null));
-        updateParameterBounds();
-        return this;
-    }
-
-    public CommandNode addParameter(String name, boolean optional, String defaultValue) {
-        parameters.add(new CommandParameter(name, optional, defaultValue));
-        updateParameterBounds();
-        return this;
-    }
-
-    public void clearParameters() {
-        parameters.clear();
-        updateParameterBounds();
     }
 
     private void updateParameterBounds() {

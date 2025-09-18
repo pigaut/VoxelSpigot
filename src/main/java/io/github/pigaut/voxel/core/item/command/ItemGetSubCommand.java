@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.core.item.command;
 
+import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.command.node.*;
-import io.github.pigaut.voxel.core.item.command.parameter.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.inventory.*;
@@ -13,7 +13,7 @@ public class ItemGetSubCommand extends SubCommand {
         super("get", plugin);
         withPermission(plugin.getPermission("item.get"));
         withDescription(plugin.getLang("item-get-command"));
-        addParameter(new ItemNameParameter(plugin));
+        withParameter(CommandParameters.itemName(plugin));
         withPlayerExecution((player, args, placeholders) -> {
             final ItemStack item = plugin.getItemStack(args[0]);
             if (item == null) {

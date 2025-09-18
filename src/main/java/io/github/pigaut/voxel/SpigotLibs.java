@@ -2,13 +2,15 @@ package io.github.pigaut.voxel;
 
 import io.github.pigaut.voxel.config.deserializer.*;
 import io.github.pigaut.voxel.server.*;
-import io.github.pigaut.yaml.parser.*;
-import io.github.pigaut.yaml.parser.deserializer.*;
+import io.github.pigaut.yaml.configurator.deserialize.*;
+import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
-import org.bukkit.util.*;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.*;
+
+import java.util.*;
 
 public class SpigotLibs {
 
@@ -30,7 +32,7 @@ public class SpigotLibs {
         try {
             materialDeserializer.deserialize(value);
             return true;
-        } catch (DeserializationException e) {
+        } catch (StringParseException e) {
             return false;
         }
     }
@@ -38,13 +40,18 @@ public class SpigotLibs {
     public static @Nullable Material getMaterial(String value) {
         try {
             return materialDeserializer.deserialize(value);
-        } catch (DeserializationException e) {
+        } catch (StringParseException e) {
             return null;
         }
     }
 
-    public static @NotNull Material deserializeMaterial(String value) throws DeserializationException {
+    public static @NotNull Material deserializeMaterial(String value) throws StringParseException {
         return materialDeserializer.deserialize(value);
+    }
+
+    public static @Nullable String getWorldName(UUID worldId) {
+        final World world = Bukkit.getWorld(worldId);
+        return world != null ? world.getName() : null;
     }
 
     public static Location getOffsetLocation(Location location, double right, double up, double front) {

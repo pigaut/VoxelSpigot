@@ -6,9 +6,8 @@ import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.input.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.util.collection.*;
-import io.github.pigaut.yaml.util.ConfigurationException;
+import io.github.pigaut.yaml.configurator.deserialize.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.player.*;
@@ -16,7 +15,6 @@ import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
 import org.jetbrains.annotations.*;
 
-import javax.naming.*;
 import java.util.*;
 
 public class SimplePlayerState implements PlayerState {
@@ -311,13 +309,33 @@ public class SimplePlayerState implements PlayerState {
     }
 
     @Override
-    public ChatInput createChatInput() {
-        return new ChatInput(this);
+    public ChatInput<String> createChatInput() {
+        return new ChatInput<>(this, Deserializers.STRING);
     }
 
     @Override
-    public MenuInput createMenuSelector() {
-        return new MenuInput(this);
+    public <T> ChatInput<T> createChatInput(@NotNull Class<T> classType) {
+        return new ChatInput<>(this, Deserializers.byType(classType));
+    }
+
+    @Override
+    public <T> ChatInput<T> createChatInput(@NotNull Deserializer<T> deserializer) {
+        return new ChatInput<>(this, deserializer);
+    }
+
+    @Override
+    public MenuInput<String> createMenuInputSelection() {
+        return new MenuInput<>(this, Deserializers.STRING);
+    }
+
+    @Override
+    public <T> MenuInput<T> createMenuInputSelection(@NotNull Class<T> classType) {
+        return new MenuInput<>(this, Deserializers.byType(classType));
+    }
+
+    @Override
+    public <T> MenuInput<T> createMenuInputSelection(@NotNull Deserializer<T> deserializer) {
+        return new MenuInput<>(this, deserializer);
     }
 
 }

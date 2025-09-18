@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.core.particle.command;
 
+import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.command.node.*;
-import io.github.pigaut.voxel.command.parameter.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.*;
@@ -14,8 +14,8 @@ public class SpawnParticleToSubCommand extends SubCommand {
         super("spawn-to", plugin);
         withPermission(plugin.getPermission("particle.spawn-to"));
         withDescription(plugin.getLang("particle-spawn-to-command"));
-        addParameter(new OnlinePlayerParameter());
-        addParameter(new ParticleNameParameter(plugin));
+        withParameter(CommandParameters.ONLINE_PLAYER);
+        withParameter(CommandParameters.particleName(plugin));
         withCommandExecution((sender, args, placeholders) -> {
             final Player player = Bukkit.getPlayer(args[0]);
             if (player == null) {

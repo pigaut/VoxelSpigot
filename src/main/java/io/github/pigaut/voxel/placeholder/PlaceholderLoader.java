@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.placeholder;
 
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.loader.*;
+import io.github.pigaut.yaml.configurator.load.*;
 import org.jetbrains.annotations.*;
 
 public class PlaceholderLoader implements ConfigLoader<Placeholder> {

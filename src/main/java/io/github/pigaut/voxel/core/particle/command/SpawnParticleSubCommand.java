@@ -1,10 +1,10 @@
 package io.github.pigaut.voxel.core.particle.command;
 
+import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.command.node.*;
-import io.github.pigaut.voxel.command.parameter.location.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.yaml.parser.deserializer.*;
+import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
 
@@ -14,11 +14,11 @@ public class SpawnParticleSubCommand extends SubCommand {
         super("spawn", plugin);
         withPermission(plugin.getPermission("particle.spawn"));
         withDescription(plugin.getLang("particle-spawn-command"));
-        addParameter(new ParticleNameParameter(plugin));
-        addParameter(new WorldNameParameter());
-        addParameter(new XCoordinateParameter(plugin));
-        addParameter(new YCoordinateParameter(plugin));
-        addParameter(new ZCoordinateParameter(plugin));
+        withParameter(CommandParameters.particleName(plugin));
+        withParameter(CommandParameters.WORLD_NAME);
+        withParameter(CommandParameters.X_COORDINATE);
+        withParameter(CommandParameters.Y_COORDINATE);
+        withParameter(CommandParameters.Z_COORDINATE);
         withCommandExecution((sender, args, placeholders) -> {
             final ParticleEffect particle = plugin.getParticle(args[0]);
             if (particle == null) {
@@ -31,9 +31,9 @@ public class SpawnParticleSubCommand extends SubCommand {
                 return;
             }
 
-            final Double x = Deserializers.getDouble(args[2]);
-            final Double y = Deserializers.getDouble(args[3]);
-            final Double z = Deserializers.getDouble(args[4]);
+            final Double x = ParseUtil.parseDoubleOrNull(args[2]);
+            final Double y = ParseUtil.parseDoubleOrNull(args[3]);
+            final Double z = ParseUtil.parseDoubleOrNull(args[4]);
 
             if (x == null || y == null || z == null) {
                 plugin.sendMessage(sender, "expected-coordinates", placeholders);

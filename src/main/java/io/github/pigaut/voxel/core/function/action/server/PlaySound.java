@@ -14,9 +14,9 @@ public class PlaySound implements Action {
     private final SoundEffect sound;
     private final Location location;
 
-    public PlaySound(SoundEffect sound, Location location) {
+    public PlaySound(SoundEffect sound, World world, double x, double y, double z) {
         this.sound = sound;
-        this.location = location;
+        this.location = new Location(world, x, y, z);
     }
 
     @Override

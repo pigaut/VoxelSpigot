@@ -2,7 +2,6 @@ package io.github.pigaut.voxel.language;
 
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
-import io.github.pigaut.voxel.util.collection.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;

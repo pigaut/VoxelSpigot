@@ -27,6 +27,10 @@ public class Button {
         this.icon = icon;
     }
 
+    public boolean updateOnClick() {
+        return false;
+    }
+
     public void onClick(MenuView view, InventoryClickEvent event) {
         final ClickType click = event.getClick();
         switch (click) {
@@ -34,6 +38,9 @@ public class Button {
             case SHIFT_LEFT -> onShiftLeftClick(view, view.getViewer(), event);
             case RIGHT -> onRightClick(view, view.getViewer(), event);
             case SHIFT_RIGHT -> onShiftRightClick(view, view.getViewer(), event);
+        }
+        if (updateOnClick()) {
+            view.update();
         }
     }
 

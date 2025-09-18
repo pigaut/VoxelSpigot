@@ -9,10 +9,10 @@ import org.jetbrains.annotations.*;
 
 import java.io.*;
 
-public class ItemManager extends ManagerContainer<Item> {
+public class ItemManager extends ConfigBackedManager.SectionKey<Item> {
 
     public ItemManager(EnhancedJavaPlugin plugin) {
-        super(plugin);
+        super(plugin, "Item", "items");
     }
 
     public @Nullable ItemStack getItemStack(@NotNull String name) {
@@ -21,25 +21,14 @@ public class ItemManager extends ManagerContainer<Item> {
     }
 
     @Override
-    public @Nullable String getFilesDirectory() {
-        return "items";
-    }
-
-    @Override
-    public void loadFile(@NotNull File file) {
-        final RootSection config = new RootSection(file, plugin.getConfigurator());
-        config.setPrefix("Item");
-        config.load();
-
-        for (String itemName : config.getKeys()) {
-            final String itemGroup = PathGroup.byItemFile(file);
-            final ConfigField itemField = config.getField(itemName);
-            final ItemStack itemStack = itemField.load(ItemStack.class);
-            try {
-                add(new Item(itemName, itemGroup, itemField, itemStack));
-            } catch (DuplicateElementException e) {
-                throw new InvalidConfigurationException(config, itemName, e.getMessage());
-            }
+    public void loadFromSectionKey(ConfigSection section, String key) throws InvalidConfigurationException {
+        final String itemGroup = Group.byItemFile(section.getRoot().getFile());
+        final ItemStack itemStack = section.getRequired(key, ItemStack.class);
+        try {
+            add(new Item(key, itemGroup, itemStack));
+        }
+        catch (DuplicateElementException e) {
+            throw new InvalidConfigurationException(section, key, e.getMessage());
         }
     }
 

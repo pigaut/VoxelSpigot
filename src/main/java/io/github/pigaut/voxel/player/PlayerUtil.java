@@ -4,6 +4,7 @@ import io.github.pigaut.voxel.placeholder.*;
 import net.md_5.bungee.api.*;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.*;
+import org.bukkit.block.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
 
@@ -25,6 +26,30 @@ public class PlayerUtil {
     public static void sendActionBar(Player player, String message) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                 TextComponent.fromLegacyText(StringPlaceholders.parseAll(player, message)));
+    }
+
+    public static int getTargetBlockX(Player player) {
+        final Block targetBlock = player.getTargetBlockExact(6);
+        if (targetBlock != null) {
+            return targetBlock.getX();
+        }
+        return 0;
+    }
+
+    public static int getTargetBlockY(Player player) {
+        final Block targetBlock = player.getTargetBlockExact(6);
+        if (targetBlock != null) {
+            return targetBlock.getY();
+        }
+        return 0;
+    }
+
+    public static int getTargetBlockZ(Player player) {
+        final Block targetBlock = player.getTargetBlockExact(6);
+        if (targetBlock != null) {
+            return targetBlock.getZ();
+        }
+        return 0;
     }
 
 }

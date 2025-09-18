@@ -43,11 +43,6 @@ public class PeriodicMessage implements Message {
     }
 
     @Override
-    public @NotNull ConfigField getField() {
-        return message.getField();
-    }
-
-    @Override
     public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
         message.send(player, placeholderSuppliers);
         for (int i = 1; i < repetitions; i++) {

@@ -4,7 +4,7 @@ import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.voxel.core.function.action.*;
 import io.github.pigaut.voxel.core.function.condition.*;
 import io.github.pigaut.voxel.core.function.response.*;
-import io.github.pigaut.voxel.player.PlayerState;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.yaml.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -15,15 +15,13 @@ public class ConditionalFunction implements Function {
 
     private final String name;
     private final String group;
-    private final ConfigSection section;
     private final Condition condition;
     private final SystemAction success;
     private final SystemAction failure;
 
-    public ConditionalFunction(String name, String group, ConfigSection section, Condition condition, SystemAction success, SystemAction failure) {
+    public ConditionalFunction(String name, String group, Condition condition, SystemAction success, SystemAction failure) {
         this.name = name;
         this.group = group;
-        this.section = section;
         this.condition = condition;
         this.success = success;
         this.failure = failure;
@@ -37,11 +35,6 @@ public class ConditionalFunction implements Function {
     @Override
     public @Nullable String getGroup() {
         return group;
-    }
-
-    @Override
-    public @NotNull ConfigSection getField() {
-        return section;
     }
 
     @Override

@@ -2,44 +2,32 @@ package io.github.pigaut.voxel.config.attribute;
 
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.*;
-import io.github.pigaut.yaml.configurator.mapper.*;
+import io.github.pigaut.yaml.configurator.map.*;
+import org.bukkit.attribute.*;
 import org.jetbrains.annotations.*;
-import org.snakeyaml.engine.v2.common.*;
 
-public class AttributeMapper implements ConfigMapper<Attribute> {
+// Attribute Mapper for 1.21.3+
+public class AttributeMapper implements ConfigMapper.Line<ItemAttribute> {
 
-    private final boolean compact;
-
-    public AttributeMapper(boolean compact) {
-        this.compact = compact;
+    @Override
+    @SuppressWarnings("UnstableApiUsage")
+    public void mapToLine(@NotNull ConfigLine line, @NotNull ItemAttribute itemAttribute) {
+        final AttributeModifier modifier = itemAttribute.modifier();
+        line.set(0, itemAttribute.attribute());
+        line.set(1, modifier.getAmount());
+        line.setFlag("operation", AttributeOperation.of(modifier.getOperation()));
+        line.setFlag("slot", modifier.getSlotGroup());
+        line.setFlag("name", modifier.getName());
     }
 
     @Override
-    public @NotNull FieldType getDefaultMappingType() {
-        return compact ? FieldType.SEQUENCE : FieldType.SECTION;
-    }
-
-    @Override
-    public void mapSection(@NotNull ConfigSection section, @NotNull Attribute attribute) {
-        section.set("attribute|type", attribute.getAttributeType());
-        section.set("name", attribute.getName());
-        section.set("amount", attribute.getAmount());
-        section.set("slot", attribute.getSlot());
-        section.set("operation", attribute.getOperation());
-    }
-
-    @Override
-    public void mapSequence(@NotNull ConfigSequence sequence, @NotNull Attribute attribute) {
-        sequence.add(attribute.getAttributeType());
-        final String name = attribute.getName();
-        if (!name.isEmpty()) {
-            sequence.add(name);
-        }
-        sequence.add(attribute.getAmount());
-        sequence.add(attribute.getSlot());
-        sequence.add(attribute.getOperation());
-        sequence.setFlowStyle(FlowStyle.FLOW);
+    public void mapToSection(@NotNull ConfigSection section, @NotNull ItemAttribute itemAttribute) {
+        final AttributeModifier modifier = itemAttribute.modifier();
+        section.set("attribute|type", itemAttribute.attribute());
+        section.set("amount", modifier.getAmount());
+        section.set("slot", modifier.getSlotGroup());
+        section.set("operation", modifier.getOperation());
+        section.set("name", modifier.getName());
     }
 
 }

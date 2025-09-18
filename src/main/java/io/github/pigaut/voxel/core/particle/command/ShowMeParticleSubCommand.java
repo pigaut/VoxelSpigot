@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.core.particle.command;
 
+import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.plugin.*;
@@ -12,7 +13,7 @@ public class ShowMeParticleSubCommand extends SubCommand {
         super("show-me", plugin);
         withPermission(plugin.getPermission("particle.show-me"));
         withDescription(plugin.getLang("particle-show-me-command"));
-        withParameters(new ParticleNameParameter(plugin));
+        withParameters(CommandParameters.particleName(plugin));
         withPlayerExecution((player, args, placeholders) -> {
             final ParticleEffect particle = plugin.getParticle(args[0]);
             if (particle == null) {

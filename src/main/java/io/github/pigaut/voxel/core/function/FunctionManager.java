@@ -2,38 +2,26 @@ package io.github.pigaut.voxel.core.function;
 
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
-import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.node.*;
 import io.github.pigaut.yaml.node.section.*;
 import org.jetbrains.annotations.*;
 
 import java.io.*;
 
-public class FunctionManager extends ManagerContainer<Function> {
+public class FunctionManager extends ConfigBackedManager.SectionKey<Function> {
 
     public FunctionManager(@NotNull EnhancedJavaPlugin plugin) {
-        super(plugin);
+        super(plugin, "Function", "functions");
     }
 
     @Override
-    public @Nullable String getFilesDirectory() {
-        return "functions";
-    }
-
-    @Override
-    public void loadFile(@NotNull File file) {
-        final RootSection config = new RootSection(file, plugin.getConfigurator());
-        config.setPrefix("Function");
-        config.load();
-
-        for (String functionName : config.getKeys()) {
-            final Function function = config.get(functionName, Function.class);
-            try {
-                add(function);
-            } catch (DuplicateElementException e) {
-                throw new InvalidConfigurationException(config, functionName, e.getMessage());
-            }
+    public void loadFromSectionKey(ConfigSection section, String key) throws InvalidConfigurationException {
+        final Function function = section.getRequired(key, Function.class);
+        try {
+            add(function);
+        }
+        catch (DuplicateElementException e) {
+            throw new InvalidConfigurationException(section, key, e.getMessage());
         }
     }
 

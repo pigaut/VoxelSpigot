@@ -4,8 +4,8 @@ import io.github.pigaut.voxel.util.Rotation;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.block.data.*;
-import org.bukkit.block.data.type.*;
 import org.bukkit.block.data.type.Bed;
+import org.bukkit.block.data.type.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;

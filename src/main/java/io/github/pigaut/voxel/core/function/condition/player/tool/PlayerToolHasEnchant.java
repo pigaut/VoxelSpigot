@@ -2,7 +2,7 @@ package io.github.pigaut.voxel.core.function.condition.player.tool;
 
 import io.github.pigaut.voxel.core.function.condition.player.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.yaml.amount.*;
 import org.bukkit.enchantments.*;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
