@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.config.deserializer;
 
 import com.cryptomorin.xseries.*;
-import io.github.pigaut.yaml.configurator.deserialize.*;
+import io.github.pigaut.yaml.configurator.convert.deserialize.*;
 import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.enchantments.*;
 import org.jetbrains.annotations.*;

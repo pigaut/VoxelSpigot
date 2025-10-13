@@ -3,7 +3,6 @@ package io.github.pigaut.voxel.core.item.config;
 import com.cryptomorin.xseries.*;
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.config.deserializer.*;
-import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.load.*;
 import io.github.pigaut.yaml.convert.format.*;
@@ -28,7 +27,7 @@ public class ItemStackLoader implements ConfigLoader.Section<ItemStack> {
     @Override
     public @NotNull ItemStack loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
         final Material type = section.getRequired("type|material", Material.class);
-        final int amount = section.getInteger("amount").throwOrElse(1);
+        final int amount = section.getInteger("amount").withDefault(1);
         final ItemStack item = new ItemStack(type, amount);
 
         {
@@ -45,7 +44,7 @@ public class ItemStackLoader implements ConfigLoader.Section<ItemStack> {
             List<ItemFlag> itemFlags = section.getAll("flags", ItemFlag.class);
             meta.addItemFlags(itemFlags.toArray(new ItemFlag[0]));
 
-            final boolean shouldGlow = section.getBoolean("glow").throwOrElse(false);
+            final boolean shouldGlow = section.getBoolean("glow").withDefault(false);
             if (shouldGlow) {
                 meta.addEnchant(XEnchantment.LUCK_OF_THE_SEA.get(), 1, true);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);

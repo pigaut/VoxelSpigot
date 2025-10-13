@@ -2,20 +2,21 @@ package io.github.pigaut.voxel.plugin;
 
 import com.jeff_media.updatechecker.*;
 import io.github.pigaut.sql.*;
-import io.github.pigaut.sql.database.*;
+import io.github.pigaut.voxel.*;
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.config.*;
+import io.github.pigaut.voxel.core.*;
 import io.github.pigaut.voxel.core.function.Function;
 import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.voxel.core.item.Item;
 import io.github.pigaut.voxel.core.item.*;
+import io.github.pigaut.voxel.core.language.*;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.core.structure.*;
-import io.github.pigaut.voxel.hook.*;
-import io.github.pigaut.voxel.language.*;
+import io.github.pigaut.voxel.hook.itemsadder.*;
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
@@ -23,12 +24,12 @@ import io.github.pigaut.voxel.player.input.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
 import io.github.pigaut.voxel.server.*;
+import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.util.reflection.*;
-import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.*;
+import io.github.pigaut.yaml.configurator.*;
 import io.github.pigaut.yaml.node.section.*;
 import io.github.pigaut.yaml.util.*;
-import org.bstats.charts.*;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
@@ -42,16 +43,15 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.*;
-import java.util.logging.*;
 import java.util.regex.*;
 
-public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedPlugin {
+public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedPlugin, PluginProperties {
 
     private final static Pattern VERSION_PATTERN = Pattern.compile("(^[\\.\\d]*).+");
 
-    protected final Logger logger = getLogger();
     protected final PluginScheduler scheduler = new PluginScheduler(this);
-
+    protected final ColoredLogger coloredLogger = new ColoredLogger(this);
+    private final OptionsManager optionsManager = new OptionsManager(this);
     private final LanguageManager languageManager = new SimpleLanguageManager(this);
     private final CommandManager commandManager = new CommandManager(this);
     private final PlayerStateManager<SimplePlayerState> playerManager = new PlayerStateManager<>(this, SimplePlayerState::new);
@@ -61,219 +61,87 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final SoundManager soundManager = new SoundManager(this);
     private final FunctionManager functionManager = new FunctionManager(this);
     private final StructureManager structureManager = new StructureManager(this);
-    private final MenuManager menuManager = new MenuManager(this);
 
-    private final List<Manager> loadedManagers = new ArrayList<>();
+    private final ManagerInitializer managerInitializer = new ManagerInitializer(this);
 
     private final Settings settings = new Settings();
-
+    private Configurator configurator;
     private RootSection config;
-    private UpdateChecker updateChecker = null;
-    private PluginMetrics metrics = null;
-    private Database database = null;
+    private @Nullable UpdateChecker updateChecker = null;
+    private @Nullable PluginMetrics metrics = null;
+    private @Nullable Database database = null;
+
     private boolean debug = true;
     private boolean reloading = false;
 
-    private EconomyHook economy = null;
-    private boolean papi = false;
-    private boolean decentHolograms = false;
-
     @Override
     public void onDisable() {
-        logger.info("Saving data to database...");
-        for (Manager manager : loadedManagers) {
-            manager.disable();
-            manager.saveData();
-        }
-        loadedManagers.clear();
-        if (database != null) {
-            database.closeConnection();
-        }
+        managerInitializer.disable();
     }
 
     @Override
     public void onEnable() {
-        final SpigotVersion serverVersion = SpigotServer.getVersion();
-        if (serverVersion == SpigotVersion.UNKNOWN) {
-            logger.severe("Found unknown server version");
-        } else {
-            if (!getCompatibleVersions().contains(serverVersion)) {
-                throw new UnsupportedVersionException(this);
-            } else {
-                logger.info("Found compatible server version: " + serverVersion);
-            }
-        }
+        configurator = createConfigurator();
+        config = PluginSetup.createConfiguration(this);
+        debug = config.getBoolean("debug").orElse(true);
 
-        this.createHooks();
+        PluginSetup.dumpLogo(this);
+        PluginSetup.checkServerVersion(this);
+        PluginSetup.logFoundDependecies(this);
+        PluginSetup.generateDirectoriesAndFiles(this);
+        PluginSetup.generateExampleFiles(this);
+        metrics = PluginSetup.createMetrics(this);
+        updateChecker = PluginSetup.createUpdateChecker(this);
+        database = PluginSetup.createDatabase(this);
 
-        logger.info("Generating directories and files...");
-        for (String directory : getPluginDirectories()) {
-            createDirectory(directory);
-        }
-        for (String resource : getPluginResources()) {
-            saveResource(resource);
-        }
-
-        config = YamlConfig.loadSection(getFile("config.yml"), getConfigurator());
-        config.load();
-        debug = config.getBoolean("debug").throwOrElse(true);
-
-        if (config.getBoolean("generate-examples").orElse(true)) {
-            logger.info("Generating example files...");
-            for (String resourcePath : getExampleResources()) {
-                saveResource(resourcePath);
-            }
-
-            final SpigotVersion currentVersion = SpigotServer.getVersion();
-            final Map<SpigotVersion, List<String>> examplesByVersion = getExamplesByVersion();
-            for (SpigotVersion requiredVersion : examplesByVersion.keySet()) {
-                if (currentVersion.equalsOrIsNewerThan(requiredVersion)) {
-                    for (String resourcePath : examplesByVersion.get(requiredVersion)) {
-                        saveResource(resourcePath);
-                    }
-                }
-            }
-        }
-
-        logger.info("Establishing database connection...");
-        final String databaseName = getDatabaseName();
-        if (database != null) {
-            database.openConnection();
-        } else if (databaseName != null) {
-            final File file = getFile(databaseName);
-            database = new FileDatabase(file);
-            database.openConnection();
-        }
-
-        logger.info("Loading configuration and data...");
-        loadedManagers.add(languageManager);
-        loadedManagers.add(commandManager);
-        loadedManagers.add(playerManager);
-        loadedManagers.add(itemManager);
-        loadedManagers.add(messageManager);
-        loadedManagers.add(particleManager);
-        loadedManagers.add(soundManager);
-        loadedManagers.add(functionManager);
-        loadedManagers.add(structureManager);
-
-        for (Field field : getClass().getDeclaredFields()) {
-            final Manager manager = ReflectionUtil.accessField(field, Manager.class, this);
-            if (manager != null) {
-                loadedManagers.add(manager);
-            }
-        }
-
-        loadedManagers.add(menuManager);
-
-        getCommand("");  // Initialize command manager
-        final List<ConfigurationException> errorsFound = new ArrayList<>();
-        for (Manager manager : loadedManagers) {
-            manager.enable();
-            manager.loadData();
-
-            if (manager instanceof ConfigBacked configBackedManager) {
-                errorsFound.addAll(configBackedManager.loadConfigurationData());
-            }
-
-            if (manager instanceof Listener listener) {
-                registerListener(listener);
-            }
-        }
-        logConfigurationErrors(null, errorsFound);
-
-        final int autoSave = config.getInteger("auto-save").orElse(0);
-        if (autoSave > 0) {
-            scheduler.runTaskTimerAsync(autoSave, () -> {
-                logger.info("Saving plugin data to database...");
-                for (Manager manager : loadedManagers) {
-                    if (manager.isAutoSave()) {
-                        manager.saveData();
-                    }
-                }
-                logger.info("All plugin data saved successfully.");
-            });
-        }
+        managerInitializer.initialize();
 
         registerListener(new PlayerInputListener(this));
+        registerListener(new PlayerInventoryListener(this));
+        registerListener(new StructureWandListener(this));
 
-        this.getPluginListeners().forEach(this::registerListener);
-        this.getPluginCommands().forEach(this::registerCommand);
-
-        if (metrics != null) {
-            metrics.shutdown();
-        }
-        final Integer metricsId = getMetricsId();
-        if (metricsId != null) {
-            if (forceMetrics() || config.getBoolean("metrics").orElse(true)) {
-                logger.info("Created bStats metrics with id: " + metricsId);
-                metrics = new PluginMetrics(this, metricsId);
-                metrics.addCustomChart(new SimplePie("premium", () -> Boolean.toString(isPremium())));
-            }
+        if (SpigotServer.isPluginEnabled("ItemsAdder")) {
+            registerListener(new ItemsAdderLoadListener(this));
         }
 
-        if (updateChecker != null) {
-            updateChecker.stop();
-        }
-        final boolean checkForUpdates = config.getBoolean("check-for-updates").orElse(true);
-        final Integer spigotId = getResourceId();
-        if (checkForUpdates && spigotId != null) {
-            updateChecker = new UpdateChecker(this, UpdateCheckSource.SPIGET, Integer.toString(spigotId))
-                    .setDownloadLink("https://www.spigotmc.org/resources/" + spigotId)
-                    .setChangelogLink("https://www.spigotmc.org/resources/" + spigotId + "/updates")
-                    .setDonationLink(getDonationLink())
-                    .setNotifyOpsOnJoin(true)
-                    .checkEveryXHours(24)
-                    .checkNow();
+        for (Listener listener : getPluginListeners()) {
+            registerListener(listener);
         }
 
+        for (EnhancedCommand command : getPluginCommands()) {
+            registerCommand(command);
+        }
+    }
+
+    public boolean isReloading() {
+        return reloading;
     }
 
     public void reload(Consumer<List<ConfigurationException>> errorCollector) throws PluginReloadInProgressException {
         if (reloading) {
             throw new PluginReloadInProgressException();
         }
-
         reloading = true;
-        createHooks();
 
-        logger.info("Generating directories and files...");
-        for (String directory : getPluginDirectories()) {
-            createDirectory(directory);
-        }
-        for (String resource : getPluginResources()) {
-            saveResource(resource);
-        }
-
-        config.load();
+        configurator = createConfigurator();
+        config = PluginSetup.createConfiguration(this);
         debug = config.getBoolean("debug").orElse(true);
+        PluginSetup.dumpLogo(this);
+        PluginSetup.logFoundDependecies(this);
+        PluginSetup.generateDirectoriesAndFiles(this);
+        PluginSetup.generateExampleFiles(this);
 
-        if (config.getBoolean("generate-examples").orElse(true)) {
-            logger.info("Generating example files...");
-            for (String resourcePath : getExampleResources()) {
-                saveResource(resourcePath);
-            }
-
-            final SpigotVersion currentVersion = SpigotServer.getVersion();
-            final Map<SpigotVersion, List<String>> examplesByVersion = getExamplesByVersion();
-            for (SpigotVersion requiredVersion : examplesByVersion.keySet()) {
-                if (currentVersion.equalsOrIsNewerThan(requiredVersion)) {
-                    for (String resourcePath : examplesByVersion.get(requiredVersion)) {
-                        saveResource(resourcePath);
-                    }
-                }
-            }
-        }
-
+        List<Manager> loadedManagers = managerInitializer.getLoadedManagers();
         for (Manager manager : loadedManagers) {
             manager.disable();
             manager.enable();
         }
 
         scheduler.runTaskLaterAsync(1, () -> {
-            logger.info("Saving data to database...");
+            coloredLogger.info("Saving data to database...");
             loadedManagers.forEach(Manager::saveData);
 
-            logger.info("Loading configuration and data...");
+            coloredLogger.info("Loading configuration and data...");
             final List<ConfigurationException> errorsFound = new ArrayList<>();
             for (Manager manager : loadedManagers) {
                 manager.loadData();
@@ -286,141 +154,32 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         });
     }
 
-    public void createHooks() {
-        logger.info("Looking for compatible plugins...");
+    public List<Manager> getAllManagers() {
+        List<Manager> managers = new ArrayList<>();
 
-        if (SpigotServer.isPluginLoaded("Vault")) {
-            economy = EconomyHook.newInstance();
-            if (economy != null) {
-                logger.info("Vault Hook: created successfully");
-            } else {
-                logger.warning("Vault Hook: missing economy plugin");
-            }
-        } else {
-            logger.info("Vault Hook: plugin not loaded");
-        }
+        managers.add(optionsManager);
+        managers.add(languageManager);
+        managers.add(commandManager);
+        managers.add(playerManager);
+        managers.add(itemManager);
+        managers.add(messageManager);
+        managers.add(particleManager);
+        managers.add(soundManager);
+        managers.add(functionManager);
+        managers.add(structureManager);
 
-        if (SpigotServer.isPluginLoaded("PlaceholderAPI")) {
-            papi = true;
-            logger.info("PlaceholderAPI Hook: created successfully");
-        } else {
-            logger.info("PlaceholderAPI Hook: plugin not loaded");
-        }
-
-        if (SpigotServer.isPluginLoaded("DecentHolograms")) {
-            decentHolograms = true;
-            logger.info("DecentHolograms Hook: created successfully");
-        } else {
-            logger.info("DecentHolograms Hook: plugin not loaded");
-        }
-    }
-
-    public @Nullable EconomyHook getEconomy() {
-        return economy;
-    }
-
-    public boolean isPlaceholderAPI() {
-        return papi;
-    }
-
-    public boolean isDecentHolograms() {
-        return decentHolograms;
-    }
-
-    public void generateFiles() {
-        logger.info("Generating directories and files...");
-        for (String directory : getPluginDirectories()) {
-            createDirectory(directory);
-        }
-        for (String resource : getPluginResources()) {
-            saveResource(resource);
-        }
-    }
-
-    public void generateExamples() {
-        if (!config.getBoolean("generate-examples").orElse(true)) {
-            return;
-        }
-
-        logger.info("Generating example files...");
-        for (String resourcePath : getExampleResources()) {
-            saveResource(resourcePath);
-        }
-
-        final SpigotVersion currentVersion = SpigotServer.getVersion();
-        final Map<SpigotVersion, List<String>> examplesByVersion = getExamplesByVersion();
-        for (SpigotVersion requiredVersion : examplesByVersion.keySet()) {
-            if (currentVersion.equalsOrIsNewerThan(requiredVersion)) {
-                for (String resourcePath : examplesByVersion.get(requiredVersion)) {
-                    saveResource(resourcePath);
-                }
+        for (Field field : getClass().getDeclaredFields()) {
+            Manager manager = ReflectionUtil.accessField(field, Manager.class, this);
+            if (manager != null) {
+                managers.add(manager);
             }
         }
 
+        return managers;
     }
 
-    public boolean isReloading() {
-        return reloading;
-    }
-
-    public boolean forceMetrics() {
-        return false;
-    }
-
-    public boolean forceUpdates() {
-        return false;
-    }
-
-    public void createMetrics() {
-        final Integer metricsId = getMetricsId();
-        if (metricsId == null || metrics != null) {
-            return;
-        }
-
-        if (!forceMetrics() && !config.getBoolean("metrics").orElse(true)) {
-            return;
-        }
-
-        metrics = new PluginMetrics(this, metricsId);
-        logger.info("Created bStats metrics with id: " + metricsId);
-    }
-
-    public void createUpdateChecker() {
-        if (!forceUpdates() && !config.getBoolean("check-for-updates").orElse(true)) {
-            return;
-        }
-
-        if (updateChecker != null) {
-            updateChecker.checkNow();
-            return;
-        }
-
-        final Integer spigotId = getResourceId();
-        if (spigotId == null) {
-            return;
-        }
-
-        updateChecker = new UpdateChecker(this, UpdateCheckSource.SPIGET, Integer.toString(spigotId))
-                .setDownloadLink("https://www.spigotmc.org/resources/" + spigotId)
-                .setChangelogLink("https://www.spigotmc.org/resources/" + spigotId + "/updates")
-                .setDonationLink(getDonationLink())
-                .setNotifyOpsOnJoin(true)
-                .checkEveryXHours(24)
-                .checkNow();
-    }
-
-    public void createDatabase() {
-        if (database != null) {
-            database.openConnection();
-            return;
-        }
-        final String databaseName = getDatabaseName();
-        if (databaseName == null) {
-            return;
-        }
-        final File file = getFile(databaseName);
-        database = new FileDatabase(file);
-        database.openConnection();
+    public @NotNull Configurator createConfigurator() {
+        return new PluginConfigurator(this);
     }
 
     @Override
@@ -433,9 +192,31 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         return this.getDescription().getVersion();
     }
 
+    public @Nullable UpdateChecker getUpdateChecker() {
+        return updateChecker;
+    }
+
+    public @Nullable PluginMetrics getMetrics() {
+        return metrics;
+    }
+
+    @Override
+    public ColoredLogger getColoredLogger() {
+        return coloredLogger;
+    }
+
+    @Override
+    public ManagerInitializer getInitializer() {
+        return managerInitializer;
+    }
+
     @Override
     public @Nullable Database getDatabase() {
         return database;
+    }
+
+    public @NotNull Settings getSettings() {
+        return settings;
     }
 
     @Override
@@ -445,12 +226,17 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     @Override
     public @NotNull String getPermission(@NotNull String permission) {
-        return this.getName().toLowerCase() + "." + permission;
+        return getName().toLowerCase() + "." + permission;
     }
 
     @Override
     public @NotNull NamespacedKey getNamespacedKey(@NotNull String key) {
         return new NamespacedKey(this, key);
+    }
+
+    @Override
+    public @NotNull OptionsManager getOptions() {
+        return optionsManager;
     }
 
     @Override
@@ -564,29 +350,15 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
-    public @NotNull MenuManager getMenus() {
-        return menuManager;
-    }
-
-    @Override
-    public @Nullable Menu getMenu(@NotNull String name) {
-        return menuManager.getMenu(name);
+    public @NotNull Configurator getConfigurator() {
+        Preconditions.checkNotNull(configurator, "Configurator has not been instantiated.");
+        return configurator;
     }
 
     @Override
     public @NotNull RootSection getConfiguration() {
-        if (config == null) {
-            config = YamlConfig.loadSection(getFile("config.yml"), getConfigurator());
-            config.load();
-            return config;
-        }
-        config.load();
+        Preconditions.checkNotNull(configurator, "Configuration has not been instantiated.");
         return config;
-    }
-
-    @Override
-    public @NotNull PluginConfigurator getConfigurator() {
-        return new PluginConfigurator(this);
     }
 
     @Override
@@ -676,94 +448,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
                 .toList();
     }
 
-    @Override
-    public void logConfigurationErrors(@Nullable Player player, @NotNull List<ConfigurationException> errors) {
-        if (errors.isEmpty()) {
-            return;
-        }
-
-        for (ConfigurationException error : errors) {
-            final String message = error.getLogMessage(getDataFolder().getPath());
-            logger.severe(message);
-        }
-
-        if (player == null) {
-            return;
-        }
-
-        final PlaceholderSupplier errorCount = PlaceholderSupplier.of("{error_count}", errors.size());
-        if (debug) {
-            sendMessage(player, "debug-configuration-errors", errorCount);
-            for (ConfigurationException error : errors) {
-                final String message = error.getLogMessage(getDataFolder().getPath());
-                player.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + message);
-            }
-            return;
-        }
-
-        sendMessage(player, "configuration-errors", errorCount);
-    }
-
-    public @NotNull Settings getSettings() {
-        return settings;
-    }
-
-    public @NotNull List<SpigotVersion> getCompatibleVersions() {
-        return List.of(SpigotVersion.values());
-    }
-
-    public @NotNull List<Manager> getLoadedManagers() {
-        return new ArrayList<>(loadedManagers);
-    }
-
-    public boolean isPremium() {
-        return false;
-    }
-
-    public @Nullable Integer getMetricsId() {
-        return null;
-    }
-
-    public @Nullable Integer getResourceId() {
-        return null;
-    }
-
-    public @Nullable String getDonationLink() {
-        return null;
-    }
-
-    public List<String> getPluginDirectories() {
-        return List.of();
-    }
-
-    public List<String> getPluginResources() {
-        return List.of();
-    }
-
-    public List<String> getExampleResources() {
-        return List.of();
-    }
-
-    public Map<SpigotVersion, List<String>> getExamplesByVersion() {
-        return Map.of();
-    }
-
-    public List<EnhancedCommand> getPluginCommands() {
-        return List.of();
-    }
-
-    public List<Listener> getPluginListeners() {
-        return List.of();
-    }
-
-    public Map<String, Menu> getPluginMenus() {
-        return Map.of();
-    }
-
-    public @Nullable String getDatabaseName() {
-        return null;
-    }
-
     private void collectYamlFiles(File directory, List<File> yamlFiles) {
         if (directory == null || !directory.isDirectory()) {
             return;
@@ -786,14 +470,14 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     protected boolean shouldCreateHook(String pluginName, String minVersion, String maxVersion) {
         final Plugin plugin = SpigotServer.getPlugin(pluginName);
         if (plugin == null) {
-            logger.info(pluginName + " Hook: plugin not loaded");
+            coloredLogger.warning(pluginName + " Hook: plugin not loaded");
             return false;
         }
 
         final String version = plugin.getDescription().getVersion();
         final Matcher matcher = VERSION_PATTERN.matcher(version);
         if (!matcher.find()) {
-            logger.info(pluginName + "Hook: found unknown version (" + minVersion + " - " + maxVersion + ")");
+            coloredLogger.warning(pluginName + "Hook: found unknown version (" + minVersion + " - " + maxVersion + ")");
             return false;
         }
 
@@ -802,16 +486,16 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         final String[] maxVersionParts = maxVersion.split("\\.");
 
         if (isVersionLessThan(versionParts, minVersionParts)) {
-            logger.info(pluginName + " Hook: found incompatible version (" + minVersion + " - " + maxVersion + ")");
+            coloredLogger.warning(pluginName + " Hook: found incompatible version (" + minVersion + " - " + maxVersion + ")");
             return false;
         }
 
         if (isVersionGreaterThan(versionParts, maxVersionParts)) {
-            logger.info(pluginName + " Hook: found incompatible version (" + minVersion + " - " + maxVersion + ")");
+            coloredLogger.warning(pluginName + " Hook: found incompatible version (" + minVersion + " - " + maxVersion + ")");
             return false;
         }
 
-        logger.info(pluginName + " Hook: found compatible version (" + minVersion + " - " + maxVersion + ")");
+        coloredLogger.info(pluginName + " Hook: found compatible version (" + minVersion + " - " + maxVersion + ")");
         return true;
     }
 

@@ -8,14 +8,14 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-public class PeriodicAction implements SystemAction {
+public class PeriodicAction implements FunctionAction {
 
     private final EnhancedPlugin plugin;
-    private final SystemAction action;
+    private final FunctionAction action;
     private final int interval;
     private final int repetitions;
 
-    public PeriodicAction(EnhancedPlugin plugin, SystemAction action, int interval, int repetitions) {
+    public PeriodicAction(EnhancedPlugin plugin, FunctionAction action, int interval, int repetitions) {
         this.plugin = plugin;
         this.action = action;
         this.interval = interval;

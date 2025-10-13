@@ -14,12 +14,12 @@ public class NegativeConditionLoader implements ConfigLoader<NegativeCondition> 
 
     @Override
     public @NotNull NegativeCondition loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
-        return new NegativeCondition(scalar.loadRequired(Condition.class));
+        return new NegativeCondition.Simple(scalar.loadRequired(Condition.class));
     }
 
     @Override
     public @NotNull NegativeCondition loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
-        return new NegativeCondition(sequence.loadRequired(Condition.class));
+        return new NegativeCondition.Multi(sequence.getAll(Condition.class));
     }
 
 }

@@ -19,7 +19,7 @@ public class PlayerToolHasEnchant implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         final ItemStack item = player.getInventory().getItemInMainHand();
         if (item.hasItemMeta()) {
             final ItemMeta meta = item.getItemMeta();

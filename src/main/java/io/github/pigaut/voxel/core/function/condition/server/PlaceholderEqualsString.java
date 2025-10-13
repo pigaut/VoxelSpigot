@@ -21,7 +21,7 @@ public class PlaceholderEqualsString implements Condition {
     }
 
     @Override
-    public boolean isMet(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+    public Boolean evaluate(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         final String parsedValue;
         if (player != null) {
             parsedValue = StringPlaceholders.parseAll(player.asPlayer(), id, player.getPlaceholders());

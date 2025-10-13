@@ -1,8 +1,8 @@
 package io.github.pigaut.voxel.core.function.action.player;
 
+import io.github.pigaut.voxel.core.hologram.*;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.message.impl.*;
-import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.jetbrains.annotations.*;

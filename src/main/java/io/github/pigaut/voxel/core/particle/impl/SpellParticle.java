@@ -1,7 +1,6 @@
 package io.github.pigaut.voxel.core.particle.impl;
 
 import io.github.pigaut.voxel.util.*;
-import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.amount.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
@@ -11,21 +10,19 @@ public class SpellParticle extends AbstractParticle {
     private final Amount red;
     private final Amount green;
     private final Amount blue;
-    private final Amount size;
     private final boolean uniform;
-    private Particle.DustOptions uniformDust = null;
+    private Color uniformColor = null;
 
     public SpellParticle(String name, String group, Particle particle,
                          Amount amount, BlockRange range, boolean playerOnly,
-                         Amount red, Amount green, Amount blue, Amount size, boolean uniform) {
+                         Amount red, Amount green, Amount blue, boolean uniform) {
         super(name, group, particle, amount, range, playerOnly);
         this.red = red;
         this.green = green;
         this.blue = blue;
-        this.size = size;
         this.uniform = uniform;
         if (uniform) {
-            uniformDust = new Particle.DustOptions(Color.fromRGB(red.getInteger(), green.getInteger(), blue.getInteger()), (float) size.getDouble());
+            uniformColor = Color.fromRGB(red.getInteger(), green.getInteger(), blue.getInteger());
         }
     }
 
@@ -42,9 +39,9 @@ public class SpellParticle extends AbstractParticle {
     @Override
     public @Nullable Object getData() {
         if (uniform) {
-            return uniformDust;
+            return uniformColor;
         }
-        return new Particle.DustOptions(Color.fromRGB(red.getInteger(), green.getInteger(), blue.getInteger()), (float) size.getDouble());
+        return Color.fromRGB(red.getInteger(), green.getInteger(), blue.getInteger());
     }
 
     // Spell particle <1.20.6

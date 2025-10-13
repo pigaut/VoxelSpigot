@@ -11,15 +11,15 @@ import java.util.*;
 
 public class MultiAction implements Action {
 
-    private final List<SystemAction> actions;
+    private final List<FunctionAction> actions;
 
-    public MultiAction(@NotNull List<@NotNull SystemAction> actions) {
+    public MultiAction(@NotNull List<@NotNull FunctionAction> actions) {
         this.actions = actions;
     }
 
     @Override
     public FunctionResponse dispatch(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
-        for (SystemAction action : actions) {
+        for (FunctionAction action : actions) {
             final FunctionResponse response = action.dispatch(player, event, block, target);
             if (response != null) {
                 return response;

@@ -10,41 +10,38 @@ import org.jetbrains.annotations.*;
 
 public interface Function extends Identifiable {
 
-    /**
-     * Executes the function and returns whether it completed successfully or was interrupted.
-     *
-     * @param player The player involved can be null.
-     * @param event The event triggering the function can be null.
-     * @param block The block involved can be null.
-     * @param target The target entity can be null.
-     * @return a function response
-     */
     @Nullable
-    FunctionResponse run(@Nullable PlayerState player, @Nullable Event event,
-                         @Nullable Block block, @Nullable Entity target);
+    FunctionResponse dispatch(@Nullable PlayerState player,
+                              @Nullable Event event,
+                              @Nullable Block block,
+                              @Nullable Entity target);
 
     default void run() {
-        run(null, null, null, null);
+        dispatch(null, null, null, null);
     }
 
     default void run(@NotNull Event event) {
-        run(null, event, null, null);
+        dispatch(null, event, null, null);
     }
 
     default void run(@NotNull PlayerState player) {
-        run(player, null, null, null);
+        dispatch(player, null, null, null);
     }
 
     default void run(@NotNull Block block) {
-        run(null, null, block, null);
+        dispatch(null, null, block, null);
+    }
+
+    default void run(@NotNull PlayerState player, @NotNull Event event) {
+        dispatch(player, event, null, null);
     }
 
     default void run(@NotNull PlayerState player, @NotNull Event event, @NotNull Block targetBlock) {
-        run(player, event, targetBlock, null);
+        dispatch(player, event, targetBlock, null);
     }
 
     default void run(@NotNull PlayerState player, @NotNull Event event, @NotNull Entity targetEntity) {
-        run(player, event, null, targetEntity);
+        dispatch(player, event, null, targetEntity);
     }
 
 }

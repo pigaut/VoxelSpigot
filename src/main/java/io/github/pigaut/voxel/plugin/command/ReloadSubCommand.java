@@ -1,6 +1,8 @@
 package io.github.pigaut.voxel.plugin.command;
 
+import io.github.pigaut.voxel.*;
 import io.github.pigaut.voxel.command.node.*;
+import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.*;
@@ -15,14 +17,15 @@ public class ReloadSubCommand extends SubCommand {
             try {
                 plugin.reload(errorsFound -> {
                     if (sender instanceof Player player) {
-                        plugin.logConfigurationErrors(player, errorsFound);
+                        ConfigErrorLogger.logAll(plugin, player, errorsFound);
                     }
                     else {
-                        plugin.logConfigurationErrors(null, errorsFound);
+                        ConfigErrorLogger.logAll(plugin, errorsFound);
                     }
                     plugin.sendMessage(sender, "reload-complete", placeholders);
                 });
-            } catch (PluginReloadInProgressException e) {
+            }
+            catch (PluginReloadInProgressException e) {
                 plugin.sendMessage(sender, "already-reloading", placeholders);
                 return;
             }

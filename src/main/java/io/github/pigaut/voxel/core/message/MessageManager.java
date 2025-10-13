@@ -11,7 +11,7 @@ import java.io.*;
 public class MessageManager extends ConfigBackedManager.SectionKey<Message> {
 
     public MessageManager(EnhancedJavaPlugin plugin) {
-        super(plugin, "Message", "messages");
+        super(plugin, "messages");
     }
 
     @Override

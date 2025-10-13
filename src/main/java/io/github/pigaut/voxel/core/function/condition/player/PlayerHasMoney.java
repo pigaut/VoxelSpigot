@@ -16,7 +16,7 @@ public class PlayerHasMoney implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         return amount.match(economy.getBalance(player.asPlayer()));
     }
 

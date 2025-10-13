@@ -46,41 +46,41 @@ public class FunctionLoader implements ConfigLoader<Function> {
         if (section.contains("if|condition|conditions")) {
             function = new ConditionalFunction(functionName, functionGroup,
                     section.getRequired("if|condition|conditions", Condition.class),
-                    section.get("do|action|actions", SystemAction.class).throwOrElse(SystemAction.EMPTY),
-                    section.get("else|or|or-else|or else", SystemAction.class).throwOrElse(SystemAction.EMPTY)
+                    section.get("do|action|actions", FunctionAction.class).withDefault(FunctionAction.EMPTY),
+                    section.get("else|or|or-else|or else", FunctionAction.class).withDefault(FunctionAction.EMPTY)
             );
         }
         else if (section.contains("if-not|if not")) {
             function = new ConditionalFunction(functionName, functionGroup,
                     section.getRequired("if-not|if not", NegativeCondition.class),
-                    section.get("do|action|actions", SystemAction.class).throwOrElse(SystemAction.EMPTY),
-                    section.get("else|or|or-else|or else", SystemAction.class).throwOrElse(SystemAction.EMPTY)
+                    section.get("do|action|actions", FunctionAction.class).withDefault(FunctionAction.EMPTY),
+                    section.get("else|or|or-else|or else", FunctionAction.class).withDefault(FunctionAction.EMPTY)
             );
         }
         else if (section.contains("if-any|if any")) {
             function = new ConditionalFunction(functionName, functionGroup,
                     section.getRequired("if-any|if any", DisjunctiveCondition.class),
-                    section.get("do|action|actions", SystemAction.class).throwOrElse(SystemAction.EMPTY),
-                    section.get("else|or|or-else", SystemAction.class).throwOrElse(SystemAction.EMPTY)
+                    section.get("do|action|actions", FunctionAction.class).withDefault(FunctionAction.EMPTY),
+                    section.get("else|or|or-else", FunctionAction.class).withDefault(FunctionAction.EMPTY)
             );
         }
         else if (section.contains("do|action|actions")) {
             function = new SimpleFunction(functionName, functionGroup,
-                    section.getRequired("do|action|actions", SystemAction.class));
+                    section.getRequired("do|action|actions", FunctionAction.class));
         }
 
         if (function == null) {
             throw new InvalidConfigurationException(section, "Function doesn't contain any valid statement");
         }
 
-        final Integer repetitions = section.getInteger("repetitions|repeat|loops")
+        Integer repetitions = section.getInteger("repeat|repetitions")
                 .filter(Predicates.isPositive(), "Repetitions must be greater than 0")
-                .throwOrElse(null);
+                .withDefault(null);
 
-        final Integer interval = section.getInteger("interval|period")
-                .filter(Predicates.notNull(repetitions), "Repetitions must be set to use interval delay")
-                .filter(Predicates.isPositive(), "Interval must be greater than 0")
-                .throwOrElse(null);
+        Integer interval = section.get("interval|period", Ticks.class)
+                .filter(repetitions != null, "Repetitions must be set to use interval delay")
+                .map(Ticks::getCount)
+                .withDefault(null);
 
         if (interval != null) {
             function = new PeriodicFunction(plugin, function, interval, repetitions);
@@ -89,17 +89,17 @@ public class FunctionLoader implements ConfigLoader<Function> {
             function = new RepeatedFunction(function, repetitions);
         }
 
-        final Integer delay = section.getInteger("delay")
-                .filter(Predicates.isPositive(), "Delay must be greater than 0")
-                .throwOrElse(null);
+        Integer delay = section.get("delay", Ticks.class)
+                .map(Ticks::getCount)
+                .withDefault(null);
 
         if (delay != null) {
             function = new DelayedFunction(plugin, function, delay);
         }
 
-        final Double chance = section.getDouble("chance")
+        Double chance = section.getDouble("chance")
                 .filter(Predicates.range(0, 1), "Chance must be a value between 0.0 to 1.0")
-                .throwOrElse(null);
+                .withDefault(null);
 
         if (chance != null) {
             function = new ChanceFunction(function, chance);
@@ -112,7 +112,7 @@ public class FunctionLoader implements ConfigLoader<Function> {
     public @NotNull Function loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
         final String functionName = sequence.getKey();
         final String functionGroup = Group.byFunctionFile(sequence.getRoot().getFile());
-        return new MultiFunction(functionName, functionGroup, sequence, sequence.getAll(Function.class));
+        return new MultiFunction(functionName, functionGroup, sequence.getAll(Function.class));
     }
 
 }

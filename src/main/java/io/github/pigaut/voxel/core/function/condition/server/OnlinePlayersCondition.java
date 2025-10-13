@@ -12,7 +12,7 @@ public class OnlinePlayersCondition implements ServerCondition {
     }
 
     @Override
-    public boolean isMet() {
+    public Boolean evaluate() {
         return amount.match(Bukkit.getOnlinePlayers().size());
     }
 

@@ -17,7 +17,7 @@ public class DisjunctiveCondition implements Condition {
     }
 
     @Override
-    public boolean isMet(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+    public @Nullable Boolean evaluate(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         for (Condition condition : conditions) {
             if (condition.isMet(player, event, block, target)) {
                 return true;

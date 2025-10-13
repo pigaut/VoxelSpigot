@@ -15,6 +15,12 @@ public class CommandManager extends Manager {
         super(plugin);
     }
 
+    @Override
+    public void enable() {
+        //Initialize Spigot Command Manager
+        plugin.getCommand("");
+    }
+
     public EnhancedCommand getCustomCommand(String name) {
         return customCommands.get(name);
     }

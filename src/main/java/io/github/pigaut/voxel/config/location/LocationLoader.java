@@ -15,12 +15,12 @@ public class LocationLoader implements ConfigLoader<Location> {
 
     @Override
     public @NotNull Location loadFromSection(@NotNull ConfigSection config) throws InvalidConfigurationException {
-        World world = config.get("world", World.class).throwOrElse(null);
+        World world = config.get("world", World.class).withDefault(null);
         double x = config.getRequiredDouble("x");
         double y = config.getRequiredDouble("y");
         double z = config.getRequiredDouble("z");
-        float yaw = config.getFloat("yaw").throwOrElse(0f);
-        float pitch = config.getFloat("pitch").throwOrElse(0f);
+        float yaw = config.getFloat("yaw").withDefault(0f);
+        float pitch = config.getFloat("pitch").withDefault(0f);
         return new Location(world, x, y, z, yaw, pitch);
     }
 

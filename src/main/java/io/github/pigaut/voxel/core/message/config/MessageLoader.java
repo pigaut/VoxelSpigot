@@ -1,17 +1,20 @@
 package io.github.pigaut.voxel.core.message.config;
 
+import io.github.pigaut.voxel.bukkit.*;
+import io.github.pigaut.voxel.core.hologram.*;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.message.impl.*;
-import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.server.*;
-import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.load.*;
 import io.github.pigaut.yaml.convert.format.*;
+import io.github.pigaut.yaml.util.*;
 import org.bukkit.boss.*;
 import org.jetbrains.annotations.*;
+
+import java.util.*;
 
 public class MessageLoader implements ConfigLoader<Message> {
 
@@ -44,42 +47,42 @@ public class MessageLoader implements ConfigLoader<Message> {
         Message message;
         switch (type) {
             case "CHAT" -> {
-                final String chat = section.getString("message", StringColor.FORMATTER).throwOrElse("none");
+                final String chat = section.getString("message", StringColor.FORMATTER).withDefault("none");
                 message = new ChatMessage(messageName, messageGroup, chat);
             }
 
             case "ACTIONBAR" -> {
-                final String actionbar = section.getString("message", StringColor.FORMATTER).throwOrElse("none");
+                final String actionbar = section.getString("message", StringColor.FORMATTER).withDefault("none");
                 message = new ActionBarMessage(messageName, messageGroup, actionbar);
             }
 
             case "BOSSBAR" -> {
                 message = new BossBarMessage(plugin, messageName, messageGroup,
-                        section.getString("title", StringColor.FORMATTER).throwOrElse("none"),
-                        section.get("style", BarStyle.class).throwOrElse(BarStyle.SOLID),
-                        section.get("color", BarColor.class).throwOrElse(BarColor.RED),
-                        section.getInteger("duration").throwOrElse(100),
+                        section.getString("title", StringColor.FORMATTER).withDefault("none"),
+                        section.get("style", BarStyle.class).withDefault(BarStyle.SOLID),
+                        section.get("color", BarColor.class).withDefault(BarColor.RED),
+                        section.getInteger("duration").withDefault(100),
                         section.getDoubleList("progress")
                 );
             }
 
             case "TITLE" -> {
                 message = new TitleMessage(messageName, messageGroup,
-                        section.getString("title", StringColor.FORMATTER).throwOrElse("none"),
-                        section.getString("subtitle", StringColor.FORMATTER).throwOrElse(""),
-                        section.getInteger("fade-in").throwOrElse(10),
-                        section.getInteger("stay").throwOrElse(70),
-                        section.getInteger("fade-out").throwOrElse(20)
+                        section.getString("title", StringColor.FORMATTER).withDefault("none"),
+                        section.getString("subtitle", StringColor.FORMATTER).withDefault(""),
+                        section.getInteger("fade-in").withDefault(10),
+                        section.getInteger("stay").withDefault(70),
+                        section.getInteger("fade-out").withDefault(20)
                 );
             }
 
             case "HOLOGRAM" -> {
                 message = new HologramMessage(plugin, messageName, messageGroup,
                         SpigotServer.isPluginLoaded("DecentHolograms") ? section.getRequired("hologram", Hologram.class) : null,
-                        section.getInteger("duration").throwOrElse(40),
-                        section.getDouble("radius.x").throwOrElse(null),
-                        section.getDouble("radius.y").throwOrElse(null),
-                        section.getDouble("radius.z").throwOrElse(null)
+                        section.getInteger("duration").withDefault(40),
+                        section.getDouble("radius.x").withDefault(null),
+                        section.getDouble("radius.y").withDefault(null),
+                        section.getDouble("radius.z").withDefault(null)
                 );
             }
 
@@ -88,27 +91,26 @@ public class MessageLoader implements ConfigLoader<Message> {
             }
         }
 
-        final Integer repetitions = section.getInteger("repetitions|loops").throwOrElse(null);
-        if (repetitions != null && repetitions < 1) {
-            throw new InvalidConfigurationException(section, "repetitions", "The message repetitions must be greater than 0");
-        }
+        Integer repetitions = section.getInteger("repeat|repetitions")
+                .filter(Predicates.isPositive(), "Repetitions must be greater than 0")
+                .withDefault(null);
 
-        final Integer interval = section.getInteger("interval|period").throwOrElse(null);
+        Integer interval = section.get("interval|period", Ticks.class)
+                .filter(repetitions != null, "Repetitions must be set to use interval delay")
+                .map(Ticks::getCount)
+                .withDefault(null);
 
         if (interval != null) {
-            if (repetitions == null) {
-                throw new InvalidConfigurationException(section, "interval", "The 'repetitions' option must be set to use interval delay");
-            }
-            if (interval < 1) {
-                throw new InvalidConfigurationException(section, "interval", "The function interval must be greater than 0");
-            }
             message = new PeriodicMessage(plugin, message, interval, repetitions);
         }
         else if (repetitions != null) {
             message = new RepeatedMessage(message, repetitions);
         }
 
-        final Integer delay = section.getInteger("delay").throwOrElse(null);
+        Integer delay = section.get("delay", Ticks.class)
+                .map(Ticks::getCount)
+                .withDefault(null);
+
         if (delay != null) {
             message = new DelayedMessage(plugin, message, delay);
         }

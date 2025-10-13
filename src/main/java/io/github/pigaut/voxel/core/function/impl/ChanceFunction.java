@@ -4,7 +4,6 @@ import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.voxel.core.function.response.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.util.*;
-import io.github.pigaut.yaml.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -31,8 +30,8 @@ public class ChanceFunction implements Function {
     }
 
     @Override
-    public @Nullable FunctionResponse run(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
-        return Probability.test(chance) ? function.run(player, event, block, target) : null;
+    public @Nullable FunctionResponse dispatch(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+        return Probability.test(chance) ? function.dispatch(player, event, block, target) : null;
     }
 
 }

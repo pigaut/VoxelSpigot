@@ -3,14 +3,13 @@ package io.github.pigaut.voxel.player.input;
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
-import io.github.pigaut.yaml.configurator.deserialize.*;
 import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 
 public class ChatInput<T> extends PlayerInput<T> {
 
-    public ChatInput(SimplePlayerState player, Deserializer<T> deserializer) {
+    public ChatInput(SimplePlayerState player, Parser<T> deserializer) {
         super(player, deserializer, "Enter a value in chat");
     }
 
@@ -57,7 +56,7 @@ public class ChatInput<T> extends PlayerInput<T> {
 
                 final T parsedInput;
                 try {
-                    parsedInput = deserializer.deserialize(input);
+                    parsedInput = parser.parse(input);
                 } catch (StringParseException e) {
                     player.sendTitle(ChatColor.RED + e.getMessage(), "Type ESC to cancel", 0, 40, 0);
                     playerState.setLastInput(null);

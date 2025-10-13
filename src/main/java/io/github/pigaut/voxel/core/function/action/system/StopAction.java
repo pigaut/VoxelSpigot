@@ -8,7 +8,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-public class StopAction implements SystemAction {
+public class StopAction implements FunctionAction {
 
     @Override
     public @Nullable FunctionResponse dispatch(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {

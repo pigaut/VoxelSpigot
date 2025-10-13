@@ -32,10 +32,10 @@ public class AttributeLoaderLegacy implements ConfigLoader.Line<ItemAttribute> {
     public @NotNull ItemAttribute loadFromLine(ConfigLine line) throws InvalidConfigurationException {
         Attribute attribute = line.getRequired(0, Attribute.class);
 
-        var name = line.getString("name").throwOrElse("");
+        var name = line.getString("name").withDefault("");
         var amount = line.getRequiredDouble(1);
-        var operation = line.get("operation", AttributeOperation.class).throwOrElse(AttributeOperation.ADD_VALUE);
-        var slot = line.get("slot", EquipmentSlot.class).throwOrElse(EquipmentSlot.HAND);
+        var operation = line.get("operation", AttributeOperation.class).withDefault(AttributeOperation.ADD_VALUE);
+        var slot = line.get("slot", EquipmentSlot.class).withDefault(EquipmentSlot.HAND);
         AttributeModifier modifier = attributeReflection.create(UUID.randomUUID(), name, amount, operation.getOperation(), slot).get();
 
         return new ItemAttribute(attribute, modifier);
@@ -45,10 +45,10 @@ public class AttributeLoaderLegacy implements ConfigLoader.Line<ItemAttribute> {
     public @NotNull ItemAttribute loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
         Attribute attribute = section.getRequired("type|attribute", Attribute.class);
 
-        var name = section.getString("name").throwOrElse("");
+        var name = section.getString("name").withDefault("");
         var amount = section.getRequiredDouble("amount");
-        var operation = section.get("operation", AttributeOperation.class).throwOrElse(AttributeOperation.ADD_VALUE);
-        var slot = section.get("slot", EquipmentSlot.class).throwOrElse(EquipmentSlot.HAND);
+        var operation = section.get("operation", AttributeOperation.class).withDefault(AttributeOperation.ADD_VALUE);
+        var slot = section.get("slot", EquipmentSlot.class).withDefault(EquipmentSlot.HAND);
         AttributeModifier modifier = attributeReflection.create(UUID.randomUUID(), name, amount, operation.getOperation(), slot).get();
 
         return new ItemAttribute(attribute, modifier);

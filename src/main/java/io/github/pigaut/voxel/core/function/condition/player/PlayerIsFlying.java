@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 public class PlayerIsFlying implements PlayerCondition {
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         return player.asPlayer().isFlying();
     }
 

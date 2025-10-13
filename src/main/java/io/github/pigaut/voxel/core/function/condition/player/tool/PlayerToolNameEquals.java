@@ -16,7 +16,7 @@ public class PlayerToolNameEquals implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         final ItemStack tool = player.getInventory().getItemInMainHand();
         if (!tool.hasItemMeta()) {
             return false;

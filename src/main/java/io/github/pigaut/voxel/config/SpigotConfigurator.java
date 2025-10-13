@@ -10,9 +10,10 @@ import io.github.pigaut.voxel.config.location.*;
 import io.github.pigaut.voxel.config.persistent.data.*;
 import io.github.pigaut.voxel.core.item.config.*;
 import io.github.pigaut.voxel.server.*;
+import io.github.pigaut.voxel.util.reflection.*;
 import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.configurator.*;
-import io.github.pigaut.yaml.configurator.serialize.*;
+import io.github.pigaut.yaml.configurator.convert.serialize.*;
 import org.bukkit.*;
 import org.bukkit.attribute.*;
 import org.bukkit.block.*;
@@ -28,6 +29,7 @@ public class SpigotConfigurator extends StandardConfigurator {
 
     @SuppressWarnings("UnstableApiUsage")
     public SpigotConfigurator(boolean compact) {
+        final SpigotVersion serverVersion = SpigotServer.getVersion();
 
         addLoader(ItemStack.class, new ItemStackLoader());
         addMapper(ItemStack.class, new ItemStackMapper());
@@ -46,7 +48,12 @@ public class SpigotConfigurator extends StandardConfigurator {
         addMapper(PersistentDataType.class, new PersistentDataTypeMapper());
 
         addDeserializer(World.class, new WorldDeserializer());
-        addSerializer(World.class, World::getName);
+        if (serverVersion.isNewerThan(SpigotVersion.V1_17_1)) {
+            addSerializer(World.class, World::getName);
+        }
+        else {
+            addSerializer(World.class, world -> Reflection.on(world).call("getName").get());
+        }
 
         addDeserializer(Enchantment.class, new EnchantmentDeserializer());
         addSerializer(Enchantment.class, enchant -> enchant.getKey().getKey());
@@ -56,7 +63,7 @@ public class SpigotConfigurator extends StandardConfigurator {
         addDeserializer(Sound.class, new SoundDeserializer());
         addDeserializer(Attribute.class, new AttributeDeserializer());
 
-        final SpigotVersion serverVersion = SpigotServer.getVersion();
+        addConverter(EquipmentSlot.class, new EquipmentSlotConverter());
 
         if (serverVersion.equalsOrIsNewerThan(SpigotVersion.V1_21_3)) {
             addDeserializer(EquipmentSlotGroup.class, new SlotGroupDeserializer());
@@ -68,7 +75,6 @@ public class SpigotConfigurator extends StandardConfigurator {
             addLoader(ItemAttribute.class, new AttributeLoaderLegacy());
             addMapper(ItemAttribute.class, new AttributeMapperLegacy());
         }
-
 
     }
 

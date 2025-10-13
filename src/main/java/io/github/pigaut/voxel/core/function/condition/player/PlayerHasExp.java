@@ -13,7 +13,7 @@ public class PlayerHasExp implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         return exp.match(player.asPlayer().getTotalExperience());
     }
 

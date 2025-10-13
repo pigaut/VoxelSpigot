@@ -11,7 +11,7 @@ import java.io.*;
 public class ParticleManager extends ConfigBackedManager.SectionKey<ParticleEffect> {
 
     public ParticleManager(@NotNull EnhancedJavaPlugin plugin) {
-        super(plugin, "Particle", "effects/particles");
+        super(plugin, "effects/particles");
     }
 
     @Override

@@ -13,7 +13,7 @@ public class PlayerHasExpLevel implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         return level.match(player.asPlayer().getLevel());
     }
 

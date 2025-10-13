@@ -19,9 +19,9 @@ public class ColorLoader implements ConfigLoader<Color> {
 
     @Override
     public @NotNull Color loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        final int red = section.getInteger("red").throwOrElse(0);
-        final int green = section.getInteger("green").throwOrElse(0);
-        final int blue = section.getInteger("blue").throwOrElse(0);
+        final int red = section.getInteger("red").withDefault(0);
+        final int green = section.getInteger("green").withDefault(0);
+        final int blue = section.getInteger("blue").withDefault(0);
         return Color.fromRGB(red, green, blue);
     }
 

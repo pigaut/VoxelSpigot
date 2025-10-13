@@ -5,7 +5,7 @@ import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.input.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.yaml.configurator.deserialize.*;
+import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
@@ -246,12 +246,12 @@ public interface PlayerState {
 
     <T> ChatInput<T> createChatInput(@NotNull Class<T> classType);
 
-    <T> ChatInput<T> createChatInput(@NotNull Deserializer<T> deserializer);
+    <T> ChatInput<T> createChatInput(@NotNull Parser<T> deserializer);
 
     MenuInput<String> createMenuInputSelection();
 
     <T> MenuInput<T> createMenuInputSelection(@NotNull Class<T> classType);
 
-    <T> MenuInput<T> createMenuInputSelection(@NotNull Deserializer<T> deserializer);
+    <T> MenuInput<T> createMenuInputSelection(@NotNull Parser<T> deserializer);
 
 }

@@ -11,7 +11,7 @@ import java.io.*;
 public class FunctionManager extends ConfigBackedManager.SectionKey<Function> {
 
     public FunctionManager(@NotNull EnhancedJavaPlugin plugin) {
-        super(plugin, "Function", "functions");
+        super(plugin, "functions");
     }
 
     @Override

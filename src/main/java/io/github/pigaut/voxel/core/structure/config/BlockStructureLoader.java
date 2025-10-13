@@ -27,45 +27,37 @@ public class BlockStructureLoader implements ConfigLoader<BlockStructure> {
     public @NotNull BlockStructure loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
         final String structureName = scalar.toString(CaseStyle.SNAKE);
         final BlockStructure blockStructure = plugin.getStructure(structureName);
-        if (blockStructure == null) {
-            throw new InvalidConfigurationException(scalar, "Could not find any block structure with name: " + structureName);
+        if (blockStructure != null) {
+            return blockStructure;
         }
-        return blockStructure;
+        List<BlockChange> blocks = List.of(scalar.loadRequired(BlockChange.class));
+        return new BlockStructure(blocks);
     }
 
     @Override
     public @NotNull BlockStructure loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        final String name;
-        final String group;
+        List<BlockChange> blocks = List.of(section.loadRequired(BlockChange.class));
+
         if (section instanceof ConfigRoot root) {
-            name = root.getName();
-            group = Group.byStructureFile(root.getFile());
+            String name = root.getName();
+            String group = Group.byStructureFile(root.getFile());
+            return new BlockStructure(name, group, blocks);
         }
-        else {
-            name = UUID.randomUUID().toString();
-            group = null;
-        }
-        final List<BlockChange> blocks = List.of(section.loadRequired(BlockChange.class));
-        return new BlockStructure(name, group, blocks);
+
+        return new BlockStructure(blocks);
     }
 
     @Override
     public @NotNull BlockStructure loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
-        final String name;
-        final String group;
+        List<BlockChange> blocks = sequence.getAll(BlockChange.class);
+
         if (sequence instanceof ConfigRoot root) {
-            name = root.getName();
-            group = Group.byStructureFile(root.getFile());
+            String name = root.getName();
+            String group = Group.byStructureFile(root.getFile());
+            return new BlockStructure(name, group, blocks);
         }
-        else {
-            name = UUID.randomUUID().toString();
-            group = null;
-        }
-        final List<BlockChange> blocks = sequence.getAll(BlockChange.class);
-        if (blocks.size() < 2) {
-            throw new InvalidConfigurationException(sequence, "Structure must have at least two blocks in it");
-        }
-        return new BlockStructure(name, group, blocks);
+
+        return new BlockStructure(blocks);
     }
 
 }

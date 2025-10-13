@@ -10,11 +10,11 @@ import org.jetbrains.annotations.*;
 @FunctionalInterface
 public interface ServerCondition extends Condition {
 
-    boolean isMet();
+    @Nullable Boolean evaluate();
 
     @Override
-    default boolean isMet(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
-        return isMet();
+    default @Nullable Boolean evaluate(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+        return evaluate();
     }
 
 }

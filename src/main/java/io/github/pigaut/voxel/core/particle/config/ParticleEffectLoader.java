@@ -12,6 +12,7 @@ import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.amount.*;
 import io.github.pigaut.yaml.configurator.load.*;
 import io.github.pigaut.yaml.convert.format.*;
+import io.github.pigaut.yaml.util.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
 
@@ -43,11 +44,11 @@ public class ParticleEffectLoader implements ConfigLoader<ParticleEffect> {
         final String particleName = section.getKey();
         final String particleGroup = Group.byParticleFile(section.getRoot().getFile());
 
-        final String type = section.getString("type", CaseStyle.CONSTANT).throwOrElse("BASIC");
-        final Particle particle = section.get("particle", Particle.class).throwOrElse(XParticle.EXPLOSION.get());
-        final Amount amount = section.get("count|amount", Amount.class).throwOrElse(Amount.fixed(1));
-        final BlockRange range = section.get("range", BlockRange.class).throwOrElse(BlockRange.ZERO);
-        final boolean playerOnly = section.getBoolean("player-only").throwOrElse(false);
+        final String type = section.getString("type", CaseStyle.CONSTANT).withDefault("BASIC");
+        final Particle particle = section.get("particle", Particle.class).withDefault(XParticle.EXPLOSION.get());
+        final Amount amount = section.get("count|amount", Amount.class).withDefault(Amount.fixed(1));
+        final BlockRange range = section.get("range", BlockRange.class).withDefault(BlockRange.ZERO);
+        final boolean playerOnly = section.getBoolean("player-only").withDefault(false);
 
         ParticleEffect particleEffect;
         switch (type) {
@@ -57,11 +58,11 @@ public class ParticleEffectLoader implements ConfigLoader<ParticleEffect> {
             }
 
             case "DUST" -> {
-                final Amount red = section.get("color.red|r", Amount.class).throwOrElse(Amount.ZERO);
-                final Amount green = section.get("color.green|g", Amount.class).throwOrElse(Amount.ZERO);
-                final Amount blue = section.get("color.blue|b", Amount.class).throwOrElse(Amount.ZERO);
-                final Amount size = section.get("size", Amount.class).throwOrElse(Amount.fixed(1));
-                final boolean uniform = section.getBoolean("uniform|iso").throwOrElse(true);
+                final Amount red = section.get("color.red|r", Amount.class).withDefault(Amount.ZERO);
+                final Amount green = section.get("color.green|g", Amount.class).withDefault(Amount.ZERO);
+                final Amount blue = section.get("color.blue|b", Amount.class).withDefault(Amount.ZERO);
+                final Amount size = section.get("size", Amount.class).withDefault(Amount.fixed(1));
+                final boolean uniform = section.getBoolean("uniform|iso").withDefault(true);
                 particleEffect = new DustParticle(particleName, particleGroup, amount, range, playerOnly,
                         red, green, blue, size, uniform);
             }
@@ -71,7 +72,7 @@ public class ParticleEffectLoader implements ConfigLoader<ParticleEffect> {
                     throw new InvalidConfigurationException(section, "particle", "Particle is not directional and cannot be rotated");
                 }
 
-                final BlockRange direction = section.get("direction", BlockRange.class).throwOrElse(BlockRange.ZERO);
+                final BlockRange direction = section.get("direction", BlockRange.class).withDefault(BlockRange.ZERO);
                 final Amount speed = section.get("speed", Amount.class).orElse(Amount.fixed(1));
                 particleEffect = new DirectionalParticle(particleName, particleGroup, particle, amount,
                         direction, playerOnly, speed);
@@ -86,10 +87,9 @@ public class ParticleEffectLoader implements ConfigLoader<ParticleEffect> {
                     final Amount red = section.get("color.red", Amount.class).orElse(Amount.ZERO);
                     final Amount green = section.get("color.green", Amount.class).orElse(Amount.ZERO);
                     final Amount blue = section.get("color.blue", Amount.class).orElse(Amount.ZERO);
-                    final Amount size = section.get("size", Amount.class).orElse(Amount.fixed(1));
                     final boolean uniform = section.getBoolean("uniform|iso").orElse(true);
                     particleEffect = new SpellParticle(particleName, particleGroup, particle, amount,
-                            range, playerOnly, red, green, blue, size, uniform);
+                            range, playerOnly, red, green, blue, uniform);
                 }
                 else {
                     final Amount red = section.get("color.red", Amount.class).orElse(Amount.ZERO);
@@ -139,28 +139,28 @@ public class ParticleEffectLoader implements ConfigLoader<ParticleEffect> {
             particleEffect = new OffsetParticle(particleEffect, offsetX, offsetY, offsetZ);
         }
 
-        final Integer repetitions = section.getInteger("repetitions|loops").orElse(null);
-        final Integer interval = section.getInteger("interval|period").orElse(null);
+        Integer repetitions = section.getInteger("repeat|repetitions")
+                .filter(Predicates.isPositive(), "Repetitions must be greater than 0")
+                .withDefault(null);
 
-        if (repetitions != null && repetitions < 1) {
-            throw new InvalidConfigurationException(section, "repetitions", "The particle repetitions must be greater than 0");
-        }
+        Integer interval = section.get("interval|period", Ticks.class)
+                .filter(repetitions != null, "Repetitions must be set to use interval delay")
+                .map(Ticks::getCount)
+                .withDefault(null);
 
         if (interval != null) {
-            if (repetitions == null) {
-                throw new InvalidConfigurationException(section, "interval", "The 'repetitions' option must be set to use interval delay");
-            }
-            if (interval > 0) {
-                particleEffect = new PeriodicalParticleEffect(plugin, particleEffect, interval, repetitions);
-            }
+            particleEffect = new PeriodicParticle(plugin, particleEffect, interval, repetitions);
         }
         else if (repetitions != null) {
-            particleEffect = new RepeatedParticleEffect(particleEffect, repetitions);
+            particleEffect = new RepeatedParticle(particleEffect, repetitions);
         }
 
-        final Integer delay = section.getInteger("delay").orElse(null);
-        if (delay != null && delay > 0) {
-            particleEffect = new DelayedParticleEffect(plugin, particleEffect, delay);
+        Integer delay = section.get("delay", Ticks.class)
+                .map(Ticks::getCount)
+                .withDefault(null);
+
+        if (delay != null) {
+            particleEffect = new DelayedParticle(plugin, particleEffect, delay);
         }
 
         return particleEffect;
@@ -170,7 +170,7 @@ public class ParticleEffectLoader implements ConfigLoader<ParticleEffect> {
     public @NotNull ParticleEffect loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
         final String particleName = sequence.getKey();
         final String particleGroup = Group.byParticleFile(sequence.getRoot().getFile());
-        return new MultiParticleEffect(particleName, particleGroup, sequence, sequence.getAll(ParticleEffect.class));
+        return new MultiParticle(particleName, particleGroup, sequence.getAll(ParticleEffect.class));
     }
 
 }

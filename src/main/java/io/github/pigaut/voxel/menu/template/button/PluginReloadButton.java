@@ -1,5 +1,7 @@
 package io.github.pigaut.voxel.menu.template.button;
 
+import io.github.pigaut.voxel.*;
+import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.player.*;
@@ -26,7 +28,7 @@ public class PluginReloadButton extends Button {
         final Player player = playerState.asPlayer();
         try {
             plugin.reload(errorsFound -> {
-                plugin.logConfigurationErrors(player, errorsFound);
+                ConfigErrorLogger.logAll(plugin, player, errorsFound);
                 plugin.sendMessage(player, "reload-complete");
                 if (errorsFound.isEmpty()) {
                     plugin.getScheduler().runTask(view::open);

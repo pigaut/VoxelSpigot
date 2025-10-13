@@ -23,10 +23,10 @@ public class AttributeLoader implements ConfigLoader.Line<ItemAttribute> {
     public @NotNull ItemAttribute loadFromLine(ConfigLine line) throws InvalidConfigurationException {
         Attribute attribute = line.getRequired(0, Attribute.class);
 
-        var namespacedKey = NamespacedKey.fromString(line.getString("name").throwOrElse(UUID.randomUUID().toString()));
+        var namespacedKey = NamespacedKey.fromString(line.getString("name").withDefault(UUID.randomUUID().toString()));
         var amount = line.getRequiredDouble(1);
-        var operation = line.get("operation", AttributeOperation.class).throwOrElse(AttributeOperation.ADD_VALUE);
-        var slot = line.get("slot", EquipmentSlotGroup.class).throwOrElse(EquipmentSlotGroup.HAND);
+        var operation = line.get("operation", AttributeOperation.class).withDefault(AttributeOperation.ADD_VALUE);
+        var slot = line.get("slot", EquipmentSlotGroup.class).withDefault(EquipmentSlotGroup.HAND);
         AttributeModifier modifier = new AttributeModifier(namespacedKey, amount, operation.getOperation(), slot);
 
         return new ItemAttribute(attribute, modifier);
@@ -37,10 +37,10 @@ public class AttributeLoader implements ConfigLoader.Line<ItemAttribute> {
     public @NotNull ItemAttribute loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
         Attribute attribute = section.getRequired("type|attribute", Attribute.class);
 
-        var namespacedKey = NamespacedKey.fromString(section.getString("name").throwOrElse(UUID.randomUUID().toString()));
+        var namespacedKey = NamespacedKey.fromString(section.getString("name").withDefault(UUID.randomUUID().toString()));
         var amount = section.getRequiredDouble("amount");
-        var operation = section.get("operation", AttributeOperation.class).throwOrElse(AttributeOperation.ADD_VALUE);
-        var slot = section.get("slot", EquipmentSlotGroup.class).throwOrElse(EquipmentSlotGroup.HAND);
+        var operation = section.get("operation", AttributeOperation.class).withDefault(AttributeOperation.ADD_VALUE);
+        var slot = section.get("slot", EquipmentSlotGroup.class).withDefault(EquipmentSlotGroup.HAND);
         AttributeModifier modifier = new AttributeModifier(namespacedKey, amount, operation.getOperation(), slot);
 
         return new ItemAttribute(attribute, modifier);

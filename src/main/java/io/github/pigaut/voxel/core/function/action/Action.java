@@ -8,7 +8,7 @@ import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
 @FunctionalInterface
-public interface Action extends SystemAction {
+public interface Action extends FunctionAction {
 
     @Override
     default @Nullable FunctionResponse dispatch(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {

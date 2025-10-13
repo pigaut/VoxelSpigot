@@ -12,7 +12,7 @@ public class GetWandSubCommand extends SubCommand {
         withPermission(plugin.getPermission("structure.wand"));
         withDescription(plugin.getLang("wand-command"));
         withPlayerExecution((player, args, placeholders) -> {
-            PlayerUtil.giveItemsOrDrop(player, plugin.getStructures().getWand());
+            PlayerUtil.giveItemsOrDrop(player, plugin.getOptions().getStructureWand());
             plugin.sendMessage(player, "received-wand", placeholders);
         });
     }

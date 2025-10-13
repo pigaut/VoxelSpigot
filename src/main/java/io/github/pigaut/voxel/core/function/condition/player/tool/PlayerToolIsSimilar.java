@@ -16,7 +16,7 @@ public class PlayerToolIsSimilar implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         final ItemStack tool = player.getInventory().getItemInMainHand();
         for (ItemStack item : items) {
             if (item.isSimilar(tool)) {

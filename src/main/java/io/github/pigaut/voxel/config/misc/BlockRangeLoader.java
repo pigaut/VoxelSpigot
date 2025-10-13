@@ -15,9 +15,9 @@ public class BlockRangeLoader implements ConfigLoader<BlockRange> {
 
     @Override
     public @NotNull BlockRange loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        final Amount rangeX = section.get("x", Amount.class).throwOrElse(Amount.ZERO);
-        final Amount rangeY = section.get("y", Amount.class).throwOrElse(Amount.ZERO);
-        final Amount rangeZ = section.get("z", Amount.class).throwOrElse(Amount.ZERO);
+        final Amount rangeX = section.get("x", Amount.class).withDefault(Amount.ZERO);
+        final Amount rangeY = section.get("y", Amount.class).withDefault(Amount.ZERO);
+        final Amount rangeZ = section.get("z", Amount.class).withDefault(Amount.ZERO);
         return new BlockRange(rangeX, rangeY, rangeZ);
     }
 

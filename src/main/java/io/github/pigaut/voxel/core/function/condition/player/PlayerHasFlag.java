@@ -12,7 +12,7 @@ public class PlayerHasFlag implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         return player.hasFlag(flag);
     }
 

@@ -1,7 +1,9 @@
 package io.github.pigaut.voxel.core.function.condition.config;
 
+import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.core.function.condition.*;
 import io.github.pigaut.voxel.core.function.condition.block.*;
+import io.github.pigaut.voxel.core.function.condition.event.*;
 import io.github.pigaut.voxel.core.function.condition.player.*;
 import io.github.pigaut.voxel.core.function.condition.player.tool.*;
 import io.github.pigaut.voxel.core.function.condition.server.*;
@@ -21,73 +23,51 @@ public class ConditionLoader extends AbstractLoader<Condition> {
 
     public ConditionLoader() {
 
+        // Server conditions
+
+        addLoader("CHANCE", (Line<Condition>) line -> {
+            double chance = line.getDouble(1)
+                    .filter(Predicates.range(0, 1), "Chance must be a value between 0.0 and 1.0")
+                    .orThrow();
+            return new IsProbability(chance);
+        });
+
         addLoader("ONLINE_PLAYERS", (Line<Condition>) line ->
                 new OnlinePlayersCondition(line.getRequired(1, Amount.class)));
 
-        addLoader("HAS_PERMISSION", (Line<Condition>) line ->
-                new PlayerHasPermission(line.getRequiredString(1)));
+        // Player Conditions
 
-        addLoader("PLAYER_HAS_PERMISSION", (Line<Condition>) line ->
+        addLoader("HAS_PERMISSION", (Line<Condition>) line ->
                 new PlayerHasPermission(line.getRequiredString(1)));
 
         addLoader("HAS_FLAG", (Line<Condition>) line ->
                 new PlayerHasFlag(line.getRequiredString(1)));
 
-        addLoader("PLAYER_HAS_FLAG", (Line<Condition>) line ->
-                new PlayerHasFlag(line.getRequiredString(1)));
-
         addLoader("HAS_EXP", (Line<Condition>) line ->
-                new PlayerHasExp(line.getRequired(1, Amount.class)));
-
-        addLoader("PLAYER_HAS_EXP", (Line<Condition>) line ->
                 new PlayerHasExp(line.getRequired(1, Amount.class)));
 
         addLoader("HAS_EXP_LEVEL", (Line<Condition>) line ->
                 new PlayerHasExpLevel(line.getRequired(1, Amount.class)));
 
-        addLoader("PLAYER_HAS_EXP_LEVEL", (Line<Condition>) line ->
-                new PlayerHasExpLevel(line.getRequired(1, Amount.class)));
-
         addLoader("HAS_ITEM", (Line<Condition>) line ->
-                new PlayerHasItem(line.getRequired(1, ItemStack.class)));
-
-        addLoader("PLAYER_HAS_ITEM", (Line<Condition>) line ->
                 new PlayerHasItem(line.getRequired(1, ItemStack.class)));
 
         addLoader("HAS_PLAYED_BEFORE", (Line<Condition>) line ->
                 new PlayerHasPlayedBefore());
 
-        addLoader("PLAYER_HAS_PLAYED_BEFORE", (Line<Condition>) line ->
-                new PlayerHasPlayedBefore());
-
         addLoader("HAS_FREE_SLOT", (Line<Condition>) line ->
-                new PlayerHasFreeSlot());
-
-        addLoader("PLAYER_HAS_FREE_SLOT", (Line<Condition>) line ->
                 new PlayerHasFreeSlot());
 
         addLoader("IS_FLYING", (Line<Condition>) line ->
                 new PlayerIsFlying());
 
-        addLoader("PLAYER_IS_FLYING", (Line<Condition>) line ->
-                new PlayerIsFlying());
-
         addLoader("IS_SNEAKING", (Line<Condition>) line ->
-                new PlayerIsSneaking());
-
-        addLoader("PLAYER_IS_SNEAKING", (Line<Condition>) line ->
                 new PlayerIsSneaking());
 
         addLoader("TOOL_IS_SIMILAR", (Line<Condition>) line ->
                 new PlayerToolIsSimilar(line.getAll(1, ItemStack.class)));
 
-        addLoader("TOOL_TYPE_IS_EQUAL", (Line<Condition>) line ->
-                new PlayerToolTypeIsEqual(line.getAll(1, Material.class)));
-
         addLoader("TOOL_TYPE_EQUALS", (Line<Condition>) line ->
-                new PlayerToolTypeIsEqual(line.getAll(1, Material.class)));
-
-        addLoader("PLAYER_TOOL_TYPE_EQUALS", (Line<Condition>) line ->
                 new PlayerToolTypeIsEqual(line.getAll(1, Material.class)));
 
         addLoader("TOOL_NAME_EQUALS", (Line<Condition>) line ->
@@ -104,14 +84,14 @@ public class ConditionLoader extends AbstractLoader<Condition> {
         addLoader("TOOL_LORE_EQUALS", (Line<Condition>) line ->
                 new PlayerToolLoreEquals(line.getAll(1, String.class)));
 
-        addLoader("TOOL_HAS_CUSTOM_MODEL", (Line<Condition>) line ->
-                new PlayerToolHasCustomModel(line.getAll(1, Integer.class)));
-
         addLoader("TOOL_HAS_ENCHANT", (Line<Condition>) line ->
                 new PlayerToolHasEnchant(
                         line.getRequired(1, Enchantment.class),
-                        line.get("level|enchantLevel", Amount.class).throwOrElse(Amount.ANY)
+                        line.get("level|enchantLevel", Amount.class).withDefault(Amount.ANY)
                 ));
+
+        addLoader("TOOL_HAS_CUSTOM_MODEL", (Line<Condition>) line ->
+                new PlayerToolHasCustomModel(line.getAll(1, Integer.class)));
 
         addLoader("PLACEHOLDER_EQUALS", (Line<Condition>) line -> {
             final String placeholder = line.getRequiredString("id|tag|placeholder|ph");
@@ -121,34 +101,29 @@ public class ConditionLoader extends AbstractLoader<Condition> {
                 return new PlaceholderEqualsAmount(placeholder, amount);
             }
 
-            final boolean ignoreCase = line.getBoolean("ignoreCase|ignore-case").throwOrElse(true);
+            final boolean ignoreCase = line.getBoolean("ignoreCase|ignore-case").withDefault(true);
             return new PlaceholderEqualsString(placeholder, line.getRequiredString(1), ignoreCase);
         });
 
         final EconomyHook economy = SpigotServer.getEconomyHook();
-        addLoader("PLAYER_HAS_MONEY", (Line<Condition>) line -> {
+        addLoader("HAS_MONEY", (Line<Condition>) line -> {
             if (economy == null) {
                 throw new InvalidConfigurationException(line, "Missing vault or an economy plugin");
             }
             return new PlayerHasMoney(economy, line.getRequired(1, Amount.class));
         });
 
-        addLoader("PROBABILITY", (Line<Condition>) line -> {
-            double chance = line.getDouble(1)
-                    .filter(Predicates.range(0, 1), "Chance must be a value between 0.0 and 1.0")
-                    .orThrow();
-            return new IsProbability(chance);
-        });
-
-        addLoader("CHANCE", (Line<Condition>) line -> {
-            double chance = line.getDouble(1)
-                    .filter(Predicates.range(0, 1), "Chance must be a value between 0.0 and 1.0")
-                    .orThrow();
-            return new IsProbability(chance);
-        });
+        // Block Conditions
 
         addLoader("BLOCK_TYPE_EQUALS", (Line<Condition>) line ->
                 new BlockTypeEquals(line.getAll(1, Material.class)));
+
+        // Event Conditions
+        addLoader("CLICK_TYPE_EQUALS", (Line<Condition>) line ->
+                new ActionEquals(
+                        line.getAll(1, ClickAction.class),
+                        line.getBoolean("shift|sneak|sneaking").withDefault(null)
+                ));
 
     }
 

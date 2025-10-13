@@ -4,7 +4,6 @@ import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.voxel.core.function.response.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.yaml.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -35,11 +34,11 @@ public class PeriodicFunction implements Function {
     }
 
     @Override
-    public @Nullable FunctionResponse run(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
-        function.run(player, event, block, target);
+    public @Nullable FunctionResponse dispatch(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+        function.dispatch(player, event, block, target);
         for (int i = 1; i < repetitions; i++) {
             final long delay = (long) interval * i;
-            plugin.getScheduler().runTaskLater(delay, () -> function.run(player, event, block, target));
+            plugin.getScheduler().runTaskLater(delay, () -> function.dispatch(player, event, block, target));
         }
         return null;
     }

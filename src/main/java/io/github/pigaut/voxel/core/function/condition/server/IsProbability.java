@@ -11,7 +11,7 @@ public class IsProbability implements ServerCondition {
     }
 
     @Override
-    public boolean isMet() {
+    public Boolean evaluate() {
         return Probability.test(chance);
     }
 

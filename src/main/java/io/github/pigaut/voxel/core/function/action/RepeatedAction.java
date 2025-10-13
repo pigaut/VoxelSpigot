@@ -7,12 +7,12 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-public class RepeatedAction implements SystemAction {
+public class RepeatedAction implements FunctionAction {
 
-    private final SystemAction action;
+    private final FunctionAction action;
     private final int repetitions;
 
-    public RepeatedAction(SystemAction action, int repetitions) {
+    public RepeatedAction(FunctionAction action, int repetitions) {
         this.action = action;
         this.repetitions = repetitions;
     }

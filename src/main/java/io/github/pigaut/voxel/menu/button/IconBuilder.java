@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.menu.button;
 
 import com.cryptomorin.xseries.*;
-import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.voxel.bukkit.*;
 import org.bukkit.*;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;

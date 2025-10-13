@@ -8,13 +8,13 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-public class DelayedAction implements SystemAction {
+public class DelayedAction implements FunctionAction {
 
     private final EnhancedPlugin plugin;
-    private final SystemAction action;
+    private final FunctionAction action;
     private final int delay;
 
-    public DelayedAction(EnhancedPlugin plugin, SystemAction action, int delay) {
+    public DelayedAction(EnhancedPlugin plugin, FunctionAction action, int delay) {
         this.plugin = plugin;
         this.action = action;
         this.delay = delay;

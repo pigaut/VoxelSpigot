@@ -8,12 +8,12 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-public class ChanceAction implements SystemAction {
+public class ChanceAction implements FunctionAction {
 
-    private final SystemAction action;
+    private final FunctionAction action;
     private final double chance;
 
-    public ChanceAction(SystemAction action, double chance) {
+    public ChanceAction(FunctionAction action, double chance) {
         this.action = action;
         this.chance = chance;
     }

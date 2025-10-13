@@ -11,7 +11,7 @@ import java.io.*;
 public class SoundManager extends ConfigBackedManager.SectionKey<SoundEffect> {
 
     public SoundManager(@NotNull EnhancedJavaPlugin plugin) {
-        super(plugin, "Sound", "effects/sounds");
+        super(plugin, "effects/sounds");
     }
 
     @Override

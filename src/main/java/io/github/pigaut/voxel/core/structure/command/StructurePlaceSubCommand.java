@@ -4,7 +4,7 @@ import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.core.structure.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.util.Rotation;
+import io.github.pigaut.voxel.bukkit.Rotation;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.jetbrains.annotations.*;

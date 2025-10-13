@@ -1,6 +1,9 @@
 package io.github.pigaut.voxel.core.structure.config;
 
+import dev.lone.itemsadder.api.*;
 import io.github.pigaut.voxel.core.structure.*;
+import io.github.pigaut.voxel.hook.itemsadder.*;
+import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.load.*;
 import org.bukkit.*;
@@ -12,7 +15,7 @@ import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-public class BlockChangeLoader implements ConfigLoader<BlockChange> {
+public class BlockChangeLoader implements ConfigLoader.Line<BlockChange> {
 
     @Override
     public @Nullable String getProblemDescription() {
@@ -20,23 +23,86 @@ public class BlockChangeLoader implements ConfigLoader<BlockChange> {
     }
 
     @Override
-    public @NotNull BlockChange loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        final Material material = section.getRequired("block", Material.class);
-        final Integer age = section.getInteger("age").throwOrElse(null);
-        final BlockFace direction = section.get("direction|face", BlockFace.class).throwOrElse(null);
-        final List<BlockFace> facingDirections = section.getAll("directions|faces", BlockFace.class);
-        final Axis orientation = section.get("orientation", Axis.class).throwOrElse(null);
-        final Boolean open = section.getBoolean("open").throwOrElse(null);
-        final Bisected.Half half = section.get("half", Bisected.Half.class).throwOrElse(null);
-        final Stairs.Shape stairShape = section.get("stair-shape|stairs-shape|stairs", Stairs.Shape.class).orElse(null);
-        final Slab.Type slabType = section.get("slab-type|slab", Slab.Type.class).orElse(null);
-        final Door.Hinge doorHinge = section.get("door-hinge|door", Door.Hinge.class).orElse(null);
-        final Bed.Part bedPart = section.get("bed-part|bed", Bed.Part.class).orElse(null);
-        final Bamboo.Leaves bambooLeaves = section.get("bamboo-leaves", Bamboo.Leaves.class)
+    public @NotNull BlockChange loadFromLine(ConfigLine line) throws InvalidConfigurationException {
+        int offsetX = line.getInteger("offsetX|offX").withDefault(0);
+        int offsetY = line.getInteger("offsetY|offY").withDefault(0);
+        int offsetZ = line.getInteger("offsetZ|offZ").withDefault(0);
+
+        if (SpigotServer.isPluginEnabled("ItemsAdder") && line.hasFlag("itemsadder")) {
+            CustomBlock customBlock = line.getRequired("itemsadder", CustomBlock.class);
+            return new ItemsAdderBlockChange(customBlock, offsetX, offsetY, offsetZ);
+        }
+
+        Material material = line.getRequired(0, Material.class);
+        Integer age = line.getInteger("age").withDefault(null);
+        BlockFace direction = line.get("direction|face", BlockFace.class).withDefault(null);
+        Axis orientation = line.get("orientation", Axis.class).withDefault(null);
+        Boolean open = line.getBoolean("open").withDefault(null);
+        Bisected.Half half = line.get("half", Bisected.Half.class).withDefault(null);
+        Stairs.Shape stairShape = line.get("stairShape|stairsShape|stairs", Stairs.Shape.class).orElse(null);
+        Slab.Type slabType = line.get("slabType|slab", Slab.Type.class).orElse(null);
+        Door.Hinge doorHinge = line.get("doorHinge|door", Door.Hinge.class).orElse(null);
+        Bed.Part bedPart = line.get("bedPart|bed", Bed.Part.class).orElse(null);
+        Bamboo.Leaves bambooLeaves = line.get("bambooLeaves", Bamboo.Leaves.class)
                 .orElse(material == Material.BAMBOO ? Bamboo.Leaves.NONE : null);
 
+        return validateAndCreate(line, material, age, direction, List.of(), orientation, open, half,
+                stairShape, slabType, doorHinge, bedPart, bambooLeaves, offsetX, offsetY, offsetZ);
+    }
+
+    @Override
+    public @NotNull BlockChange loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
+        int offsetX = section.getInteger("offset.x").withDefault(0);
+        int offsetY = section.getInteger("offset.y").withDefault(0);
+        int offsetZ = section.getInteger("offset.z").withDefault(0);
+
+        if (section.contains("itemsadder-block|ia-block")) {
+            if (!SpigotServer.isPluginEnabled("ItemsAdder")) {
+                throw new InvalidConfigurationException(section, "itemsadder-block", "ItemsAdder is not loaded/enabled");
+            }
+
+            CustomBlock customBlock = section.getRequired("itemsadder-block|ia-block", CustomBlock.class);
+            return new ItemsAdderBlockChange(customBlock, offsetX, offsetY, offsetZ);
+        }
+
+        Material material = section.getRequired("block", Material.class);
+        Integer age = section.getInteger("age").withDefault(null);
+        BlockFace direction = section.get("direction|face", BlockFace.class).withDefault(null);
+        List<BlockFace> facingDirections = section.getAll("directions|faces", BlockFace.class);
+        Axis orientation = section.get("orientation", Axis.class).withDefault(null);
+        Boolean open = section.getBoolean("open").withDefault(null);
+        Bisected.Half half = section.get("half", Bisected.Half.class).withDefault(null);
+        Stairs.Shape stairShape = section.get("stair-shape|stairs-shape|stairs", Stairs.Shape.class).orElse(null);
+        Slab.Type slabType = section.get("slab-type|slab", Slab.Type.class).orElse(null);
+        Door.Hinge doorHinge = section.get("door-hinge|door", Door.Hinge.class).orElse(null);
+        Bed.Part bedPart = section.get("bed-part|bed", Bed.Part.class).orElse(null);
+        Bamboo.Leaves bambooLeaves = section.get("bamboo-leaves", Bamboo.Leaves.class)
+                .orElse(material == Material.BAMBOO ? Bamboo.Leaves.NONE : null);
+
+        return validateAndCreate(section, material, age, direction, facingDirections, orientation, open, half,
+                stairShape, slabType, doorHinge, bedPart, bambooLeaves, offsetX, offsetY, offsetZ);
+    }
+
+    private static BlockChange validateAndCreate(
+            ConfigField field,
+            Material material,
+            Integer age,
+            BlockFace direction,
+            List<BlockFace> facingDirections,
+            Axis orientation,
+            Boolean open,
+            Bisected.Half half,
+            Stairs.Shape stairShape,
+            Slab.Type slabType,
+            Door.Hinge doorHinge,
+            Bed.Part bedPart,
+            Bamboo.Leaves bambooLeaves,
+            int offsetX,
+            int offsetY,
+            int offsetZ
+    ) throws InvalidConfigurationException {
         if (!material.isBlock()) {
-            throw new InvalidConfigurationException(section, "block", "The material must be a block");
+            throw new InvalidConfigurationException(field, "block", "The material must be a block");
         }
 
         final BlockData blockData = material.createBlockData();
@@ -45,22 +111,22 @@ public class BlockChangeLoader implements ConfigLoader<BlockChange> {
             if (blockData instanceof Ageable ageable) {
                 final int maximumAge = ageable.getMaximumAge();
                 if (age < 0 || age > maximumAge) {
-                    throw new InvalidConfigurationException(section, "age", "The age for this block must be a value between 0 and " + maximumAge + " (inclusive)");
+                    throw new InvalidConfigurationException(field, "age", "The age for this block must be a value between 0 and " + maximumAge + " (inclusive)");
                 }
             }
             else {
-                throw new InvalidConfigurationException(section, "age", "The current block is not ageable, please remove the age parameter");
+                throw new InvalidConfigurationException(field, "age", "The current block is not ageable, please remove the age parameter");
             }
         }
 
         if (direction != null) {
             if (blockData instanceof Directional directional) {
                 if (!directional.getFaces().contains(direction)) {
-                    throw new InvalidConfigurationException(section, "direction", "Block cannot face that direction");
+                    throw new InvalidConfigurationException(field, "direction", "Block cannot face that direction");
                 }
             }
             else if (!(blockData instanceof Rotatable)) {
-                throw new InvalidConfigurationException(section, "direction", "The current block is not directional, please remove the direction parameter");
+                throw new InvalidConfigurationException(field, "direction", "The current block is not directional, please remove the direction parameter");
             }
         }
 
@@ -68,54 +134,50 @@ public class BlockChangeLoader implements ConfigLoader<BlockChange> {
             if (blockData instanceof MultipleFacing multipleFacing) {
                 for (BlockFace face : facingDirections) {
                     if (!multipleFacing.getAllowedFaces().contains(face)) {
-                        throw new InvalidConfigurationException(section, "directions", "Block cannot face one of those directions");
+                        throw new InvalidConfigurationException(field, "directions", "Block cannot face one of those directions");
                     }
                 }
             }
             else {
-                throw new InvalidConfigurationException(section, "directions", "The current block is not multiple facing, please remove the directions parameter");
+                throw new InvalidConfigurationException(field, "directions", "The current block is not multiple facing, please remove the directions parameter");
             }
         }
 
         if (orientation != null) {
             if (blockData instanceof Orientable orientable) {
                 if (!orientable.getAxes().contains(orientation)) {
-                    throw new InvalidConfigurationException(section, "orientation", "Block cannot be oriented to that axis");
+                    throw new InvalidConfigurationException(field, "orientation", "Block cannot be oriented to that axis");
                 }
             } else {
-                throw new InvalidConfigurationException(section, "orientation", "The current block is not orientable, please remove the orientation parameter");
+                throw new InvalidConfigurationException(field, "orientation", "The current block is not orientable, please remove the orientation parameter");
             }
         }
 
         if (open != null && !(blockData instanceof Openable)) {
-            throw new InvalidConfigurationException(section, "open", "The current block is not openable, please remove the open parameter");
+            throw new InvalidConfigurationException(field, "open", "The current block is not openable, please remove the open parameter");
         }
 
         if (half != null && !(blockData instanceof Bisected)) {
-            throw new InvalidConfigurationException(section, "half", "The current block is not bisected, please remove the half parameter");
+            throw new InvalidConfigurationException(field, "half", "The current block is not bisected, please remove the half parameter");
         }
 
         if (stairShape != null && !(blockData instanceof Stairs)) {
-            throw new InvalidConfigurationException(section, "stairs-shape", "The current block is not a stairs, please remove the stairs-shape parameter");
+            throw new InvalidConfigurationException(field, "stairs-shape", "The current block is not a stairs, please remove the stairs-shape parameter");
         }
 
         if (slabType != null && !(blockData instanceof Slab)) {
-            throw new InvalidConfigurationException(section, "slab-type", "The current block is not a slab, please remove the slab-type parameter");
+            throw new InvalidConfigurationException(field, "slab-type", "The current block is not a slab, please remove the slab-type parameter");
         }
 
         if (doorHinge != null && !(blockData instanceof Door)) {
-            throw new InvalidConfigurationException(section, "door-hinge", "The current block is not a door, please remove the door-hinge parameter");
+            throw new InvalidConfigurationException(field, "door-hinge", "The current block is not a door, please remove the door-hinge parameter");
         }
 
         if (bambooLeaves != null && !(blockData instanceof Bamboo)) {
-            throw new InvalidConfigurationException(section, "bamboo-leaves", "The current block is not bamboo, please remove the bamboo-leaves parameter");
+            throw new InvalidConfigurationException(field, "bamboo-leaves", "The current block is not bamboo, please remove the bamboo-leaves parameter");
         }
 
-        final int offsetX = section.getInteger("offset.x").orElse(0);
-        final int offsetY = section.getInteger("offset.y").orElse(0);
-        final int offsetZ = section.getInteger("offset.z").orElse(0);
-
-        return new BlockChange(material, age, direction, facingDirections, orientation, open, half, stairShape, slabType,
+        return new SimpleBlockChange(material, age, direction, facingDirections, orientation, open, half, stairShape, slabType,
                 doorHinge, bedPart, bambooLeaves, offsetX, offsetY, offsetZ);
     }
 

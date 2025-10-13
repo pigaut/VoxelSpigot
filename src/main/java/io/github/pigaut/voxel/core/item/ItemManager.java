@@ -12,7 +12,7 @@ import java.io.*;
 public class ItemManager extends ConfigBackedManager.SectionKey<Item> {
 
     public ItemManager(EnhancedJavaPlugin plugin) {
-        super(plugin, "Item", "items");
+        super(plugin, "items");
     }
 
     public @Nullable ItemStack getItemStack(@NotNull String name) {

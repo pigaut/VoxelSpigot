@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.core.function.action;
 
+import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.core.function.action.block.*;
 import io.github.pigaut.voxel.core.function.action.event.*;
 import io.github.pigaut.voxel.core.function.action.player.*;
@@ -11,7 +12,6 @@ import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.hook.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.server.*;
-import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.amount.*;
 import io.github.pigaut.yaml.configurator.load.*;
@@ -21,7 +21,7 @@ import org.bukkit.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
-public class ActionLoader extends AbstractLoader<SystemAction> {
+public class ActionLoader extends AbstractLoader<FunctionAction> {
 
     private final EnhancedPlugin plugin;
 
@@ -29,59 +29,64 @@ public class ActionLoader extends AbstractLoader<SystemAction> {
         this.plugin = plugin;
 
         //server
-        addLoader("BROADCAST", (Line<SystemAction>) line ->
+        addLoader("BROADCAST", (Line<FunctionAction>) line ->
                 new ServerBroadcast(line.getRequiredString(1)));
 
-        addLoader("LIGHTNING", (Line<SystemAction>) line ->
+        addLoader("LIGHTNING", (Line<FunctionAction>) line ->
                 new StrikeLightning(
-                        line.get("world", World.class).throwOrElse(SpigotServer.getDefaultWorld()),
+                        line.get("world", World.class).withDefault(SpigotServer.getDefaultWorld()),
                         line.getRequiredDouble("x"),
                         line.getRequiredDouble("y"),
                         line.getRequiredDouble("z"),
-                        line.getBoolean("doDamage|damage").throwOrElse(true)
+                        line.getBoolean("doDamage|damage").withDefault(true)
                 ));
 
-        addLoader("CONSOLE_COMMAND", (Line<SystemAction>) line ->
+        addLoader("CONSOLE_COMMAND", (Line<FunctionAction>) line ->
                 new ExecuteConsoleCommand(line.getRequiredString(1)));
 
-        addLoader("DROP_ITEM", (Line<SystemAction>) line ->
-                new DropItem(
-                        line.getRequired(1, ItemStack.class),
-                        line.get("world", World.class).throwOrElse(SpigotServer.getDefaultWorld()),
-                        line.getRequiredDouble("x"),
-                        line.getRequiredDouble("y"),
-                        line.getRequiredDouble("z")
-                ));
+        addLoader("DROP_ITEM", (Line<FunctionAction>) line -> {
+            ItemStack item = line.getRequired(1, ItemStack.class);
+            Amount amount = line.get("amount|dropAmount", Amount.class)
+                    .withDefault(Amount.ONE);
+            boolean doFortune = line.getBoolean("doFortune|fortune")
+                    .withDefault(plugin.getOptions().shouldDoFortune(item.getType()));
 
-        addLoader("DROP_EXP", (Line<SystemAction>) line ->
+            return new DropItem(item, amount, doFortune,
+                    line.get("world", World.class).withDefault(SpigotServer.getDefaultWorld()),
+                    line.getRequiredDouble("x"),
+                    line.getRequiredDouble("y"),
+                    line.getRequiredDouble("z"));
+        });
+
+        addLoader("DROP_EXP", (Line<FunctionAction>) line ->
                 new DropExp(
                         line.getRequired(1, Amount.class),
-                        line.get("world", World.class).throwOrElse(SpigotServer.getDefaultWorld()),
-                        line.getRequiredDouble("x"),
-                        line.getRequiredDouble("y"),
-                        line.getRequiredDouble("z"),
-                        line.get("orbs|orbCount", Amount.class).throwOrElse(Amount.ONE)
-                ));
-
-        addLoader("SPAWN_PARTICLE", (Line<SystemAction>) line ->
-                new SpawnParticle(
-                        line.getRequired(1, ParticleEffect.class),
-                        line.get("world", World.class).throwOrElse(SpigotServer.getDefaultWorld()),
+                        line.get("orbs|orbCount", Amount.class).withDefault(null),
+                        line.get("world", World.class).withDefault(SpigotServer.getDefaultWorld()),
                         line.getRequiredDouble("x"),
                         line.getRequiredDouble("y"),
                         line.getRequiredDouble("z")
                 ));
 
-        addLoader("PARTICLE", (Line<SystemAction>) line ->
+        addLoader("SPAWN_PARTICLE", (Line<FunctionAction>) line ->
                 new SpawnParticle(
                         line.getRequired(1, ParticleEffect.class),
-                        line.get("world", World.class).throwOrElse(SpigotServer.getDefaultWorld()),
+                        line.get("world", World.class).withDefault(SpigotServer.getDefaultWorld()),
                         line.getRequiredDouble("x"),
                         line.getRequiredDouble("y"),
                         line.getRequiredDouble("z")
                 ));
 
-        addLoader("PLAY_SOUND", (Line<SystemAction>) line ->
+        addLoader("PARTICLE", (Line<FunctionAction>) line ->
+                new SpawnParticle(
+                        line.getRequired(1, ParticleEffect.class),
+                        line.get("world", World.class).withDefault(SpigotServer.getDefaultWorld()),
+                        line.getRequiredDouble("x"),
+                        line.getRequiredDouble("y"),
+                        line.getRequiredDouble("z")
+                ));
+
+        addLoader("PLAY_SOUND", (Line<FunctionAction>) line ->
                 new PlaySound(
                         line.getRequired(1, SoundEffect.class),
                         line.get("world", World.class).orElse(SpigotServer.getDefaultWorld()),
@@ -90,7 +95,7 @@ public class ActionLoader extends AbstractLoader<SystemAction> {
                         line.getRequiredDouble("z")
                 ));
 
-        addLoader("SOUND", (Line<SystemAction>) line ->
+        addLoader("SOUND", (Line<FunctionAction>) line ->
                 new PlaySound(
                         line.getRequired(1, SoundEffect.class),
                         line.get("world", World.class).orElse(SpigotServer.getDefaultWorld()),
@@ -101,221 +106,186 @@ public class ActionLoader extends AbstractLoader<SystemAction> {
 
         //Function Actions
 
-        addLoader("RETURN", (Line<SystemAction>) line ->
+        addLoader("RETURN", (Line<FunctionAction>) line ->
                 new ReturnAction());
 
-        addLoader("STOP", (Line<SystemAction>) line ->
+        addLoader("STOP", (Line<FunctionAction>) line ->
                 new StopAction());
 
-        addLoader("GOTO", (Line<SystemAction>) line ->
-                new GotoAction(line.getRequiredInteger(1)));
+        addLoader("GOTO", (Line<FunctionAction>) line ->
+                new GotoAction(line.getInteger(1)
+                        .filter(Predicates.isPositive(), "Value must be greater than or equal to 1")
+                        .orThrow() - 1
+                ));
 
         //Event Actions
 
-        addLoader("CANCEL_EVENT", (Line<SystemAction>) line ->
+        addLoader("CANCEL_EVENT", (Line<FunctionAction>) line ->
                 new CancelEventAction(true));
 
-        addLoader("CANCEL", (Line<SystemAction>) line ->
+        addLoader("CANCEL", (Line<FunctionAction>) line ->
                 new CancelEventAction(true));
 
-        addLoader("SET_CANCELLED", (Line<SystemAction>) line ->
+        addLoader("SET_CANCELLED", (Line<FunctionAction>) line ->
                 new CancelEventAction(line.getRequiredBoolean(1)));
 
         //Block Actions
-        addLoader("STRIKE_BLOCK", (Line<SystemAction>) line ->
-                new StrikeBlockWithLightning(line.getBoolean("doDamage|damage").orElse(true)));
+        addLoader("STRIKE_BLOCK", (Line<FunctionAction>) line ->
+                new StrikeBlockWithLightning(line.getBoolean("doDamage|damage").withDefault(true)));
 
-        addLoader("DROP_AT_BLOCK", (Line<SystemAction>) line ->
-                new DropItemAtBlock(line.getRequired(1, ItemStack.class)));
+        addLoader("DROP_ITEM_AT_BLOCK", (Line<FunctionAction>) line -> {
+            ItemStack item = line.getRequired(1, ItemStack.class);
+            Amount amount = line.get("amount|dropAmount", Amount.class)
+                    .withDefault(Amount.ONE);
+            boolean doFortune = line.getBoolean("doFortune|fortune")
+                    .withDefault(plugin.getOptions().shouldDoFortune(item.getType()));
+            return new DropItemAtBlock(item, amount, doFortune);
+        });
 
-        addLoader("DROP_ITEM_AT_BLOCK", (Line<SystemAction>) line ->
-                new DropItemAtBlock(line.getRequired(1, ItemStack.class)));
-
-        addLoader("DROP_EXP_AT_BLOCK", (Line<SystemAction>) line ->
+        addLoader("DROP_EXP_AT_BLOCK", (Line<FunctionAction>) line ->
                 new DropExpAtBlock(
                         line.getRequired(1, Amount.class),
-                        line.get("orbs|orbCount", Amount.class).orElse(Amount.ONE)
+                        line.get("orbs|orbCount", Amount.class).withDefault(null)
                 ));
 
-        addLoader("PARTICLE_AT_BLOCK", (Line<SystemAction>) line ->
+        addLoader("PARTICLE_AT_BLOCK", (Line<FunctionAction>) line ->
                 new SpawnParticleOnBlock(line.getRequired(1, ParticleEffect.class)));
 
-        addLoader("SPAWN_PARTICLE_AT_BLOCK", (Line<SystemAction>) line ->
+        addLoader("SPAWN_PARTICLE_AT_BLOCK", (Line<FunctionAction>) line ->
                 new SpawnParticleOnBlock(line.getRequired(1, ParticleEffect.class)));
 
-        addLoader("SOUND_AT_BLOCK", (Line<SystemAction>) line ->
+        addLoader("SOUND_AT_BLOCK", (Line<FunctionAction>) line ->
                 new PlaySoundOnBlock(line.getRequired(1, SoundEffect.class)));
 
-        addLoader("PLAY_SOUND_AT_BLOCK", (Line<SystemAction>) line ->
+        addLoader("PLAY_SOUND_AT_BLOCK", (Line<FunctionAction>) line ->
                 new PlaySoundOnBlock(line.getRequired(1, SoundEffect.class)));
 
         //player actions
 
-        addLoader("DROP_AT_PLAYER", (Line<SystemAction>) line ->
-                new DropItemAtPlayer(line.getRequired(1, ItemStack.class)));
+        addLoader("DROP_ITEM_AT_PLAYER", (Line<FunctionAction>) line -> {
+            ItemStack item = line.getRequired(1, ItemStack.class);
+            Amount amount = line.get("amount|dropAmount", Amount.class)
+                    .withDefault(Amount.ONE);
+            boolean doFortune = line.getBoolean("doFortune|fortune")
+                    .withDefault(plugin.getOptions().shouldDoFortune(item.getType()));
+            return new DropItemAtPlayer(item, amount, doFortune);
+        });
 
-        addLoader("DROP_ITEM_AT_PLAYER", (Line<SystemAction>) line ->
-                new DropItemAtPlayer(line.getRequired(1, ItemStack.class)));
-
-        addLoader("DROP_EXP_AT_PLAYER", (Line<SystemAction>) line ->
+        addLoader("DROP_EXP_AT_PLAYER", (Line<FunctionAction>) line ->
                 new DropExpAtPlayer(
                         line.getRequired(1, Amount.class),
-                        line.get("orbs|orbCount", Amount.class).orElse(Amount.ONE)
+                        line.get("orbs|orbCount", Amount.class).withDefault(null)
                 ));
 
-        addLoader("PARTICLE_AT_PLAYER", (Line<SystemAction>) line ->
+        addLoader("SPAWN_PARTICLE_AT_PLAYER", (Line<FunctionAction>) line ->
                 new SpawnParticleOnPlayer(line.getRequired(1, ParticleEffect.class)));
 
-        addLoader("SPAWN_PARTICLE_AT_PLAYER", (Line<SystemAction>) line ->
-                new SpawnParticleOnPlayer(line.getRequired(1, ParticleEffect.class)));
-
-        addLoader("SOUND_AT_PLAYER", (Line<SystemAction>) line ->
+        addLoader("PLAY_SOUND_AT_PLAYER", (Line<FunctionAction>) line ->
                 new PlaySoundOnPlayer(line.getRequired(1, SoundEffect.class)));
 
-        addLoader("PLAY_SOUND_AT_PLAYER", (Line<SystemAction>) line ->
-                new PlaySoundOnPlayer(line.getRequired(1, SoundEffect.class)));
-
-        addLoader("GIVE_EXP", (Line<SystemAction>) line ->
+        addLoader("GIVE_EXP", (Line<FunctionAction>) line ->
                 new GiveExpToPlayer(line.getRequired(1, Amount.class)));
 
-        addLoader("GIVE_EXP_TO_PLAYER", (Line<SystemAction>) line ->
-                new GiveExpToPlayer(line.getRequired(1, Amount.class)));
-
-        addLoader("GIVE_FLAG", (Line<SystemAction>) line ->
+        addLoader("GIVE_FLAG", (Line<FunctionAction>) line ->
                 new GiveFlagToPlayer(line.getRequiredString(1)));
 
-        addLoader("GIVE_FLAG_TO_PLAYER", (Line<SystemAction>) line ->
-                new GiveFlagToPlayer(line.getRequiredString(1)));
-
-        addLoader("GIVE_ITEM", (Line<SystemAction>) line ->
-                new GiveItemToPlayer(line.getRequired(1, ItemStack.class)));
-
-        addLoader("GIVE_ITEM_TO_PLAYER", (Line<SystemAction>) line ->
-                new GiveItemToPlayer(line.getRequired(1, ItemStack.class)));
+        addLoader("GIVE_ITEM", (Line<FunctionAction>) line -> {
+            ItemStack item = line.getRequired(1, ItemStack.class);
+            Amount amount = line.get("amount|dropAmount", Amount.class)
+                    .withDefault(Amount.ONE);
+            boolean doFortune = line.getBoolean("doFortune|fortune")
+                    .withDefault(plugin.getOptions().shouldDoFortune(item.getType()));
+            return new GiveItemToPlayer(item, amount, doFortune);
+        });
 
         final EconomyHook economy = SpigotServer.getEconomyHook();
-        addLoader("GIVE_MONEY", (Line<SystemAction>) line -> {
+        addLoader("GIVE_MONEY", (Line<FunctionAction>) line -> {
             if (economy == null) {
                 throw new InvalidConfigurationException(line, "Missing Vault or economy plugin");
             }
             return new GiveMoneyToPlayer(economy, line.getRequired(1, Amount.class));
         });
 
-        addLoader("GIVE_MONEY_TO_PLAYER", (Line<SystemAction>) line -> {
-            if (economy == null) {
-                throw new InvalidConfigurationException(line, "Missing Vault or economy plugin");
-            }
-            return new GiveMoneyToPlayer(economy, line.getRequired(1, Amount.class));
-        });
-
-        addLoader("TAKE_EXP", (Line<SystemAction>) line ->
+        addLoader("TAKE_EXP", (Line<FunctionAction>) line ->
                 new TakeExpFromPlayer(line.getRequired(1, Amount.class)));
 
-        addLoader("TAKE_EXP_FROM_PLAYER", (Line<SystemAction>) line ->
-                new TakeExpFromPlayer(line.getRequired(1, Amount.class)));
-
-        addLoader("TAKE_FLAG", (Line<SystemAction>) line ->
+        addLoader("TAKE_FLAG", (Line<FunctionAction>) line ->
                 new TakeFlagFromPlayer(line.getRequiredString(1)));
 
-        addLoader("TAKE_FLAG_FROM_PLAYER", (Line<SystemAction>) line ->
-                new TakeFlagFromPlayer(line.getRequiredString(1)));
-
-        addLoader("TAKE_ITEM", (Line<SystemAction>) line ->
+        addLoader("TAKE_ITEM", (Line<FunctionAction>) line ->
                 new TakeItemFromPlayer(line.getRequired(1, ItemStack.class)));
 
-        addLoader("TAKE_ITEM_FROM_PLAYER", (Line<SystemAction>) line ->
-                new TakeItemFromPlayer(line.getRequired(1, ItemStack.class)));
-
-        addLoader("TAKE_MONEY", (Line<SystemAction>) line -> {
+        addLoader("TAKE_MONEY", (Line<FunctionAction>) line -> {
             if (economy == null) {
                 throw new InvalidConfigurationException(line, "Missing Vault or economy plugin");
             }
             return new TakeMoneyFromPlayer(economy, line.getRequired(1, Amount.class));
         });
 
-        addLoader("TAKE_MONEY_FROM_PLAYER", (Line<SystemAction>) line -> {
-            if (economy == null) {
-                throw new InvalidConfigurationException(line, "Missing Vault or economy plugin");
-            }
-            return new TakeMoneyFromPlayer(economy, line.getRequired(1, Amount.class));
-        });
-
-        addLoader("SET_EXP", (Line<SystemAction>) line ->
+        addLoader("SET_EXP", (Line<FunctionAction>) line ->
                 new SetPlayerExp(line.getRequired(1, Amount.class)));
 
-        addLoader("SET_PLAYER_EXP", (Line<SystemAction>) line ->
-                new SetPlayerExp(line.getRequired(1, Amount.class)));
-
-        addLoader("HEAL", (Line<SystemAction>) line ->
+        addLoader("HEAL", (Line<FunctionAction>) line ->
                 new HealPlayer(line.get(1, Amount.class).orElse(Amount.fixed(20))));
 
-        addLoader("HEAL_PLAYER", (Line<SystemAction>) line ->
-                new HealPlayer(line.get(1, Amount.class).orElse(Amount.fixed(20))));
-
-        addLoader("DAMAGE", (Line<SystemAction>) line ->
+        addLoader("DAMAGE", (Line<FunctionAction>) line ->
                 new DamagePlayer(line.get(1, Amount.class).orElse(Amount.fixed(2))));
 
-        addLoader("DAMAGE_PLAYER", (Line<SystemAction>) line ->
-                new DamagePlayer(line.get(1, Amount.class).orElse(Amount.fixed(2))));
-
-        addLoader("COMMAND", (Line<SystemAction>) line ->
+        addLoader("COMMAND", (Line<FunctionAction>) line ->
                 new ExecutePlayerCommand(line.getRequiredString(1)));
 
-        addLoader("CHAT_MESSAGE", (Line<SystemAction>) line ->
+        addLoader("CHAT_MESSAGE", (Line<FunctionAction>) line ->
                 new SendChatToPlayer(line.getRequiredString(1, StringColor.FORMATTER)));
 
-        addLoader("SEND_CHAT", (Line<SystemAction>) line ->
+        addLoader("SEND_CHAT", (Line<FunctionAction>) line ->
                 new SendChatToPlayer(line.getRequiredString(1, StringColor.FORMATTER)));
 
-        addLoader("SEND_ACTIONBAR", (Line<SystemAction>) line ->
+        addLoader("SEND_ACTIONBAR", (Line<FunctionAction>) line ->
                 new SendActionbarToPlayer(line.getRequiredString(1, StringColor.FORMATTER)));
 
-        addLoader("SEND_TITLE", (Line<SystemAction>) line ->
+        addLoader("SEND_TITLE", (Line<FunctionAction>) line ->
                 new SendTitleToPlayer(
                         line.getRequiredString(1, StringColor.FORMATTER),
-                        line.getString("subtitle", StringColor.FORMATTER).throwOrElse(""),
-                        line.getInteger("fadeIn|fade-in").throwOrElse(10),
-                        line.getInteger("stay").throwOrElse(70),
-                        line.getInteger("fadeOut|fade-out").throwOrElse(20)
+                        line.getString("subtitle", StringColor.FORMATTER).withDefault(""),
+                        line.getInteger("fadeIn|fade-in").withDefault(10),
+                        line.getInteger("stay").withDefault(70),
+                        line.getInteger("fadeOut|fade-out").withDefault(20)
                 ));
 
-        addLoader("SEND_HOLOGRAM", (Line<SystemAction>) line ->
+        addLoader("SEND_HOLOGRAM", (Line<FunctionAction>) line ->
                 new SendHologramToPlayer(plugin,
                         line.getRequiredString(1, StringColor.FORMATTER),
-                        line.getInteger("duration").throwOrElse(60),
-                        line.getDouble("radiusX|radius-x|xRadius").throwOrElse(null),
-                        line.getDouble("radiusY|radius-y|yRadius").throwOrElse(null),
-                        line.getDouble("radiusZ|radius-z|zRadius").throwOrElse(null)
+                        line.getInteger("duration").withDefault(60),
+                        line.getDouble("radiusX|radius-x|xRadius").withDefault(null),
+                        line.getDouble("radiusY|radius-y|yRadius").withDefault(null),
+                        line.getDouble("radiusZ|radius-z|zRadius").withDefault(null)
                 ));
 
-        addLoader("MESSAGE", (Line<SystemAction>) line ->
+        addLoader("MESSAGE", (Line<FunctionAction>) line ->
                 new SendMessage(line.getRequired(1, Message.class)));
 
-        addLoader("SEND_MESSAGE", (Line<SystemAction>) line ->
+        addLoader("SEND_MESSAGE", (Line<FunctionAction>) line ->
                 new SendMessage(line.getRequired(1, Message.class)));
 
-        addLoader("LIGHTNING_AT_PLAYER", (Line<SystemAction>) line ->
+        addLoader("LIGHTNING_AT_PLAYER", (Line<FunctionAction>) line ->
                 new StrikePlayerWithLightning(line.getBoolean("doDamage|damage").orElse(true)));
 
-        addLoader("SET_FLIGHT", (Line<SystemAction>) line ->
+        addLoader("SET_FLIGHT", (Line<FunctionAction>) line ->
                 new SetPlayerFlight(line.getBoolean(1).orElse(true)));
 
-        addLoader("TELEPORT", (Line<SystemAction>) line ->
+        addLoader("TELEPORT", (Line<FunctionAction>) line ->
                 new TeleportPlayer(line.getRequired(1, Location.class)));
 
-        addLoader("TELEPORT_PLAYER", (Line<SystemAction>) line ->
-                new TeleportPlayer(line.getRequired(1, Location.class)));
-
-        addLoader("SET_CURSOR_ITEM", (Line<SystemAction>) line ->
+        addLoader("SET_CURSOR_ITEM", (Line<FunctionAction>) line ->
                 new SetPlayerCursorItem(line.getRequired(1, ItemStack.class)));
 
-        addLoader("OPEN_ENDER_CHEST", (Line<SystemAction>) line ->
+        addLoader("OPEN_ENDER_CHEST", (Line<FunctionAction>) line ->
                 new OpenEnderChest());
 
-        addLoader("CLOSE_INVENTORY", (Line<SystemAction>) line ->
+        addLoader("CLOSE_INVENTORY", (Line<FunctionAction>) line ->
                 new CloseInventory());
 
-        addLoader("PLAYER_CACHE", (Line<SystemAction>) line ->
+        addLoader("PLAYER_CACHE", (Line<FunctionAction>) line ->
                 new CachePlayerValue(
                         line.getRequiredString(1),
                         line.getRequiredString(2)
@@ -328,45 +298,44 @@ public class ActionLoader extends AbstractLoader<SystemAction> {
     }
 
     @Override
-    public @NotNull SystemAction loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
+    public @NotNull FunctionAction loadFromScalar(ConfigScalar scalar) throws InvalidConfigurationException {
         final ConfigLine line = scalar.toLine();
         final String actionId = line.getRequiredString(0);
 
-        final ConfigLoader<? extends SystemAction> loader = getLoader(actionId);
+        final ConfigLoader<? extends FunctionAction> loader = getLoader(actionId);
         if (loader == null) {
             throw new InvalidConfigurationException(line,
                     "Could not find action with name: " + CaseFormatter.toCamelCase(actionId));
         }
 
-        SystemAction action = loader.loadFromScalar(scalar);
+        FunctionAction action = loader.loadFromScalar(scalar);
 
-        final Integer repetitions = line.getInteger("repetitions|loops")
+        Integer repetitions = line.getInteger("repeat|repetitions")
                 .filter(Predicates.isPositive(), "Repetitions must be greater than 0")
-                .throwOrElse(null);
+                .withDefault(null);
 
-        final Integer interval = line.getInteger("interval|period")
-                .filter(Predicates.notNull(repetitions), "Repetitions must be set to use interval delay")
-                .filter(Predicates.isPositive(), "Interval must be greater than 0")
-                .throwOrElse(null);
+        Integer interval = line.get("interval|period", Ticks.class)
+                .filter(repetitions != null, "Repetitions must be set to use interval delay")
+                .map(Ticks::getCount)
+                .withDefault(null);
 
         if (interval != null) {
             action = new PeriodicAction(plugin, action, interval, repetitions);
-        }
-        else if (repetitions != null) {
+        } else if (repetitions != null) {
             action = new RepeatedAction(action, repetitions);
         }
 
-        final Integer delay = line.getInteger("delay")
-                .filter(Predicates.isPositive(), "Delay must be greater than 0")
-                .throwOrElse(null);
+        Integer delay = line.get("delay", Ticks.class)
+                .map(Ticks::getCount)
+                .withDefault(null);
 
         if (delay != null) {
             action = new DelayedAction(plugin, action, delay);
         }
 
-        final Double chance = line.getDouble("chance")
+        Double chance = line.getDouble("chance")
                 .filter(Predicates.range(0, 1), "Chance must be a value between 0.0 to 1.0")
-                .throwOrElse(null);
+                .withDefault(null);
 
         if (chance != null) {
             action = new ChanceAction(action, chance);
@@ -376,8 +345,8 @@ public class ActionLoader extends AbstractLoader<SystemAction> {
     }
 
     @Override
-    public @NotNull SystemAction loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
-        return new MultiAction(sequence.getAll(SystemAction.class));
+    public @NotNull FunctionAction loadFromSequence(@NotNull ConfigSequence sequence) throws InvalidConfigurationException {
+        return new MultiAction(sequence.getAll(FunctionAction.class));
     }
 
 }

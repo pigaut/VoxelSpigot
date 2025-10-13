@@ -2,22 +2,22 @@ package io.github.pigaut.voxel.plugin;
 
 import io.github.pigaut.sql.*;
 import io.github.pigaut.voxel.command.*;
-import io.github.pigaut.voxel.config.*;
+import io.github.pigaut.voxel.core.*;
 import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.voxel.core.item.Item;
 import io.github.pigaut.voxel.core.item.*;
+import io.github.pigaut.voxel.core.language.*;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.core.structure.*;
-import io.github.pigaut.voxel.language.*;
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
-import io.github.pigaut.yaml.*;
+import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.yaml.configurator.*;
 import io.github.pigaut.yaml.node.section.*;
-import io.github.pigaut.yaml.util.*;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
@@ -35,6 +35,10 @@ public interface EnhancedPlugin extends Plugin {
 
     String getVersion();
 
+    ColoredLogger getColoredLogger();
+
+    ManagerInitializer getInitializer();
+
     @Nullable
     Database getDatabase();
 
@@ -49,6 +53,9 @@ public interface EnhancedPlugin extends Plugin {
 
     @NotNull
     NamespacedKey getNamespacedKey(@NotNull String key);
+
+    @NotNull
+    OptionsManager getOptions();
 
     @NotNull
     LanguageManager getLanguages();
@@ -117,16 +124,10 @@ public interface EnhancedPlugin extends Plugin {
     BlockStructure getStructure(@NotNull String name);
 
     @NotNull
-    MenuManager getMenus();
-
-    @Nullable
-    Menu getMenu(@NotNull String name);
+    Configurator getConfigurator();
 
     @NotNull
     RootSection getConfiguration();
-
-    @NotNull
-    PluginConfigurator getConfigurator();
 
     @Nullable
     EnhancedCommand getCustomCommand(String name);
@@ -160,7 +161,5 @@ public interface EnhancedPlugin extends Plugin {
     String getFilePath(@NotNull String path);
 
     List<String> getFilePaths(@NotNull String directory);
-
-    void logConfigurationErrors(@Nullable Player player, @NotNull List<ConfigurationException> errors);
 
 }

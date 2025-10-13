@@ -10,14 +10,11 @@ import org.jetbrains.annotations.*;
 @FunctionalInterface
 public interface BlockCondition extends Condition {
 
-    boolean isMet(@NotNull Block block);
+    @Nullable Boolean evaluate(@NotNull Block block);
 
     @Override
-    default boolean isMet(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
-        if (block != null) {
-            return isMet(block);
-        }
-        return false;
+    default @Nullable Boolean evaluate(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+        return block != null ? evaluate(block) : null;
     }
 
 }

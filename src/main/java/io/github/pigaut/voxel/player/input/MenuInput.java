@@ -5,7 +5,6 @@ import io.github.pigaut.voxel.menu.template.button.*;
 import io.github.pigaut.voxel.menu.template.menu.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
-import io.github.pigaut.yaml.configurator.deserialize.*;
 import io.github.pigaut.yaml.convert.parse.*;
 import org.jetbrains.annotations.*;
 
@@ -16,8 +15,8 @@ public class MenuInput<T> extends PlayerInput<T> {
 
     private List<ValueInputButton> valueEntries = new ArrayList<>();
 
-    public MenuInput(SimplePlayerState player, Deserializer<T> deserializer) {
-        super(player, deserializer, "Select a value");
+    public MenuInput(SimplePlayerState player, Parser<T> parser) {
+        super(player, parser, "Select a value");
     }
 
     @Override
@@ -38,7 +37,7 @@ public class MenuInput<T> extends PlayerInput<T> {
     public MenuInput<T> withValues(@NotNull List<ValueInputButton> entries) {
         for (ValueInputButton entry : entries) {
             try {
-                deserializer.deserialize(entry.getValue());
+                parser.parse(entry.getValue());
             } catch (StringParseException e) {
                 throw new IllegalStateException("Invalid menu input selection value. " + e.getMessage());
             }
@@ -49,7 +48,7 @@ public class MenuInput<T> extends PlayerInput<T> {
 
     public MenuInput<T> addValue(@NotNull ValueInputButton entry) {
         try {
-            deserializer.deserialize(entry.getValue());
+            parser.parse(entry.getValue());
         } catch (StringParseException e) {
             throw new IllegalStateException("Invalid menu input selection value. " + e.getMessage());
         }
@@ -87,7 +86,7 @@ public class MenuInput<T> extends PlayerInput<T> {
 
                 final T parsedInput;
                 try {
-                    parsedInput = deserializer.deserialize(input);
+                    parsedInput = parser.parse(input);
                 } catch (StringParseException e) {
                     playerState.setLastInput(null);
                     return;

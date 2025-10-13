@@ -6,17 +6,44 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-public class NegativeCondition implements Condition {
+import java.util.*;
 
-    private final Condition condition;
+public interface NegativeCondition extends Condition {
 
-    public NegativeCondition(@NotNull Condition condition) {
-        this.condition = condition;
+    class Simple implements NegativeCondition {
+        private final Condition condition;
+
+        public Simple(@NotNull Condition condition) {
+            this.condition = condition;
+        }
+
+        @Override
+        public Boolean evaluate(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+            Boolean result = condition.evaluate(player, event, block, target);
+            if (result == null) {
+                return false;
+            }
+            return !result;
+        }
     }
 
-    @Override
-    public boolean isMet(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
-        return !condition.isMet(player, event, block, target);
+    class Multi implements NegativeCondition {
+        private final List<Condition> conditions;
+
+        public Multi(@NotNull List<@NotNull Condition> conditions) {
+            this.conditions = conditions;
+        }
+
+        @Override
+        public @Nullable Boolean evaluate(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+            for (Condition condition : conditions) {
+                if (condition.isMet(player, event, block, target)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
+
 
 }

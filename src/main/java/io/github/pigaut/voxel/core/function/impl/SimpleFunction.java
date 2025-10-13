@@ -4,7 +4,6 @@ import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.voxel.core.function.action.*;
 import io.github.pigaut.voxel.core.function.response.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.yaml.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -14,9 +13,9 @@ public class SimpleFunction implements Function {
 
     private final String name;
     private final String group;
-    private final SystemAction action;
+    private final FunctionAction action;
 
-    public SimpleFunction(String name, String group, SystemAction action) {
+    public SimpleFunction(String name, String group, FunctionAction action) {
         this.name = name;
         this.group = group;
         this.action = action;
@@ -33,7 +32,7 @@ public class SimpleFunction implements Function {
     }
 
     @Override
-    public @Nullable FunctionResponse run(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
+    public @Nullable FunctionResponse dispatch(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         return action.dispatch(player, event, block, target);
     }
 

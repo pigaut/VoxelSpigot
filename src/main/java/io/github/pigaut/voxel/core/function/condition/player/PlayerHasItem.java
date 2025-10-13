@@ -13,7 +13,7 @@ public class PlayerHasItem implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         return player.getInventory().containsAtLeast(item, item.getAmount());
     }
 

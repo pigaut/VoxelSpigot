@@ -62,9 +62,11 @@ public enum SpigotVersion {
     V1_21_3(NMSVersion.V1_21_R2),
     V1_21_4(NMSVersion.V1_21_R3),
     V1_21_5(NMSVersion.V1_21_R4),
-    V1_21_6(NMSVersion.V1_21_R4),
-    V1_21_7(NMSVersion.V1_21_R4),
-    V1_21_8(NMSVersion.V1_21_R4),
+    V1_21_6(NMSVersion.V1_21_R5),
+    V1_21_7(NMSVersion.V1_21_R5),
+    V1_21_8(NMSVersion.V1_21_R5),
+    V1_21_9(NMSVersion.V1_21_R5),
+    V1_21_10(NMSVersion.V1_21_R5),
 
     UNKNOWN(NMSVersion.UNKNOWN);
 

@@ -8,7 +8,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-public class GotoAction extends GotoResponse implements SystemAction {
+public class GotoAction extends GotoResponse implements FunctionAction {
 
     public GotoAction(int gotoLine) {
         super(gotoLine);

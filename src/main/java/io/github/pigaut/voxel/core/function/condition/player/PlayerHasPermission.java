@@ -18,7 +18,7 @@ public class PlayerHasPermission implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         for (String permission : permissions) {
             if (!player.hasPermission(permission)) {
                 return false;

@@ -14,12 +14,12 @@ public class Placeholder implements StringFormatter {
     private final String value;
 
     public Placeholder(@NotNull String id, @NotNull String value) {
-        this.id = Pattern.quote(id);
-        this.value = Matcher.quoteReplacement(value);
+        this.id = id;
+        this.value = value;
         final String idName = StringUtil.removeParentheses(id);
         for (CaseStyle style : CaseStyle.values()) {
             final String styleId = StringUtil.buildString(id.charAt(0), idName, "_", style.getTagName(), id.charAt(id.length() - 1));
-            formatIds.put(Pattern.quote(styleId), style);
+            formatIds.put(styleId, style);
         }
     }
 
@@ -65,9 +65,9 @@ public class Placeholder implements StringFormatter {
 
     @Override
     public @NotNull String format(@NotNull String str) {
-        str = str.replaceAll(id, value);
+        str = str.replace(id, value);
         for (Map.Entry<String, StringFormatter> entry : formatIds.entrySet()) {
-            str = str.replaceAll(entry.getKey(), entry.getValue().format(value));
+            str = str.replace(entry.getKey(), entry.getValue().format(value));
         }
         return str;
     }

@@ -15,7 +15,7 @@ public class BlockTypeEquals implements BlockCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull Block block) {
+    public Boolean evaluate(@NotNull Block block) {
         final Material blockType = block.getType();
         for (Material validBlockType : validBlockTypes) {
             if (blockType == validBlockType) {

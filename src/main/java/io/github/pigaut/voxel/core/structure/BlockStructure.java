@@ -2,11 +2,11 @@ package io.github.pigaut.voxel.core.structure;
 
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.plugin.manager.*;
-import io.github.pigaut.voxel.util.Rotation;
-import io.github.pigaut.yaml.*;
+import io.github.pigaut.voxel.bukkit.Rotation;
 import io.github.pigaut.yaml.convert.format.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
@@ -18,6 +18,10 @@ public class BlockStructure implements Identifiable {
     private final String group;
     private final List<BlockChange> blockChanges;
     private final Material mostCommonMaterial;
+
+    public BlockStructure(List<BlockChange> blockChanges) {
+        this(UUID.randomUUID().toString(), null, blockChanges);
+    }
 
     public BlockStructure(String name, @Nullable String group, List<BlockChange> blockChanges) {
         this.name = name;
@@ -44,15 +48,17 @@ public class BlockStructure implements Identifiable {
                 .buildIcon();
     }
 
-    public Material getMostCommonMaterial() {
+    public synchronized Material getMostCommonMaterial() {
         if (mostCommonMaterial != null) {
             return mostCommonMaterial;
         }
 
         final Map<Material, Integer> materialFrequency = new HashMap<>();
         for (BlockChange blockChange : blockChanges) {
-            final Material material = blockChange.getType();
-            materialFrequency.put(material, materialFrequency.getOrDefault(material, 0) + 1);
+            if (blockChange instanceof SimpleBlockChange simpleBlock) {
+                Material material = simpleBlock.getType();
+                materialFrequency.put(material, materialFrequency.getOrDefault(material, 0) + 1);
+            }
         }
 
         Material mostCommonMaterial = null;

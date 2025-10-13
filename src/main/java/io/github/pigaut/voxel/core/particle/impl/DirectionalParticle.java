@@ -18,7 +18,7 @@ public class DirectionalParticle extends AbstractParticle {
 
     @Override
     public int getParticleCount() {
-        return 1;
+        return 0;
     }
 
     @Override

@@ -1,11 +1,10 @@
 package io.github.pigaut.voxel.core.message.impl;
 
+import io.github.pigaut.voxel.core.hologram.*;
 import io.github.pigaut.voxel.core.message.*;
-import io.github.pigaut.voxel.hologram.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.yaml.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;

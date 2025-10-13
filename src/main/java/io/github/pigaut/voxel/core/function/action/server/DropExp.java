@@ -3,14 +3,15 @@ package io.github.pigaut.voxel.core.function.action.server;
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.yaml.amount.*;
 import org.bukkit.*;
+import org.jetbrains.annotations.*;
 
 public class DropExp implements ServerAction {
 
     private final Amount expAmount;
-    private final Amount orbCount;
+    private final @Nullable Amount orbCount;
     private final Location location;
 
-    public DropExp(Amount expAmount, World world, double x, double y, double z, Amount orbCount) {
+    public DropExp(Amount expAmount, @Nullable Amount orbCount, World world, double x, double y, double z) {
         this.expAmount = expAmount;
         this.orbCount = orbCount;
         this.location = new Location(world, x, y, z);
@@ -18,7 +19,12 @@ public class DropExp implements ServerAction {
 
     @Override
     public void execute() {
-        ExpOrb.spawn(location, expAmount, orbCount.getInteger());
+        if (orbCount != null) {
+            ExpDrop.spawn(location, expAmount, orbCount.getInteger());
+        }
+        else {
+            ExpDrop.spawn(location, expAmount.getInteger());
+        }
     }
 
 }

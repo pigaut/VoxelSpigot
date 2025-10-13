@@ -51,7 +51,7 @@ public class StructureSaveSubCommand extends SubCommand {
             final RootSequence sequence = YamlConfig.createEmptySequence(file, plugin.getConfigurator());
             sequence.setFlowStyle(FlowStyle.AUTO);
 
-            final Set<Material> structureBlacklist = plugin.getStructures().getMaterialBlacklist();
+            final Set<Material> structureBlacklist = plugin.getOptions().getStructureBlacklist();
             for (Location location : CuboidRegion.getAllLocations(player.getWorld(), firstSelection, secondSelection)) {
                 final Block block = location.getBlock();
                 final Material blockType = block.getType();

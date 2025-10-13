@@ -16,7 +16,7 @@ public class PlayerToolHasCustomModel implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         final ItemStack heldItem = player.getInventory().getItemInMainHand();
         if (!heldItem.hasItemMeta()) {
             return false;

@@ -16,7 +16,7 @@ public class PlayerToolTypeIsEqual implements PlayerCondition {
     }
 
     @Override
-    public boolean isMet(@NotNull PlayerState player) {
+    public Boolean evaluate(@NotNull PlayerState player) {
         final Material toolMaterial = player.getInventory().getItemInMainHand().getType();
         for (Material material : materials) {
             if (material == toolMaterial) {

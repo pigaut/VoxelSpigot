@@ -1,6 +1,6 @@
 package io.github.pigaut.voxel.config.deserializer;
 
-import io.github.pigaut.yaml.configurator.deserialize.*;
+import io.github.pigaut.yaml.configurator.convert.deserialize.*;
 import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;

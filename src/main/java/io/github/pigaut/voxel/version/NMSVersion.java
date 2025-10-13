@@ -30,6 +30,7 @@ public enum NMSVersion {
     V1_21_R2,
     V1_21_R3,
     V1_21_R4,
+    V1_21_R5,
 
     UNKNOWN();
 
