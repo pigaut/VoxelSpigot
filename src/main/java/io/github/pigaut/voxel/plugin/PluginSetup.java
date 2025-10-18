@@ -1,12 +1,12 @@
 package io.github.pigaut.voxel.plugin;
 
-import com.jeff_media.updatechecker.*;
 import io.github.pigaut.sql.*;
 import io.github.pigaut.sql.database.*;
 import io.github.pigaut.voxel.*;
 import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.voxel.util.UpdateChecker;
 import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.*;
@@ -24,8 +24,11 @@ public class PluginSetup {
 
     public static @NotNull RootSection createConfiguration(EnhancedJavaPlugin plugin) {
         File configFile = plugin.getFile("config.yml");
-        Configurator configurator = plugin.getConfigurator();
+        if (!configFile.exists()) {
+            plugin.saveDefaultConfig();
+        }
 
+        Configurator configurator = plugin.getConfigurator();
         RootSection config;
         try {
             config = YamlConfig.loadSection(configFile, configurator);
@@ -74,11 +77,13 @@ public class PluginSetup {
         }
 
         ConfigSection config = plugin.getConfiguration();
-        if (!plugin.forceMetrics() && !config.getBoolean("metrics").orElse(true)) {
+        if (config.getBoolean("metrics").orElse(true)) {
+            plugin.getColoredLogger().info("Created bStats metrics with id: " + metricsId);
+        }
+        else if (!plugin.forceMetricsSilent()) {
             return null;
         }
 
-        plugin.getColoredLogger().info("Created bStats metrics with id: " + metricsId);
         currentMetrics = new PluginMetrics(plugin, metricsId);
         currentMetrics.addCustomChart(new SimplePie("premium", () ->
                 Boolean.toString(plugin.isPremium())));
@@ -93,8 +98,9 @@ public class PluginSetup {
         }
 
         UpdateChecker currentChecker = plugin.getUpdateChecker();
-        if (currentChecker != null) {
-            currentChecker.stop();
+        if (currentChecker == null) {
+            currentChecker = new UpdateChecker(plugin, plugin.getResourceId());
+            plugin.registerListener(currentChecker);
         }
 
         ConfigSection config = plugin.getConfiguration();
@@ -103,14 +109,7 @@ public class PluginSetup {
         }
 
         plugin.getColoredLogger().info("Created update checker with id: " + resourceId);
-        currentChecker = new UpdateChecker(plugin, UpdateCheckSource.SPIGET, Integer.toString(resourceId))
-                .setDownloadLink("https://www.spigotmc.org/resources/" + resourceId)
-                .setChangelogLink("https://www.spigotmc.org/resources/" + resourceId + "/updates")
-                .setDonationLink(plugin.getDonationLink())
-                .setNotifyOpsOnJoin(true)
-                .checkEveryXHours(24)
-                .checkNow();
-
+        currentChecker.checkForUpdates();
         return currentChecker;
     }
 
@@ -173,7 +172,7 @@ public class PluginSetup {
             }
         }
 
-        logger.info("Generating hooked plugins example files...");
+        logger.info("Generating plugin specific example files...");
         Map<String, List<String>> examplesByPlugin = plugin.getExamplesByPlugin();
         for (String pluginName : examplesByPlugin.keySet()) {
             if (SpigotServer.isPluginEnabled(pluginName)) {

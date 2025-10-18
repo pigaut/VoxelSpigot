@@ -7,23 +7,23 @@ import org.bukkit.entity.*;
 
 import java.util.*;
 
-public class ExpDrop {
+public class Exp {
 
-    private ExpDrop() {}
+    private Exp() {}
 
-    public static void spawn(Location location, int totalExp) {
+    public static void drop(Location location, int totalExp) {
         World world = location.getWorld();
         if (world == null) {
             world = SpigotServer.getDefaultWorld();
         }
 
-        for (Integer orbExp : getExpOrbs(totalExp)) {
+        for (Integer orbExp : getOrbs(totalExp)) {
             final ExperienceOrb expOrb = (ExperienceOrb) world.spawnEntity(location, EntityType.EXPERIENCE_ORB);
             expOrb.setExperience(orbExp);
         }
     }
 
-    public static void spawn(Location location, int exp, int count) {
+    public static void drop(Location location, int exp, int count) {
         World world = location.getWorld();
         if (world == null) {
             world = SpigotServer.getDefaultWorld();
@@ -35,7 +35,7 @@ public class ExpDrop {
         }
     }
 
-    public static void spawn(Location location, Amount expAmount, int count) {
+    public static void drop(Location location, Amount expAmount, int count) {
         World world = location.getWorld();
         if (world == null) {
             world = SpigotServer.getDefaultWorld();
@@ -47,7 +47,7 @@ public class ExpDrop {
         }
     }
 
-    public static List<Integer> getExpOrbs(int totalXP) {
+    public static List<Integer> getOrbs(int totalXP) {
         List<Integer> orbs = new ArrayList<>();
 
         while (totalXP > 0) {

@@ -20,10 +20,10 @@ public class DropExpAtPlayer implements PlayerAction {
     public void execute(@NotNull PlayerState player) {
         Location location = player.getLocation();
         if (orbCount == null) {
-            ExpDrop.spawn(location, expAmount.getInteger());
+            Exp.drop(location, expAmount.getInteger());
             return;
         }
-        ExpDrop.spawn(location, expAmount, orbCount.getInteger());
+        Exp.drop(location, expAmount, orbCount.getInteger());
     }
 
 }

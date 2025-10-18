@@ -1,12 +1,10 @@
 package io.github.pigaut.voxel.core.function.action.server;
 
 import io.github.pigaut.voxel.bukkit.*;
+import io.github.pigaut.voxel.bukkit.ItemUtil;
 import io.github.pigaut.voxel.core.function.action.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.server.*;
-import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.amount.*;
-import io.github.pigaut.yaml.configurator.load.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -32,12 +30,12 @@ public class DropItem implements Action {
     @Override
     public void execute(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         if (player == null || !doFortune) {
-            ItemDrop.spawn(location, item, amount.getInteger());
+            ItemUtil.dropItem(location, item, amount.getInteger());
             return;
         }
 
         int fortuneLevel = Fortune.getEnchantLevel(player.getInventory().getItemInMainHand());
-        ItemDrop.spawn(location, item, amount.getInteger(), fortuneLevel);
+        ItemUtil.dropItem(location, item, amount.getInteger(), fortuneLevel);
     }
 
 }

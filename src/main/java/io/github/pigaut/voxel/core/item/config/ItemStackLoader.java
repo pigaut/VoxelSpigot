@@ -8,6 +8,7 @@ import io.github.pigaut.yaml.configurator.load.*;
 import io.github.pigaut.yaml.convert.format.*;
 import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
+import org.bukkit.enchantments.*;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.*;
@@ -72,12 +73,9 @@ public class ItemStackLoader implements ConfigLoader.Section<ItemStack> {
 
             final ConfigSection enchantsSection = section.getSectionOrCreate("enchantments|enchants");
             for (String key : enchantsSection.getKeys()) {
-                try {
-                    meta.addEnchant(enchantDeserializer.deserialize(key), enchantsSection.getRequiredInteger(key), true);
-                }
-                catch (StringParseException e) {
-                    throw new InvalidConfigurationException(section, "enchantments", e.getMessage());
-                }
+                Enchantment enchantment = enchantDeserializer.loadFromKey(enchantsSection, key);
+                int level = enchantsSection.getRequiredInteger(key);
+                meta.addEnchant(enchantment, level, true);
             }
 
             final PersistentDataContainer dataContainer = meta.getPersistentDataContainer();

@@ -1,7 +1,6 @@
 package io.github.pigaut.voxel.plugin;
 
 import io.github.pigaut.voxel.command.*;
-import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.configurator.*;
 import org.bukkit.event.*;
@@ -14,22 +13,6 @@ public interface PluginProperties {
     @NotNull
     Configurator createConfigurator();
 
-    default boolean isPremium() {
-        return false;
-    }
-
-    default boolean forceMetrics() {
-        return !isPremium();
-    }
-
-    default boolean forceUpdateChecker() {
-        return !isPremium();
-    }
-
-    default boolean forceLogoDump() {
-        return !isPremium();
-    }
-
     @Nullable
     default String getLogo() {
         return null;
@@ -40,10 +23,6 @@ public interface PluginProperties {
     }
 
     default @Nullable Integer getResourceId() {
-        return null;
-    }
-
-    default @Nullable String getDonationLink() {
         return null;
     }
 
@@ -81,6 +60,22 @@ public interface PluginProperties {
 
     default @Nullable String getDatabaseName() {
         return null;
+    }
+
+    default boolean isPremium() {
+        return false;
+    }
+
+    default boolean forceUpdateChecker() {
+        return !isPremium();
+    }
+
+    default boolean forceLogoDump() {
+        return !isPremium();
+    }
+
+    default boolean forceMetricsSilent() {
+        return true;
     }
 
 }

@@ -20,10 +20,10 @@ public class DropExpAtBlock implements BlockAction {
     public void execute(@NotNull Block block) {
         Location location = block.getLocation().add(0.5, 0.5, 0.5);
         if (orbCount == null) {
-            ExpDrop.spawn(location, expAmount.getInteger());
+            Exp.drop(location, expAmount.getInteger());
             return;
         }
-        ExpDrop.spawn(location, expAmount, orbCount.getInteger());
+        Exp.drop(location, expAmount, orbCount.getInteger());
     }
 
 }

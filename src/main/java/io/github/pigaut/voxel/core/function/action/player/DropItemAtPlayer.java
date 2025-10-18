@@ -24,10 +24,10 @@ public class DropItemAtPlayer implements PlayerAction {
         Location location = player.getLocation();
         if (doFortune) {
             int fortuneLevel = Fortune.getEnchantLevel(player.getInventory().getItemInMainHand());
-            ItemDrop.spawn(location, item, amount.getInteger(), fortuneLevel);
+            ItemUtil.dropItem(location, item, amount.getInteger(), fortuneLevel);
             return;
         }
-        ItemDrop.spawn(location, item, amount.getInteger());
+        ItemUtil.dropItem(location, item, amount.getInteger());
     }
 
 }

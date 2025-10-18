@@ -20,10 +20,10 @@ public class DropExp implements ServerAction {
     @Override
     public void execute() {
         if (orbCount != null) {
-            ExpDrop.spawn(location, expAmount, orbCount.getInteger());
+            Exp.drop(location, expAmount, orbCount.getInteger());
         }
         else {
-            ExpDrop.spawn(location, expAmount.getInteger());
+            Exp.drop(location, expAmount.getInteger());
         }
     }
 

@@ -78,7 +78,7 @@ public class MessageLoader implements ConfigLoader<Message> {
 
             case "HOLOGRAM" -> {
                 message = new HologramMessage(plugin, messageName, messageGroup,
-                        SpigotServer.isPluginLoaded("DecentHolograms") ? section.getRequired("hologram", Hologram.class) : null,
+                        SpigotServer.isPluginEnabled("DecentHolograms") ? section.getRequired("hologram", Hologram.class) : null,
                         section.getInteger("duration").withDefault(40),
                         section.getDouble("radius.x").withDefault(null),
                         section.getDouble("radius.y").withDefault(null),

@@ -25,6 +25,7 @@ import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.voxel.util.UpdateChecker;
 import io.github.pigaut.voxel.util.reflection.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.*;
@@ -126,10 +127,13 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         configurator = createConfigurator();
         config = PluginSetup.createConfiguration(this);
         debug = config.getBoolean("debug").orElse(true);
+
         PluginSetup.dumpLogo(this);
         PluginSetup.logFoundDependecies(this);
         PluginSetup.generateDirectoriesAndFiles(this);
         PluginSetup.generateExampleFiles(this);
+        metrics = PluginSetup.createMetrics(this);
+        updateChecker = PluginSetup.createUpdateChecker(this);
 
         List<Manager> loadedManagers = managerInitializer.getLoadedManagers();
         for (Manager manager : loadedManagers) {

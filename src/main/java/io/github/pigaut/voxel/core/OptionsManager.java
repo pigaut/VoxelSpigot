@@ -30,7 +30,7 @@ public class OptionsManager extends Manager implements ConfigBacked {
         List<ConfigurationException> errorsFound = new ArrayList<>();
 
         ConfigSection config = plugin.getConfiguration();
-        doFortuneWhitelist = config.getElements("do-fortune-whitelist", Material.class)
+        doFortuneWhitelist = config.getElements("apply-fortune|do-fortune-whitelist", Material.class)
                 .withDefault(List.of(), errorsFound::add);
 
         structureBlacklist = config.getElements("structure-blacklist", Material.class)

@@ -185,6 +185,11 @@ public class SimplePlayerState implements PlayerState {
     }
 
     @Override
+    public @NotNull ItemStack getTool() {
+        return getInventory().getItemInMainHand();
+    }
+
+    @Override
     public void performCommand(String command) {
         final Player player = asPlayer();
         player.performCommand(StringPlaceholders.parseAll(player, command, placeholders));
@@ -222,6 +227,12 @@ public class SimplePlayerState implements PlayerState {
     @Override
     public void addFlag(String flag) {
         flags.add(flag);
+    }
+
+    @Override
+    public void addTemporaryFlag(String flag, int ticks) {
+        flags.add(flag);
+        plugin.getScheduler().runTaskLater(ticks, () -> flags.remove(flag));
     }
 
     @Override

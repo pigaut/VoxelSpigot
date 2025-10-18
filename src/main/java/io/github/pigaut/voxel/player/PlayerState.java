@@ -158,6 +158,9 @@ public interface PlayerState {
      */
     PlayerInventory getInventory();
 
+    @NotNull
+    ItemStack getTool();
+
     /**
      * Executes a command as the player.
      *
@@ -196,6 +199,8 @@ public interface PlayerState {
      * @param flag The flag to add.
      */
     void addFlag(String flag);
+
+    void addTemporaryFlag(String flag, int ticks);
 
     /**
      * Removes a flag from the player's set of flags.
