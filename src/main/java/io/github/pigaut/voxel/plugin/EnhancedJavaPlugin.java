@@ -1,6 +1,5 @@
 package io.github.pigaut.voxel.plugin;
 
-import com.jeff_media.updatechecker.*;
 import io.github.pigaut.sql.*;
 import io.github.pigaut.voxel.*;
 import io.github.pigaut.voxel.bukkit.*;
@@ -95,6 +94,8 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         updateChecker = PluginSetup.createUpdateChecker(this);
         database = PluginSetup.createDatabase(this);
 
+        createHooks();
+
         managerInitializer.initialize();
 
         registerListener(new PlayerInputListener(this));
@@ -184,6 +185,10 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     public @NotNull Configurator createConfigurator() {
         return new PluginConfigurator(this);
+    }
+
+    public void createHooks() {
+
     }
 
     @Override

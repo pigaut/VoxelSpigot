@@ -1,8 +1,10 @@
 package io.github.pigaut.voxel.core.structure.config;
 
+import com.nexomc.nexo.api.*;
 import dev.lone.itemsadder.api.*;
 import io.github.pigaut.voxel.core.structure.*;
 import io.github.pigaut.voxel.hook.itemsadder.*;
+import io.github.pigaut.voxel.hook.nexo.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.load.*;
@@ -33,6 +35,14 @@ public class BlockChangeLoader implements ConfigLoader.Line<BlockChange> {
             return new ItemsAdderBlockChange(customBlock, offsetX, offsetY, offsetZ);
         }
 
+        if (SpigotServer.isPluginEnabled("Nexo") && line.hasFlag("nexo")) {
+            String blockId = line.getRequiredString("nexo");
+            if (!NexoBlocks.isCustomBlock(blockId)) {
+                throw new InvalidConfigurationException(line, "nexo", "Could not find nexo block with name: '" + blockId + "'");
+            }
+            return new NexoBlockChange(blockId, offsetX, offsetY, offsetZ);
+        }
+
         Material material = line.getRequired(0, Material.class);
         Integer age = line.getInteger("age").withDefault(null);
         BlockFace direction = line.get("direction|face", BlockFace.class).withDefault(null);
@@ -60,9 +70,19 @@ public class BlockChangeLoader implements ConfigLoader.Line<BlockChange> {
             if (!SpigotServer.isPluginEnabled("ItemsAdder")) {
                 throw new InvalidConfigurationException(section, "itemsadder-block", "ItemsAdder is not loaded/enabled");
             }
-
             CustomBlock customBlock = section.getRequired("itemsadder-block|ia-block", CustomBlock.class);
             return new ItemsAdderBlockChange(customBlock, offsetX, offsetY, offsetZ);
+        }
+
+        if (section.contains("nexo-block")) {
+            if (!SpigotServer.isPluginEnabled("Nexo")) {
+                throw new InvalidConfigurationException(section, "nexo-block", "Nexo is not loaded/enabled");
+            }
+            String blockId = section.getRequiredString("nexo-block");
+            if (!NexoBlocks.isCustomBlock(blockId)) {
+                throw new InvalidConfigurationException(section, "nexo-block", "Could not find nexo block with name: '" + blockId + "'");
+            }
+            return new NexoBlockChange(blockId, offsetX, offsetY, offsetZ);
         }
 
         Material material = section.getRequired("block", Material.class);

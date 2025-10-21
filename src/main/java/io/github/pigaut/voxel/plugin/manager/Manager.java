@@ -1,20 +1,18 @@
 package io.github.pigaut.voxel.plugin.manager;
 
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.yaml.convert.format.*;
-import org.jetbrains.annotations.*;
+import io.github.pigaut.voxel.util.*;
 
 import java.util.*;
-import java.util.logging.*;
 
 public abstract class Manager {
 
     protected final EnhancedJavaPlugin plugin;
-    protected final Logger logger;
+    protected final ColoredLogger logger;
 
     protected Manager(EnhancedJavaPlugin plugin) {
         this.plugin = plugin;
-        this.logger = plugin.getLogger();
+        this.logger = plugin.getColoredLogger();
     }
 
     public boolean isAutoSave() {

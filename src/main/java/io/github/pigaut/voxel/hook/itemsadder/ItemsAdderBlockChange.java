@@ -7,18 +7,13 @@ import org.bukkit.*;
 import org.bukkit.block.*;
 import org.jetbrains.annotations.*;
 
-public class ItemsAdderBlockChange implements BlockChange {
+public class ItemsAdderBlockChange extends OffsetBlockChange {
 
     private final CustomBlock customBlock;
-    private final int offsetX;
-    private final int offsetY;
-    private final int offsetZ;
 
     public ItemsAdderBlockChange(CustomBlock customBlock, int offsetX, int offsetY, int offsetZ) {
+        super(offsetX, offsetY, offsetZ);
         this.customBlock = customBlock;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.offsetZ = offsetZ;
     }
 
     @Override
@@ -28,16 +23,6 @@ public class ItemsAdderBlockChange implements BlockChange {
             return false;
         }
         return customBlock.getNamespacedID().equals(placedBlock.getNamespacedID());
-    }
-
-    @Override
-    public @NotNull Location getLocation(Location origin, Rotation rotation) {
-        return rotation.apply(origin.clone(), offsetX, offsetY, offsetZ);
-    }
-
-    @Override
-    public @NotNull Block getBlock(Location origin, Rotation rotation) {
-        return getLocation(origin, rotation).getBlock();
     }
 
     @Override
