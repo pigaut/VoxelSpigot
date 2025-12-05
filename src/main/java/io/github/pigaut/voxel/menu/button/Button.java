@@ -34,29 +34,29 @@ public class Button {
     public void onClick(MenuView view, InventoryClickEvent event) {
         final ClickType click = event.getClick();
         switch (click) {
-            case LEFT -> onLeftClick(view, view.getViewer(), event);
-            case SHIFT_LEFT -> onShiftLeftClick(view, view.getViewer(), event);
-            case RIGHT -> onRightClick(view, view.getViewer(), event);
-            case SHIFT_RIGHT -> onShiftRightClick(view, view.getViewer(), event);
+            case LEFT -> onLeftClick(view, view.getViewer());
+            case SHIFT_LEFT -> onShiftLeftClick(view, view.getViewer());
+            case RIGHT -> onRightClick(view, view.getViewer());
+            case SHIFT_RIGHT -> onShiftRightClick(view, view.getViewer());
         }
         if (updateOnClick()) {
             view.update();
         }
     }
 
-    public void onLeftClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onLeftClick(MenuView view, PlayerState player) {
 
     }
 
-    public void onRightClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onRightClick(MenuView view, PlayerState player) {
 
     }
 
-    public void onShiftLeftClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onShiftLeftClick(MenuView view, PlayerState player) {
 
     }
 
-    public void onShiftRightClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onShiftRightClick(MenuView view, PlayerState player) {
 
     }
 

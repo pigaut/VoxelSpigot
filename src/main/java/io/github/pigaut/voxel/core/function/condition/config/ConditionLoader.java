@@ -121,7 +121,7 @@ public class ConditionLoader extends AbstractLoader<Condition> {
         // Event Conditions
         addLoader("CLICK_TYPE_EQUALS", (Line<Condition>) line ->
                 new ActionEquals(
-                        line.getAll(1, ClickAction.class),
+                        line.getAll(1, InteractType.class),
                         line.getBoolean("shift|sneak|sneaking").withDefault(null)
                 ));
 

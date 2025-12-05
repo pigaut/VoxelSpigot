@@ -14,7 +14,7 @@ public class StructurePlaceSubCommand extends SubCommand {
     public StructurePlaceSubCommand(@NotNull EnhancedPlugin plugin) {
         super("place", plugin);
         withPermission(plugin.getPermission("structure.place"));
-        withDescription(plugin.getLang("structure-place-command"));
+        withDescription(plugin.getTranslation("structure-place-command"));
         withParameter(CommandParameters.structureName(plugin));
         withPlayerExecution((player, args, placeholders) -> {
             final BlockStructure structure = plugin.getStructure(args[0]);

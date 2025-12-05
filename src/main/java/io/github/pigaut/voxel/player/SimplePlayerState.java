@@ -8,6 +8,7 @@ import io.github.pigaut.voxel.player.input.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.util.collection.*;
 import io.github.pigaut.yaml.convert.parse.*;
+import io.github.pigaut.yaml.util.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.player.*;
@@ -30,8 +31,7 @@ public class SimplePlayerState implements PlayerState {
     private @Nullable Location firstSelection = null;
     private @Nullable Location secondSelection = null;
 
-    private @Nullable InputType awaitingInput = null;
-    private @Nullable String lastInput = null;
+    private @Nullable InputCollector inputCollector = null;
 
     public SimplePlayerState(@NotNull EnhancedPlugin plugin, @NotNull Player player) {
         this.plugin = plugin;
@@ -95,8 +95,11 @@ public class SimplePlayerState implements PlayerState {
     }
 
     @Override
-    public void sendTitle(Title title) {
-        title.send(asPlayer());
+    public void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        Preconditions.checkArgument(fadeIn <= Short.MAX_VALUE, "Title fade in amount is too large.");
+        Preconditions.checkArgument(stay <= Short.MAX_VALUE, "Title stay amount is too large.");
+        Preconditions.checkArgument(fadeOut <= Short.MAX_VALUE, "Title fade out amount is too large.");
+        asPlayer().sendTitle(title, subtitle, fadeIn, stay, fadeOut);
     }
 
     @Override
@@ -294,59 +297,83 @@ public class SimplePlayerState implements PlayerState {
         this.secondSelection = location;
     }
 
+
     @Override
     public boolean isAwaitingInput() {
-        return awaitingInput != null;
+        return inputCollector != null && inputCollector.isCollecting();
     }
 
     @Override
-    public boolean isAwaitingInput(@NotNull InputType inputType) {
-        return awaitingInput == inputType;
+    public boolean isAwaitingInput(@NotNull InputSource inputSource) {
+        return isAwaitingInput() && inputCollector.getInputSource() == inputSource;
     }
 
     @Override
-    public void setAwaitingInput(@Nullable InputType inputType) {
-        this.awaitingInput = inputType;
+    public void submitInput(@NotNull String input) {
+        Preconditions.checkState(isAwaitingInput(), "Player is currently not being prompted for input.");
+        inputCollector.accept(input);
+        if (!inputCollector.isCollecting()) {
+            inputCollector = null;
+        }
     }
 
     @Override
-    public @Nullable String getLastInput() {
-        return lastInput;
+    public void cancelInputCollection() {
+        if (inputCollector != null) {
+            if (inputCollector.isCollecting()) {
+                inputCollector.cancel();
+            }
+            this.inputCollector = null;
+        }
+    }
+
+    private void registerInputCollector(@NotNull InputCollector inputCollector) {
+        if (isAwaitingInput()) {
+            this.inputCollector.cancel();
+        }
+        this.inputCollector = inputCollector;
     }
 
     @Override
-    public void setLastInput(@Nullable String input) {
-        this.lastInput = input;
+    public ChatInput<String> collectChatInput() {
+        ChatInput<String> chatInput = new ChatInput<>(plugin, this, Parsers.STRING);
+        registerInputCollector(chatInput);
+        return chatInput;
     }
 
     @Override
-    public ChatInput<String> createChatInput() {
-        return new ChatInput<>(this, Parsers.STRING);
+    public <T> ChatInput<T> collectChatInput(@NotNull Class<T> classType) {
+        ChatInput<T> chatInput = new ChatInput<>(plugin,this, Parsers.getByType(classType));
+        registerInputCollector(chatInput);
+        return chatInput;
     }
 
     @Override
-    public <T> ChatInput<T> createChatInput(@NotNull Class<T> classType) {
-        return new ChatInput<>(this, Parsers.getByType(classType));
+    public <T> ChatInput<T> collectChatInput(@NotNull Parser<T> parser) {
+        ChatInput<T> chatInput = new ChatInput<>(plugin,this, parser);
+        registerInputCollector(chatInput);
+        return chatInput;
     }
 
     @Override
-    public <T> ChatInput<T> createChatInput(@NotNull Parser<T> deserializer) {
-        return new ChatInput<>(this, deserializer);
+    public MenuSelection<String> collectMenuSelection() {
+        MenuSelection<String> menuSelection = new MenuSelection<>(this, Parsers.STRING);
+        registerInputCollector(menuSelection);
+        return menuSelection;
     }
 
     @Override
-    public MenuInput<String> createMenuInputSelection() {
-        return new MenuInput<>(this, Parsers.STRING);
+    public <T> MenuSelection<T> collectMenuSelection(@NotNull Class<T> classType) {
+        MenuSelection<T> menuSelection = new MenuSelection<>(this, Parsers.getByType(classType));
+        registerInputCollector(menuSelection);
+        return menuSelection;
     }
 
     @Override
-    public <T> MenuInput<T> createMenuInputSelection(@NotNull Class<T> classType) {
-        return new MenuInput<>(this, Parsers.getByType(classType));
-    }
-
-    @Override
-    public <T> MenuInput<T> createMenuInputSelection(@NotNull Parser<T> deserializer) {
-        return new MenuInput<>(this, deserializer);
+    public <T> MenuSelection<T> collectMenuSelection(@NotNull Parser<T> parser) {
+        MenuSelection<T> menuSelection = new MenuSelection<>(this, parser);
+        registerInputCollector(menuSelection);
+        return menuSelection;
     }
 
 }

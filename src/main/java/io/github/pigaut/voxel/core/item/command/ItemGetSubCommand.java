@@ -12,7 +12,7 @@ public class ItemGetSubCommand extends SubCommand {
     public ItemGetSubCommand(@NotNull EnhancedPlugin plugin) {
         super("get", plugin);
         withPermission(plugin.getPermission("item.get"));
-        withDescription(plugin.getLang("item-get-command"));
+        withDescription(plugin.getTranslation("item-get-command"));
         withParameter(CommandParameters.itemName(plugin));
         withPlayerExecution((player, args, placeholders) -> {
             final ItemStack item = plugin.getItemStack(args[0]);

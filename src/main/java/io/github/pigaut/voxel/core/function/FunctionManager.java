@@ -1,12 +1,12 @@
 package io.github.pigaut.voxel.core.function;
 
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.plugin.boot.*;
+import io.github.pigaut.voxel.plugin.boot.phase.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.node.section.*;
 import org.jetbrains.annotations.*;
 
-import java.io.*;
+import java.util.*;
 
 public class FunctionManager extends ConfigBackedManager.SectionKey<Function> {
 
@@ -16,7 +16,7 @@ public class FunctionManager extends ConfigBackedManager.SectionKey<Function> {
 
     @Override
     public void loadFromSectionKey(ConfigSection section, String key) throws InvalidConfigurationException {
-        final Function function = section.getRequired(key, Function.class);
+        Function function = section.getRequired(key, Function.class);
         try {
             add(function);
         }

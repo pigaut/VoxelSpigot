@@ -9,7 +9,7 @@ public class MessageSubCommand extends SubCommand {
     public MessageSubCommand(@NotNull EnhancedPlugin plugin) {
         super("message", plugin);
         withPermission(plugin.getPermission("message"));
-        withDescription(plugin.getLang("message-command"));
+        withDescription(plugin.getTranslation("message-command"));
         addSubCommand(new SendMessageSubCommand(plugin));
         addSubCommand(new BroadcastMessageSubCommand(plugin));
     }

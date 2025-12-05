@@ -9,7 +9,7 @@ public class ItemSubCommand extends SubCommand {
     public ItemSubCommand(@NotNull EnhancedPlugin plugin) {
         super("item", plugin);
         this.withPermission(plugin.getPermission("item"));
-        this.withDescription(plugin.getLang("item-command"));
+        this.withDescription(plugin.getTranslation("item-command"));
         this.addSubCommand(new ItemSaveSubCommand(plugin));
         this.addSubCommand(new ItemGetSubCommand(plugin));
         this.addSubCommand(new ItemGetGroupSubCommand(plugin));

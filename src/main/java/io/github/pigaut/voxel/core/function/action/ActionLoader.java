@@ -49,7 +49,7 @@ public class ActionLoader extends AbstractLoader<FunctionAction> {
             Amount amount = line.get("amount|dropAmount", Amount.class)
                     .withDefault(Amount.ONE);
             boolean doFortune = line.getBoolean("doFortune|applyFortune|fortune")
-                    .withDefault(plugin.getOptions().shouldDoFortune(item.getType()));
+                    .withDefault(plugin.getSettings().isApplyFortune(item.getType()));
 
             return new DropItem(item, amount, doFortune,
                     line.get("world", World.class).withDefault(SpigotServer.getDefaultWorld()),
@@ -138,7 +138,7 @@ public class ActionLoader extends AbstractLoader<FunctionAction> {
             Amount amount = line.get("amount|dropAmount", Amount.class)
                     .withDefault(Amount.ONE);
             boolean doFortune = line.getBoolean("doFortune|applyFortune|fortune")
-                    .withDefault(plugin.getOptions().shouldDoFortune(item.getType()));
+                    .withDefault(plugin.getSettings().isApplyFortune(item.getType()));
             return new DropItemAtBlock(item, amount, doFortune);
         });
 
@@ -149,16 +149,16 @@ public class ActionLoader extends AbstractLoader<FunctionAction> {
                 ));
 
         addLoader("PARTICLE_AT_BLOCK", (Line<Action>) line ->
-                new SpawnParticleOnBlock(line.getRequired(1, ParticleEffect.class)));
+                new SpawnParticleAtBlock(line.getRequired(1, ParticleEffect.class)));
 
         addLoader("SPAWN_PARTICLE_AT_BLOCK", (Line<Action>) line ->
-                new SpawnParticleOnBlock(line.getRequired(1, ParticleEffect.class)));
+                new SpawnParticleAtBlock(line.getRequired(1, ParticleEffect.class)));
 
         addLoader("SOUND_AT_BLOCK", (Line<Action>) line ->
-                new PlaySoundOnBlock(line.getRequired(1, SoundEffect.class)));
+                new PlaySoundAtBlock(line.getRequired(1, SoundEffect.class)));
 
         addLoader("PLAY_SOUND_AT_BLOCK", (Line<Action>) line ->
-                new PlaySoundOnBlock(line.getRequired(1, SoundEffect.class)));
+                new PlaySoundAtBlock(line.getRequired(1, SoundEffect.class)));
 
         //player actions
 
@@ -167,7 +167,7 @@ public class ActionLoader extends AbstractLoader<FunctionAction> {
             Amount amount = line.get("amount|dropAmount", Amount.class)
                     .withDefault(Amount.ONE);
             boolean doFortune = line.getBoolean("doFortune|applyFortune|fortune")
-                    .withDefault(plugin.getOptions().shouldDoFortune(item.getType()));
+                    .withDefault(plugin.getSettings().isApplyFortune(item.getType()));
             return new DropItemAtPlayer(item, amount, doFortune);
         });
 
@@ -194,7 +194,7 @@ public class ActionLoader extends AbstractLoader<FunctionAction> {
             Amount amount = line.get("amount|dropAmount", Amount.class)
                     .withDefault(Amount.ONE);
             boolean doFortune = line.getBoolean("doFortune|applyFortune|fortune")
-                    .withDefault(plugin.getOptions().shouldDoFortune(item.getType()));
+                    .withDefault(plugin.getSettings().isApplyFortune(item.getType()));
             return new GiveItemToPlayer(item, amount, doFortune);
         });
 
@@ -276,6 +276,9 @@ public class ActionLoader extends AbstractLoader<FunctionAction> {
                 new SendMessage(line.getRequired(1, Message.class)));
 
         addLoader("LIGHTNING_AT_PLAYER", (Line<Action>) line ->
+                new StrikePlayerWithLightning(line.getBoolean("doDamage|damage").orElse(true)));
+
+        addLoader("STRIKE_PLAYER", (Line<Action>) line ->
                 new StrikePlayerWithLightning(line.getBoolean("doDamage|damage").orElse(true)));
 
         addLoader("SET_FLIGHT", (Line<Action>) line ->

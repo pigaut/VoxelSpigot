@@ -9,6 +9,7 @@ import org.bukkit.event.*;
 import org.bukkit.plugin.*;
 import org.jetbrains.annotations.*;
 
+import java.io.*;
 import java.util.*;
 
 public class SpigotServer {
@@ -92,6 +93,33 @@ public class SpigotServer {
 
     public static void callEvent(Event event) {
         Bukkit.getPluginManager().callEvent(event);
+    }
+
+    public static List<String> getWorldFolderNames() {
+        File worldFolder = Bukkit.getServer().getWorldContainer();
+
+        List<String> worlds = new ArrayList<>();
+
+        if (!worldFolder.isDirectory()) {
+            return worlds;
+        }
+
+        File[] children = worldFolder.listFiles();
+        if (children == null) {
+            return worlds;
+        }
+
+        for (File child : children) {
+            if (!child.isDirectory()) continue;
+
+            // Check if this folder contains a level.dat file
+            File levelDat = new File(child, "level.dat");
+            if (levelDat.exists() && levelDat.isFile()) {
+                worlds.add(child.getName());
+            }
+        }
+
+        return worlds;
     }
 
 }

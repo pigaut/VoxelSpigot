@@ -1,75 +1,67 @@
 package io.github.pigaut.voxel.player.input;
 
-import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.plugin.runnable.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.yaml.convert.parse.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.jetbrains.annotations.*;
 
-public class ChatInput<T> extends PlayerInput<T> {
+import java.util.function.*;
 
-    public ChatInput(SimplePlayerState player, Parser<T> deserializer) {
-        super(player, deserializer, "Enter a value in chat");
+public class ChatInput<T> extends GenericInputCollector<T> {
+
+    private final EnhancedPlugin plugin;
+    private final Player player;
+    private String description = "Enter a value in chat";
+
+    public ChatInput(@NotNull EnhancedPlugin plugin, @NotNull PlayerState player, @NotNull Parser<T> parser) {
+        super(player, parser);
+        this.plugin = plugin;
+        this.player = player.asPlayer();
     }
 
-    public void collect() {
-        if (playerState.isAwaitingInput()) {
-            throw new IllegalStateException("Player is already being asked for input.");
-        }
+    @Override
+    public @NotNull InputSource getInputSource() {
+        return InputSource.CHAT;
+    }
 
-        playerState.setAwaitingInput(InputType.CHAT);
-        playerState.setLastInput(null);
+    @Override
+    public void onStart() {
+        player.sendTitle(description, "Type ESC to cancel", 10, Short.MAX_VALUE, 0);
+    }
 
-        final MenuView previousView = playerState.getOpenMenu();
+    @Override
+    public void onSuccess(@NotNull T input) {
+        player.resetTitle();
+    }
 
-        final Player player = playerState.asPlayer();
-        if (previousView != null) {
-            previousView.close();
-        }
-        player.sendTitle(inputDescription, "Type ESC to cancel", 10, Integer.MAX_VALUE, 10);
+    @Override
+    public void onCancel() {
+        player.resetTitle();
+    }
 
-        new PluginRunnable(playerState.getPlugin()) {
-            int resetErrorTitle = 0;
-            @Override
-            public void run() {
-                if (!playerState.isAwaitingInput(InputType.CHAT)) {
-                    player.resetTitle();
-                    playerState.setOpenMenu(previousView);
-
-                    onCancel.run();
-                    cancel();
-                    return;
-                }
-
-                if (resetErrorTitle > 0) {
-                    resetErrorTitle--;
-                    if (resetErrorTitle == 0) {
-                        player.sendTitle(inputDescription, "Type ESC to cancel", 10, Integer.MAX_VALUE, 10);
-                    }
-                }
-
-                final String input = playerState.getLastInput();
-                if (input == null) {
-                    return;
-                }
-
-                final T parsedInput;
-                try {
-                    parsedInput = parser.parse(input);
-                } catch (StringParseException e) {
-                    player.sendTitle(ChatColor.RED + e.getMessage(), "Type ESC to cancel", 0, 40, 0);
-                    playerState.setLastInput(null);
-                    resetErrorTitle = 8;
-                    return;
-                }
-
-                player.resetTitle();
-                playerState.setAwaitingInput(null);
-                inputCollector.accept(parsedInput);
-                cancel();
+    @Override
+    public void onInputRejected(@NotNull String errorMessage) {
+        player.sendTitle(ChatColor.RED + errorMessage, "Type ESC to cancel", 10, 70, 0);
+        plugin.getScheduler().runTaskLater(60, () -> {
+            if (isCollecting()) {
+                player.sendTitle(description, "Type ESC to cancel", 10, Short.MAX_VALUE, 0);
             }
-        }.runTaskTimer(0, 5);
+        });
+    }
+
+    public ChatInput<T> description(@NotNull String description) {
+        this.description = description;
+        return this;
+    }
+
+    public ChatInput<T> onInput(@NotNull Consumer<T> inputCollector) {
+        return (ChatInput<T>) super.onInput(inputCollector);
+    }
+
+    public ChatInput<T> onCancel(@NotNull Runnable cancelAction) {
+        return (ChatInput<T>) super.onCancel(cancelAction);
     }
 
 }

@@ -90,14 +90,14 @@ public class Buttons {
             .withType(Material.RED_WOOL)
             .withDisplay("&4Close")
             .enchanted(true)
-            .onLeftClick((view, playerState, event) -> view.close())
+            .onLeftClick((view, playerState) -> view.close())
             .buildButton();
 
     public static final Button BACK = Button.builder()
             .withType(Material.SPRUCE_DOOR)
             .withDisplay("&cBack")
             .enchanted(true)
-            .onLeftClick((view, playerState, event) -> {
+            .onLeftClick((view, playerState) -> {
                 final MenuView previousView = view.getPreviousView();
                 if (previousView != null) {
                     previousView.open();
@@ -109,7 +109,7 @@ public class Buttons {
             .withType(Material.MINECART)
             .withDisplay("&5Main Menu")
             .enchanted(true)
-            .onLeftClick((view, playerState, event) -> {
+            .onLeftClick((view, playerState) -> {
                 final MenuView firstView = view.getFirstView();
                 if (view == firstView) {
                     return;

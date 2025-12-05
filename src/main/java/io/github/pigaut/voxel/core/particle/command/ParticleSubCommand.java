@@ -9,7 +9,7 @@ public class ParticleSubCommand extends SubCommand {
     public ParticleSubCommand(@NotNull EnhancedPlugin plugin) {
         super("particle", plugin);
         withPermission(plugin.getPermission("particle"));
-        withDescription(plugin.getLang("particle-command"));
+        withDescription(plugin.getTranslation("particle-command"));
         addSubCommand(new SpawnParticleSubCommand(plugin));
         addSubCommand(new SpawnParticleToSubCommand(plugin));
         addSubCommand(new ShowMeParticleSubCommand(plugin));

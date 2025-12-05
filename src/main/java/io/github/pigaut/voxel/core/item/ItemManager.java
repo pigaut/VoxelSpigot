@@ -1,13 +1,10 @@
 package io.github.pigaut.voxel.core.item;
 
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.plugin.boot.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.node.section.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
-
-import java.io.*;
 
 public class ItemManager extends ConfigBackedManager.SectionKey<Item> {
 

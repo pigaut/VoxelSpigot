@@ -20,7 +20,7 @@ public class StructureWandListener implements Listener {
     @EventHandler
     public void onClick(PlayerInteractEvent event) {
         if (!event.hasBlock() || !event.hasItem() || event.getHand() != EquipmentSlot.HAND
-                || !plugin.getOptions().isStructureWand(event.getItem())) {
+                || !plugin.getSettings().isStructureWand(event.getItem())) {
             return;
         }
         event.setCancelled(true);

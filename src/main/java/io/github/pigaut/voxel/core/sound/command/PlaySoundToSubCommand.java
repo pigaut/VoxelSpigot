@@ -13,7 +13,7 @@ public class PlaySoundToSubCommand extends SubCommand {
     public PlaySoundToSubCommand(@NotNull EnhancedPlugin plugin) {
         super("play-to", plugin);
         withPermission(plugin.getPermission("sound.play-to"));
-        withDescription(plugin.getLang("sound-play-to-command"));
+        withDescription(plugin.getTranslation("sound-play-to-command"));
         withParameter(CommandParameters.ONLINE_PLAYER);
         withParameter(CommandParameters.soundName(plugin));
         withCommandExecution((sender, args, placeholders) -> {

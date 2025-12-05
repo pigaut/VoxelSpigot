@@ -8,11 +8,11 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-public class SpawnParticleOnBlock implements Action {
+public class SpawnParticleAtBlock implements Action {
 
     private final ParticleEffect particle;
 
-    public SpawnParticleOnBlock(ParticleEffect particle) {
+    public SpawnParticleAtBlock(ParticleEffect particle) {
         this.particle = particle;
     }
 

@@ -62,12 +62,7 @@ public interface PlayerState {
 
     void sendMessage(Message message);
 
-    /**
-     * Sends a title to the player.
-     *
-     * @param title The title to send.
-     */
-    void sendTitle(Title title);
+    void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut);
 
     /**
      * Opens an inventory for the player.
@@ -239,24 +234,22 @@ public interface PlayerState {
 
     boolean isAwaitingInput();
 
-    boolean isAwaitingInput(InputType inputType);
+    boolean isAwaitingInput(@NotNull InputSource inputSource);
 
-    void setAwaitingInput(@Nullable InputType inputType);
+    void submitInput(@NotNull String input);
 
-    @Nullable String getLastInput();
+    void cancelInputCollection();
 
-    void setLastInput(@Nullable String input);
+    ChatInput<String> collectChatInput();
 
-    ChatInput<String> createChatInput();
+    <T> ChatInput<T> collectChatInput(@NotNull Class<T> classType);
 
-    <T> ChatInput<T> createChatInput(@NotNull Class<T> classType);
+    <T> ChatInput<T> collectChatInput(@NotNull Parser<T> parser);
 
-    <T> ChatInput<T> createChatInput(@NotNull Parser<T> deserializer);
+    MenuSelection<String> collectMenuSelection();
 
-    MenuInput<String> createMenuInputSelection();
+    <T> MenuSelection<T> collectMenuSelection(@NotNull Class<T> classType);
 
-    <T> MenuInput<T> createMenuInputSelection(@NotNull Class<T> classType);
-
-    <T> MenuInput<T> createMenuInputSelection(@NotNull Parser<T> deserializer);
+    <T> MenuSelection<T> collectMenuSelection(@NotNull Parser<T> parser);
 
 }

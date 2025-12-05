@@ -1,9 +1,8 @@
-package io.github.pigaut.voxel.plugin;
+package io.github.pigaut.voxel.plugin.boot;
 
 import io.github.pigaut.sql.*;
 import io.github.pigaut.sql.database.*;
 import io.github.pigaut.voxel.*;
-import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.util.UpdateChecker;
@@ -23,28 +22,29 @@ public class PluginSetup {
     private PluginSetup() {}
 
     public static @NotNull RootSection createConfiguration(EnhancedJavaPlugin plugin) {
-        File configFile = plugin.getFile("config.yml");
-        if (!configFile.exists()) {
+        File file = plugin.getFile("config.yml");
+        if (!file.exists()) {
             plugin.saveDefaultConfig();
         }
-
         Configurator configurator = plugin.getConfigurator();
-        RootSection config;
+        return YamlConfig.createEmptySection(file, configurator);
+    }
+
+    public static Optional<ConfigurationLoadException> loadConfiguration(EnhancedJavaPlugin plugin) {
+        RootSection configuration = plugin.getConfiguration();
         try {
-            config = YamlConfig.loadSection(configFile, configurator);
+            configuration.load();
         }
         catch (ConfigurationLoadException e) {
-            config = YamlConfig.createEmptySection(configFile, configurator);
-            ConfigErrorLogger.logAll(plugin, List.of(e));
+            return Optional.of(e);
         }
-
-        return config;
+        return Optional.empty();
     }
 
     public static void dumpLogo(EnhancedJavaPlugin plugin) {
         String logo = plugin.getLogo();
         if (logo != null) {
-            if (plugin.forceLogoDump() || plugin.getConfiguration().getBoolean("dump-logo").orElse(true)) {
+            if (plugin.forceLogoDump() || plugin.getSettings().isDumpLogo()) {
                 plugin.getColoredLogger().log(Level.INFO, logo);
             }
         }
@@ -73,18 +73,16 @@ public class PluginSetup {
 
         PluginMetrics currentMetrics = plugin.getMetrics();
         if (currentMetrics != null) {
-            currentMetrics.shutdown();
+            return currentMetrics;
         }
 
-        ConfigSection config = plugin.getConfiguration();
-        if (config.getBoolean("metrics").orElse(true)) {
-            plugin.getColoredLogger().info("Created bStats metrics with id: " + metricsId);
-        }
-        else if (!plugin.forceMetricsSilent()) {
+        boolean enabled = plugin.getSettings().isMetrics();
+        if (!enabled) {
             return null;
         }
 
-        currentMetrics = new PluginMetrics(plugin, metricsId);
+        plugin.getColoredLogger().info("Created bStats metrics with id: " + metricsId);
+        currentMetrics = new PluginMetrics(plugin, metricsId, enabled);
         currentMetrics.addCustomChart(new SimplePie("premium", () ->
                 Boolean.toString(plugin.isPremium())));
 
@@ -103,8 +101,7 @@ public class PluginSetup {
             plugin.registerListener(currentChecker);
         }
 
-        ConfigSection config = plugin.getConfiguration();
-        if (!plugin.forceUpdateChecker() && !config.getBoolean("check-for-updates").orElse(true)) {
+        if (!plugin.forceUpdateChecker() && !plugin.getSettings().isCheckForUpdates()) {
             return null;
         }
 
@@ -113,17 +110,17 @@ public class PluginSetup {
         return currentChecker;
     }
 
-    public static void logFoundDependecies(EnhancedJavaPlugin plugin) {
+    public static void checkCompatiblePlugins(EnhancedJavaPlugin plugin) {
         ColoredLogger logger = plugin.getColoredLogger();
         logger.info("Looking for compatible plugins...");
 
-        List<String> plugins = plugin.getDescription().getSoftDepend();
+        List<String> plugins = plugin.getCompatiblePlugins();
         StringJoiner joiner = new StringJoiner(", ");
         for (int i = 0; i < plugins.size(); i++) {
             String pluginName = plugins.get(i);
             boolean enabled = SpigotServer.isPluginEnabled(pluginName);
 
-            joiner.add((enabled ? "&a" : "&c") + pluginName);
+            joiner.add((enabled ? "&e" : "&7") + pluginName);
             if ((i + 1) % 4 == 0) {
                 logger.log(Level.INFO, joiner.toString());
                 joiner = new StringJoiner(", ");
@@ -138,20 +135,19 @@ public class PluginSetup {
     public static void generateDirectoriesAndFiles(EnhancedJavaPlugin plugin) {
         plugin.getColoredLogger().info("Generating directories and files...");
 
-        for (String directory : plugin.getPluginDirectories()) {
+        for (String directory : plugin.getDefaultDirectories()) {
             plugin.createDirectory(directory);
         }
 
-        for (String resource : plugin.getPluginResources()) {
+        for (String resource : plugin.getDefaultResources()) {
             plugin.saveResource(resource);
         }
-
     }
 
     public static void generateExampleFiles(EnhancedJavaPlugin plugin) {
         ColoredLogger logger = plugin.getColoredLogger();
 
-        if (!plugin.getConfiguration().getBoolean("generate-examples").orElse(true)) {
+        if (!plugin.getSettings().isGenerateExamples()) {
             logger.warning("Skipping example file generation (disabled in config)");
             return;
         }
@@ -162,8 +158,8 @@ public class PluginSetup {
         }
 
         logger.info("Generating version specific example files...");
-        final SpigotVersion currentVersion = SpigotServer.getVersion();
-        final Map<SpigotVersion, List<String>> examplesByVersion = plugin.getExamplesByVersion();
+        SpigotVersion currentVersion = SpigotServer.getVersion();
+        Map<SpigotVersion, List<String>> examplesByVersion = plugin.getExamplesByVersion();
         for (SpigotVersion requiredVersion : examplesByVersion.keySet()) {
             if (currentVersion.equalsOrIsNewerThan(requiredVersion)) {
                 for (String resourcePath : examplesByVersion.get(requiredVersion)) {

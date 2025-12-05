@@ -3,7 +3,9 @@ package io.github.pigaut.voxel.plugin.command;
 import io.github.pigaut.voxel.*;
 import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.config.*;
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.plugin.boot.*;
+import io.github.pigaut.voxel.util.*;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.*;
 
@@ -12,17 +14,22 @@ public class ReloadSubCommand extends SubCommand {
     public ReloadSubCommand(@NotNull EnhancedJavaPlugin plugin) {
         super("reload", plugin);
         withPermission(plugin.getPermission("reload"));
-        withDescription(plugin.getLang("reload-command"));
+        withDescription(plugin.getTranslation("reload-command"));
         withCommandExecution((sender, args, placeholders) -> {
             try {
-                plugin.reload(errorsFound -> {
-                    if (sender instanceof Player player) {
-                        ConfigErrorLogger.logAll(plugin, player, errorsFound);
+                plugin.reload(errors -> {
+                    if (errors.isEmpty()) {
+                        plugin.sendMessage(sender, "reload-completed", placeholders);
                     }
                     else {
-                        ConfigErrorLogger.logAll(plugin, errorsFound);
+                        if (sender instanceof Player player) {
+                            ConfigErrorLogger.logAll(plugin, player, errors);
+                        }
+                        else {
+                            plugin.sendMessage(sender, "reload-completed-with-errors", placeholders);
+                            ConfigErrorLogger.logAll(plugin, errors);
+                        }
                     }
-                    plugin.sendMessage(sender, "reload-complete", placeholders);
                 });
             }
             catch (PluginReloadInProgressException e) {

@@ -12,8 +12,8 @@ public interface Identifiable {
     @Nullable String getGroup();
 
     @NotNull default ItemStack getIcon() {
-        final ItemStack icon = new ItemStack(Material.TERRACOTTA);
-        final ItemMeta meta = icon.getItemMeta();
+        ItemStack icon = new ItemStack(Material.TERRACOTTA);
+        ItemMeta meta = icon.getItemMeta();
         if (meta != null) {
             meta.setDisplayName(this.getName());
         }

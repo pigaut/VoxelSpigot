@@ -1,5 +1,6 @@
-package io.github.pigaut.voxel.menu;
+package io.github.pigaut.voxel.listener;
 
+import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.player.input.*;
 import io.github.pigaut.voxel.plugin.*;
@@ -35,8 +36,8 @@ public class PlayerInventoryListener implements Listener {
         }
 
         player.setOpenMenu(null);
-        if (player.isAwaitingInput(InputType.MENU)) {
-            player.setAwaitingInput(null);
+        if (player.isAwaitingInput(InputSource.MENU)) {
+            player.cancelInputCollection();
             return;
         }
 

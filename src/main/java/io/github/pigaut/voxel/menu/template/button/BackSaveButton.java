@@ -20,7 +20,7 @@ public class BackSaveButton extends Button {
     }
 
     @Override
-    public void onLeftClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onLeftClick(MenuView view, PlayerState player) {
         final MenuView previousView = view.getPreviousView();
         if (previousView != null) {
             previousView.open();

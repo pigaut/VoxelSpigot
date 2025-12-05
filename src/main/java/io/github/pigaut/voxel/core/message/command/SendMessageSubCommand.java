@@ -13,7 +13,7 @@ public class SendMessageSubCommand extends SubCommand {
     public SendMessageSubCommand(@NotNull EnhancedPlugin plugin) {
         super("send", plugin);
         withPermission(plugin.getPermission("message.send"));
-        withDescription(plugin.getLang("message-send-command"));
+        withDescription(plugin.getTranslation("message-send-command"));
         withParameter(CommandParameters.messageName(plugin));
         withCommandExecution((sender, args, placeholders) -> {
             final Player player = Bukkit.getPlayer(args[0]);

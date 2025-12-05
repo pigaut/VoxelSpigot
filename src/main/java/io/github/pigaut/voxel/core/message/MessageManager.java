@@ -1,12 +1,8 @@
 package io.github.pigaut.voxel.core.message;
 
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.plugin.boot.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.node.section.*;
-import org.jetbrains.annotations.*;
-
-import java.io.*;
 
 public class MessageManager extends ConfigBackedManager.SectionKey<Message> {
 

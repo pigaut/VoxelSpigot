@@ -23,7 +23,7 @@ public class ConfigSaveButton extends Button {
     }
 
     @Override
-    public void onLeftClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onLeftClick(MenuView view, PlayerState player) {
         root.save();
     }
 

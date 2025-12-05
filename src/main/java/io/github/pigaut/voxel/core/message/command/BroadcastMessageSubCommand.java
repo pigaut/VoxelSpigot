@@ -13,7 +13,7 @@ public class BroadcastMessageSubCommand extends SubCommand {
     public BroadcastMessageSubCommand(@NotNull EnhancedPlugin plugin) {
         super("broadcast", plugin);
         withPermission(plugin.getPermission("message.broadcast"));
-        withDescription(plugin.getLang("message-broadcast-command"));
+        withDescription(plugin.getTranslation("message-broadcast-command"));
         withParameter(CommandParameters.messageName(plugin));
         withCommandExecution((sender, args, placeholders) -> {
             final Message message = plugin.getMessage(args[0]);

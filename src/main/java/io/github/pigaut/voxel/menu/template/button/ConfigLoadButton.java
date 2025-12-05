@@ -23,7 +23,7 @@ public class ConfigLoadButton extends Button {
     }
 
     @Override
-    public void onLeftClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onLeftClick(MenuView view, PlayerState player) {
         root.load();
         view.update();
     }

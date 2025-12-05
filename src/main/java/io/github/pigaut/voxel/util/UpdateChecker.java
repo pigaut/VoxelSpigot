@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.util;
 
 import com.google.common.base.*;
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.plugin.boot.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.*;

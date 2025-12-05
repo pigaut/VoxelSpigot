@@ -1,6 +1,6 @@
 package io.github.pigaut.voxel.player.input;
 
-public enum InputType {
+public enum InputSource {
 
     CHAT,
     MENU;

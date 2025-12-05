@@ -9,7 +9,7 @@ public class StructureSubCommand extends SubCommand {
     public StructureSubCommand(@NotNull EnhancedPlugin plugin) {
         super("structure", plugin);
         withPermission(plugin.getPermission("structure"));
-        withDescription(plugin.getLang("structure-command"));
+        withDescription(plugin.getTranslation("structure-command"));
         addSubCommand(new StructureSaveSubCommand(plugin));
         addSubCommand(new StructurePlaceSubCommand(plugin));
     }

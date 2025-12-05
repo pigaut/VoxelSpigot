@@ -8,6 +8,10 @@ public class InventoryUtil {
 
     private InventoryUtil() {}
 
+    public static boolean isValidChestSize(int size) {
+        return isValidInventory(InventoryType.CHEST, size);
+    }
+
     public static boolean isValidInventory(InventoryType storage, int size) {
         return storage == InventoryType.CHEST ? (size > 0 && size <= 54 && size % 9 == 0) : size == storage.getDefaultSize();
     }

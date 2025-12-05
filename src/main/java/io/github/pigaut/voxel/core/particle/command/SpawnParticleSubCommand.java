@@ -13,7 +13,7 @@ public class SpawnParticleSubCommand extends SubCommand {
     public SpawnParticleSubCommand(@NotNull EnhancedPlugin plugin) {
         super("spawn", plugin);
         withPermission(plugin.getPermission("particle.spawn"));
-        withDescription(plugin.getLang("particle-spawn-command"));
+        withDescription(plugin.getTranslation("particle-spawn-command"));
         withParameter(CommandParameters.particleName(plugin));
         withParameter(CommandParameters.WORLD_NAME);
         withParameter(CommandParameters.X_COORDINATE);

@@ -33,22 +33,22 @@ public class GuiReopenDelayButton extends Button {
     }
 
     @Override
-    public void onLeftClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onLeftClick(MenuView view, PlayerState player) {
         settings.guiReopenDelay = Math.min(settings.guiReopenDelay + 5, 200);
     }
 
     @Override
-    public void onRightClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onRightClick(MenuView view, PlayerState player) {
         settings.guiReopenDelay = Math.max(settings.guiReopenDelay - 5, 5);
     }
 
     @Override
-    public void onShiftLeftClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onShiftLeftClick(MenuView view, PlayerState player) {
         settings.guiReopenDelay = Math.min(settings.guiReopenDelay + 20, 200);
     }
 
     @Override
-    public void onShiftRightClick(MenuView view, PlayerState player, InventoryClickEvent event) {
+    public void onShiftRightClick(MenuView view, PlayerState player) {
         settings.guiReopenDelay = Math.max(settings.guiReopenDelay - 20, 5);
     }
 

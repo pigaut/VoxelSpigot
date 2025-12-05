@@ -1,19 +1,18 @@
 package io.github.pigaut.voxel.player;
 
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.plugin.boot.*;
 import io.github.pigaut.voxel.plugin.manager.*;
+import org.bukkit.*;
 import org.bukkit.entity.*;
-import org.bukkit.event.*;
-import org.bukkit.event.player.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-public class PlayerStateManager<P extends PlayerState> extends Manager implements Listener {
+public class PlayerStateManager<P extends PlayerState> extends Manager {
 
     private final PlayerStateFactory<P> playerStateFactory;
     private final Map<UUID, P> playersByUUID = new HashMap<>();
-    private final Map<String, P> playersByName = new HashMap<>();
+    private final Map<UUID, P> playersCache = new HashMap<>();
 
     public PlayerStateManager(@NotNull EnhancedJavaPlugin plugin, @NotNull PlayerStateFactory<P> playerStateFactory) {
         super(plugin);
@@ -21,7 +20,8 @@ public class PlayerStateManager<P extends PlayerState> extends Manager implement
     }
 
     public @Nullable P getPlayerState(@NotNull String name) {
-        return playersByName.get(name);
+        Player player = Bukkit.getPlayer(name);
+        return player != null ? getPlayerState(player) : null;
     }
 
     public @Nullable P getPlayerState(@NotNull UUID playerId) {
@@ -29,38 +29,58 @@ public class PlayerStateManager<P extends PlayerState> extends Manager implement
     }
 
     public @NotNull P getPlayerState(@NotNull Player player) {
-        return playersByUUID.getOrDefault(player.getUniqueId(),
-                    playersByName.getOrDefault(player.getName(),
-                        playerStateFactory.create(plugin, player)));
+        UUID playerId = player.getUniqueId();
+        if (playersByUUID.containsKey(playerId)) {
+            return playersByUUID.get(playerId);
+        }
+
+        P playerState = playerStateFactory.create(plugin, player);
+        playersByUUID.put(playerState.getUniqueId(), playerState);
+        return playerState;
     }
 
     public List<P> getAllPlayerStates() {
         return new ArrayList<>(playersByUUID.values());
     }
 
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        this.registerPlayer(playerStateFactory.create(plugin, event.getPlayer()));
+    @Override
+    public void enable() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            registerPlayer(player);
+        }
+        playersCache.clear();
     }
 
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        this.unregisterPlayer(event.getPlayer());
-    }
-
-    private void registerPlayer(P player) {
-        playersByUUID.put(player.getUniqueId(), player);
-        playersByName.put(player.getName(), player);
-    }
-
-    private void unregisterPlayer(Player player) {
-        playersByUUID.remove(player.getUniqueId());
-        playersByName.remove(player.getName());
-    }
-
-    private void clearPlayers() {
+    @Override
+    public void disable() {
+        playersCache.putAll(playersByUUID);
         playersByUUID.clear();
-        playersByName.clear();
+    }
+
+    public void registerPlayer(@NotNull Player player) {
+        UUID playerId = player.getUniqueId();
+        P playerState = playersCache.get(playerId);
+        if (playerState != null) {
+            playersCache.remove(playerId);
+        }
+        else {
+            playerState = playerStateFactory.create(plugin, player);
+        }
+
+        playersByUUID.put(playerState.getUniqueId(), playerState);
+    }
+
+    public void unregisterPlayer(@NotNull Player player) {
+        UUID playerId = player.getUniqueId();
+        P playerState = playersByUUID.remove(playerId);
+        if (playerState != null) {
+            playersCache.put(playerId, playerState);
+
+            int playerCacheDuration = plugin.getSettings().getPlayerCacheDuration().getCount();
+            plugin.getScheduler().runTaskLater(playerCacheDuration, () -> {
+                playersCache.remove(playerId);
+            });
+        }
     }
 
 }

@@ -19,7 +19,7 @@ public class PluginMetrics {
     private final EnhancedPlugin plugin;
     private final MetricsBase metricsBase;
 
-    public PluginMetrics(EnhancedPlugin plugin, int serviceId) {
+    public PluginMetrics(EnhancedPlugin plugin, int serviceId, boolean enabled) {
         this.plugin = plugin;
         File bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
         File configFile = new File(bStatsFolder, "config.yml");
@@ -48,7 +48,8 @@ public class PluginMetrics {
             Bukkit.getScheduler().runTask(plugin, submitDataTask);
         };
         Objects.requireNonNull(plugin);
-        this.metricsBase = new MetricsBase("bukkit", serverUUID, serviceId, true, var10007, var10008, var10009, plugin::isEnabled, (message, error) -> {
+
+        this.metricsBase = new MetricsBase("bukkit", serverUUID, serviceId, enabled, var10007, var10008, var10009, plugin::isEnabled, (message, error) -> {
             this.plugin.getLogger().log(Level.WARNING, message, error);
         }, (message) -> {
             this.plugin.getLogger().log(Level.INFO, message);

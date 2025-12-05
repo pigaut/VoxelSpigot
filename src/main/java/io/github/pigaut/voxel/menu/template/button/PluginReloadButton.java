@@ -5,7 +5,7 @@ import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.plugin.boot.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.*;
@@ -23,15 +23,17 @@ public class PluginReloadButton extends Button {
     }
 
     @Override
-    public void onLeftClick(MenuView view, PlayerState playerState, InventoryClickEvent event) {
+    public void onLeftClick(MenuView view, PlayerState playerState) {
         view.close();
-        final Player player = playerState.asPlayer();
+        Player player = playerState.asPlayer();
         try {
-            plugin.reload(errorsFound -> {
-                ConfigErrorLogger.logAll(plugin, player, errorsFound);
-                plugin.sendMessage(player, "reload-complete");
-                if (errorsFound.isEmpty()) {
+            plugin.reload(errors -> {
+                if (errors.isEmpty()) {
+                    plugin.sendMessage(player, "reload-completed");
                     plugin.getScheduler().runTask(view::open);
+                }
+                else {
+                    ConfigErrorLogger.logAll(plugin, player, errors);
                 }
             });
         } catch (PluginReloadInProgressException e) {

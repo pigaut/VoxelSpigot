@@ -224,16 +224,12 @@ public abstract class CommandNode implements Iterable<SubCommand>, PlaceholderSu
 
     public CommandNode withPlayerStateExecution(@NotNull PlayerStateExecution playerExecution) {
         return withPlayerExecution((player, args, placeholders) -> {
-            final PlayerState pluginPlayer = plugin.getPlayerState(player.getUniqueId());
-            if (pluginPlayer == null) {
-                Chat.send(player, plugin.getLang("loading-player-data"));
-                return;
-            }
-            playerExecution.execute(pluginPlayer, args, placeholders);
+            PlayerState playerState = plugin.getPlayerState(player);
+            playerExecution.execute(playerState, args, placeholders);
         });
     }
 
-    public CommandCompletion getCommandCompletion() {
+    public @NotNull CommandCompletion getCommandCompletion() {
         return commandCompletion;
     }
 

@@ -2,7 +2,6 @@ package io.github.pigaut.voxel.plugin;
 
 import io.github.pigaut.sql.*;
 import io.github.pigaut.voxel.command.*;
-import io.github.pigaut.voxel.core.*;
 import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.voxel.core.item.Item;
 import io.github.pigaut.voxel.core.item.*;
@@ -11,9 +10,9 @@ import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.core.structure.*;
-import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
+import io.github.pigaut.voxel.plugin.boot.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.configurator.*;
@@ -31,19 +30,17 @@ import java.util.*;
 
 public interface EnhancedPlugin extends Plugin {
 
-    boolean isDebug();
-
     String getVersion();
 
     ColoredLogger getColoredLogger();
 
-    ManagerInitializer getInitializer();
-
-    @Nullable
-    Database getDatabase();
+    PluginBootstrap getBootstrap();
 
     @NotNull
     Settings getSettings();
+
+    @Nullable
+    Database getDatabase();
 
     @NotNull
     PluginScheduler getScheduler();
@@ -55,28 +52,22 @@ public interface EnhancedPlugin extends Plugin {
     NamespacedKey getNamespacedKey(@NotNull String key);
 
     @NotNull
-    OptionsManager getOptions();
+    LanguageDictionary getDictionary();
 
     @NotNull
-    LanguageManager getLanguages();
+    String getTranslation(@NotNull String name) throws TranslationNotFoundException;
 
     @NotNull
-    String getLang(@NotNull String name) throws LangNotFoundException;
+    String getTranslationOrDefault(@NotNull String name, @NotNull String def);
 
     @NotNull
-    String getLang(@NotNull String name, @NotNull String def);
-
-    @NotNull
-    CommandManager getCommands();
+    CommandRegistry getCommands();
 
     @NotNull
     PlayerStateManager<? extends @NotNull PlayerState> getPlayersState();
 
     @NotNull
     PlayerState getPlayerState(@NotNull Player player);
-
-    @Nullable
-    PlayerState getPlayerState(@NotNull String playerName);
 
     @Nullable
     PlayerState getPlayerState(@NotNull UUID playerId);
@@ -132,13 +123,13 @@ public interface EnhancedPlugin extends Plugin {
     @Nullable
     EnhancedCommand getCustomCommand(String name);
 
-    void sendMessage(@NotNull Player player, @NotNull String messageId) throws LangNotFoundException;
+    void sendMessage(@NotNull Player player, @NotNull String messageId) throws TranslationNotFoundException;
 
-    void sendMessage(@NotNull Player player, @NotNull String messageId, @NotNull PlaceholderSupplier... placeholderSuppliers) throws LangNotFoundException;
+    void sendMessage(@NotNull Player player, @NotNull String messageId, @NotNull PlaceholderSupplier... placeholderSuppliers) throws TranslationNotFoundException;
 
-    void sendMessage(@NotNull CommandSender sender, @NotNull String messageId) throws LangNotFoundException;
+    void sendMessage(@NotNull CommandSender sender, @NotNull String messageId) throws TranslationNotFoundException;
 
-    void sendMessage(@NotNull CommandSender sender, @NotNull String messageId, @NotNull PlaceholderSupplier... placeholderSuppliers) throws LangNotFoundException;
+    void sendMessage(@NotNull CommandSender sender, @NotNull String messageId, @NotNull PlaceholderSupplier... placeholderSuppliers) throws TranslationNotFoundException;
 
     void registerCommand(@NotNull EnhancedCommand command);
 

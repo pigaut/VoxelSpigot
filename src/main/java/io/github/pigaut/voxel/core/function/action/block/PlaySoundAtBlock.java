@@ -8,11 +8,11 @@ import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.jetbrains.annotations.*;
 
-public class PlaySoundOnBlock implements Action {
+public class PlaySoundAtBlock implements Action {
 
     private final SoundEffect sound;
 
-    public PlaySoundOnBlock(SoundEffect sound) {
+    public PlaySoundAtBlock(SoundEffect sound) {
         this.sound = sound;
     }
 

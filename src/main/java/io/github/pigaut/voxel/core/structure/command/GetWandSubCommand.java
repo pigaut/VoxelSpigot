@@ -10,9 +10,9 @@ public class GetWandSubCommand extends SubCommand {
     public GetWandSubCommand(@NotNull EnhancedPlugin plugin) {
         super("wand", plugin);
         withPermission(plugin.getPermission("structure.wand"));
-        withDescription(plugin.getLang("wand-command"));
+        withDescription(plugin.getTranslation("wand-command"));
         withPlayerExecution((player, args, placeholders) -> {
-            PlayerUtil.giveItemsOrDrop(player, plugin.getOptions().getStructureWand());
+            PlayerUtil.giveItemsOrDrop(player, plugin.getSettings().getStructureWand());
             plugin.sendMessage(player, "received-wand", placeholders);
         });
     }

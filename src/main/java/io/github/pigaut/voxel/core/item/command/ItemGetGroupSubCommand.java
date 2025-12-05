@@ -14,7 +14,7 @@ public class ItemGetGroupSubCommand extends SubCommand {
     public ItemGetGroupSubCommand(@NotNull EnhancedPlugin plugin) {
         super("get-group", plugin);
         withPermission(plugin.getPermission("item.get-group"));
-        withDescription(plugin.getLang("item-get-group-command"));
+        withDescription(plugin.getTranslation("item-get-group-command"));
         withParameter(CommandParameters.itemGroup(plugin));
         withPlayerExecution((player, args, placeholders) -> {
             final List<Item> groupItems = plugin.getItems().getAll(args[0]);

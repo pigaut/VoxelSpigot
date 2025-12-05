@@ -20,7 +20,7 @@ public class StructureSaveSubCommand extends SubCommand {
     public StructureSaveSubCommand(@NotNull EnhancedPlugin plugin) {
         super("save", plugin);
         withPermission(plugin.getPermission("structure.save"));
-        withDescription(plugin.getLang("structure-save-command"));
+        withDescription(plugin.getTranslation("structure-save-command"));
         withParameter(CommandParameters.filePath(plugin, "structures"));
         withPlayerExecution((player, args, placeholders) -> {
             final PlayerState playerState = plugin.getPlayerState(player.getUniqueId());
@@ -51,7 +51,7 @@ public class StructureSaveSubCommand extends SubCommand {
             final RootSequence sequence = YamlConfig.createEmptySequence(file, plugin.getConfigurator());
             sequence.setFlowStyle(FlowStyle.AUTO);
 
-            final Set<Material> structureBlacklist = plugin.getOptions().getStructureBlacklist();
+            final Set<Material> structureBlacklist = plugin.getSettings().getStructureBlacklist();
             for (Location location : CuboidRegion.getAllLocations(player.getWorld(), firstSelection, secondSelection)) {
                 final Block block = location.getBlock();
                 final Material blockType = block.getType();

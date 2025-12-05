@@ -1,6 +1,7 @@
 package io.github.pigaut.voxel.core.structure;
 
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.plugin.boot.*;
+import io.github.pigaut.voxel.plugin.boot.phase.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.yaml.*;
 import org.jetbrains.annotations.*;
@@ -11,11 +12,6 @@ public class StructureManager extends ConfigBackedManager.Sequence<BlockStructur
 
     public StructureManager(@NotNull EnhancedJavaPlugin plugin) {
         super(plugin, "structures");
-    }
-
-    @Override
-    public List<String> getLoadAfter() {
-        return List.of("ItemsAdder");
     }
 
     @Override

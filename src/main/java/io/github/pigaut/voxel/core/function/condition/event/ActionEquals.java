@@ -9,10 +9,10 @@ import java.util.*;
 
 public class ActionEquals implements EventCondition {
 
-    private final List<ClickAction> actions;
+    private final List<InteractType> actions;
     private final @Nullable Boolean sneaking;
 
-    public ActionEquals(List<ClickAction> actions, @Nullable Boolean sneaking) {
+    public ActionEquals(List<InteractType> actions, @Nullable Boolean sneaking) {
         this.actions = actions;
         this.sneaking = sneaking;
     }
@@ -29,7 +29,7 @@ public class ActionEquals implements EventCondition {
             }
         }
 
-        for (ClickAction action : actions) {
+        for (InteractType action : actions) {
             if (action.test(interactEvent.getAction())) {
                 return true;
             }

@@ -73,6 +73,10 @@ public class BlockStructure implements Identifiable {
         return mostCommonMaterial != null ? mostCommonMaterial : Material.TERRACOTTA;
     }
 
+    public boolean hasMultipleBlocks() {
+        return blockChanges.size() > 1;
+    }
+
     public List<BlockChange> getBlockChanges() {
         return new ArrayList<>(blockChanges);
     }

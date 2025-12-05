@@ -9,7 +9,7 @@ public class SoundSubCommand extends SubCommand {
     public SoundSubCommand(@NotNull EnhancedPlugin plugin) {
         super("sound", plugin);
         withPermission(plugin.getPermission("sound"));
-        withDescription(plugin.getLang("sound-play-command"));
+        withDescription(plugin.getTranslation("sound-play-command"));
         addSubCommand(new PlaySoundSubCommand(plugin));
         addSubCommand(new PlaySoundToSubCommand(plugin));
     }

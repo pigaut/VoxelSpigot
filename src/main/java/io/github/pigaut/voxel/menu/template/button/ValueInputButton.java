@@ -26,8 +26,8 @@ public class ValueInputButton extends Button {
     }
 
     @Override
-    public void onLeftClick(MenuView view, PlayerState player, InventoryClickEvent event) {
-        player.setLastInput(value);
+    public void onLeftClick(MenuView view, PlayerState player) {
+        player.submitInput(value);
     }
 
 }

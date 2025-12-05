@@ -12,7 +12,7 @@ public class ShowMeParticleSubCommand extends SubCommand {
     public ShowMeParticleSubCommand(@NotNull EnhancedPlugin plugin) {
         super("show-me", plugin);
         withPermission(plugin.getPermission("particle.show-me"));
-        withDescription(plugin.getLang("particle-show-me-command"));
+        withDescription(plugin.getTranslation("particle-show-me-command"));
         withParameters(CommandParameters.particleName(plugin));
         withPlayerExecution((player, args, placeholders) -> {
             final ParticleEffect particle = plugin.getParticle(args[0]);

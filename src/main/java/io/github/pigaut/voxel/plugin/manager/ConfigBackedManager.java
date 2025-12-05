@@ -1,11 +1,8 @@
 package io.github.pigaut.voxel.plugin.manager;
 
-import com.google.common.collect.*;
 import io.github.pigaut.voxel.config.*;
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.plugin.boot.*;
 import io.github.pigaut.yaml.*;
-import io.github.pigaut.yaml.configurator.*;
-import io.github.pigaut.yaml.configurator.load.*;
 import io.github.pigaut.yaml.convert.format.*;
 import org.jetbrains.annotations.*;
 
@@ -13,13 +10,10 @@ import java.io.*;
 import java.util.*;
 import java.util.function.*;
 
-public abstract class ConfigBackedManager<T extends Identifiable> extends Manager implements ConfigBacked, Container<T> {
+public abstract class ConfigBackedManager<T extends Identifiable> extends ContainerBackedManager<T> implements ConfigBacked {
 
     protected final String filesDirectory;
     private final String prefix;
-
-    private final Map<String, T> valuesByName = new HashMap<>();
-    private final Multimap<String, T> valuesByGroup = Multimaps.newListMultimap(new HashMap<>(), ArrayList::new);
 
     public ConfigBackedManager(@NotNull EnhancedJavaPlugin plugin, String filesDirectory) {
         super(plugin);
@@ -70,85 +64,6 @@ public abstract class ConfigBackedManager<T extends Identifiable> extends Manage
     }
 
     public abstract void loadFromFile(File file) throws InvalidConfigurationException;
-
-    @Override
-    public boolean contains(@NotNull String name) {
-        return valuesByName.containsKey(name);
-    }
-
-    @Override
-    public boolean containsGroup(@NotNull String group) {
-        return valuesByGroup.containsKey(group);
-    }
-
-    @Override
-    public @Nullable T get(@NotNull String name) {
-        return valuesByName.get(name);
-    }
-
-    @Override
-    public @NotNull List<T> getAll() {
-        return new ArrayList<>(valuesByName.values());
-    }
-
-    @Override
-    public @NotNull List<T> getAll(@NotNull String group) {
-        return new ArrayList<>(valuesByGroup.get(group));
-    }
-
-    @Override
-    public void add(@NotNull T value) throws DuplicateElementException {
-        final String name = CaseFormatter.toSnakeCase(value.getName());
-        if (valuesByName.containsKey(name)) {
-            throw new DuplicateElementException(name);
-        }
-        valuesByName.put(name, value);
-        final String group = value.getGroup();
-        if (group != null) {
-            valuesByGroup.put(CaseFormatter.toSnakeCase(group), value);
-        }
-    }
-
-    @Override
-    public void remove(@NotNull String name) {
-        final T value = valuesByName.remove(name);
-        if (value != null) {
-            final String group = value.getGroup();
-            if (group != null) {
-                valuesByGroup.remove(group, value);
-            }
-        }
-    }
-
-    @Override
-    public void removeAll(@NotNull String group) {
-        for (T value : valuesByGroup.removeAll(group)) {
-            valuesByName.remove(value.getName());
-        }
-    }
-
-    @Override
-    public @NotNull List<String> getAllNames() {
-        return valuesByName.keySet().stream().toList();
-    }
-
-    @Override
-    public @NotNull List<String> getAllNames(String group) {
-        return valuesByGroup.get(group).stream()
-                .map(Identifiable::getName)
-                .toList();
-    }
-
-    @Override
-    public @NotNull List<String> getAllGroups() {
-        return new ArrayList<>(valuesByGroup.keySet());
-    }
-
-    @Override
-    public void clear() {
-        valuesByName.clear();
-        valuesByGroup.clear();
-    }
 
     @Override
     public void disable() {

@@ -1,35 +1,30 @@
-package io.github.pigaut.voxel.plugin;
+package io.github.pigaut.voxel.plugin.boot;
 
 import io.github.pigaut.sql.*;
 import io.github.pigaut.voxel.*;
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.config.*;
-import io.github.pigaut.voxel.core.*;
-import io.github.pigaut.voxel.core.function.Function;
 import io.github.pigaut.voxel.core.function.*;
-import io.github.pigaut.voxel.core.item.Item;
+import io.github.pigaut.voxel.core.function.Function;
 import io.github.pigaut.voxel.core.item.*;
+import io.github.pigaut.voxel.core.item.Item;
 import io.github.pigaut.voxel.core.language.*;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.core.particle.*;
 import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.core.structure.*;
-import io.github.pigaut.voxel.hook.itemsadder.*;
-import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.player.input.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.plugin.runnable.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
-import io.github.pigaut.voxel.util.UpdateChecker;
 import io.github.pigaut.voxel.util.reflection.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.*;
 import io.github.pigaut.yaml.node.section.*;
-import io.github.pigaut.yaml.util.*;
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
@@ -51,9 +46,10 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     protected final PluginScheduler scheduler = new PluginScheduler(this);
     protected final ColoredLogger coloredLogger = new ColoredLogger(this);
-    private final OptionsManager optionsManager = new OptionsManager(this);
-    private final LanguageManager languageManager = new SimpleLanguageManager(this);
-    private final CommandManager commandManager = new CommandManager(this);
+
+    private final LanguageDictionary dictionary = new LanguageDictionary(this);
+    private final CommandRegistry commandRegistry = new CommandRegistry(this);
+
     private final PlayerStateManager<SimplePlayerState> playerManager = new PlayerStateManager<>(this, SimplePlayerState::new);
     private final ItemManager itemManager = new ItemManager(this);
     private final MessageManager messageManager = new MessageManager(this);
@@ -62,109 +58,29 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final FunctionManager functionManager = new FunctionManager(this);
     private final StructureManager structureManager = new StructureManager(this);
 
-    private final ManagerInitializer managerInitializer = new ManagerInitializer(this);
-
-    private final Settings settings = new Settings();
-    private Configurator configurator;
-    private RootSection config;
-    private @Nullable UpdateChecker updateChecker = null;
-    private @Nullable PluginMetrics metrics = null;
-    private @Nullable Database database = null;
-
-    private boolean debug = true;
-    private boolean reloading = false;
+    private final PluginBootstrap bootstrap = new PluginBootstrap(this);
 
     @Override
     public void onDisable() {
-        managerInitializer.disable();
+        bootstrap.shutdown();
     }
 
     @Override
     public void onEnable() {
-        configurator = createConfigurator();
-        config = PluginSetup.createConfiguration(this);
-        debug = config.getBoolean("debug").orElse(true);
-
-        PluginSetup.dumpLogo(this);
-        PluginSetup.checkServerVersion(this);
-        PluginSetup.logFoundDependecies(this);
-        PluginSetup.generateDirectoriesAndFiles(this);
-        PluginSetup.generateExampleFiles(this);
-        metrics = PluginSetup.createMetrics(this);
-        updateChecker = PluginSetup.createUpdateChecker(this);
-        database = PluginSetup.createDatabase(this);
-
-        createHooks();
-
-        managerInitializer.initialize();
-
-        registerListener(new PlayerInputListener(this));
-        registerListener(new PlayerInventoryListener(this));
-        registerListener(new StructureWandListener(this));
-
-        if (SpigotServer.isPluginEnabled("ItemsAdder")) {
-            registerListener(new ItemsAdderLoadListener(this));
-        }
-
-        for (Listener listener : getPluginListeners()) {
-            registerListener(listener);
-        }
-
-        for (EnhancedCommand command : getPluginCommands()) {
-            registerCommand(command);
-        }
+        bootstrap.init();
     }
 
     public boolean isReloading() {
-        return reloading;
+        return bootstrap.isReloading();
     }
 
-    public void reload(Consumer<List<ConfigurationException>> errorCollector) throws PluginReloadInProgressException {
-        if (reloading) {
-            throw new PluginReloadInProgressException();
-        }
-        reloading = true;
-
-        configurator = createConfigurator();
-        config = PluginSetup.createConfiguration(this);
-        debug = config.getBoolean("debug").orElse(true);
-
-        PluginSetup.dumpLogo(this);
-        PluginSetup.logFoundDependecies(this);
-        PluginSetup.generateDirectoriesAndFiles(this);
-        PluginSetup.generateExampleFiles(this);
-        metrics = PluginSetup.createMetrics(this);
-        updateChecker = PluginSetup.createUpdateChecker(this);
-
-        List<Manager> loadedManagers = managerInitializer.getLoadedManagers();
-        for (Manager manager : loadedManagers) {
-            manager.disable();
-            manager.enable();
-        }
-
-        scheduler.runTaskLaterAsync(1, () -> {
-            coloredLogger.info("Saving data to database...");
-            loadedManagers.forEach(Manager::saveData);
-
-            coloredLogger.info("Loading configuration and data...");
-            final List<ConfigurationException> errorsFound = new ArrayList<>();
-            for (Manager manager : loadedManagers) {
-                manager.loadData();
-                if (manager instanceof ConfigBacked configBackedManager) {
-                    errorsFound.addAll(configBackedManager.loadConfigurationData());
-                }
-            }
-            errorCollector.accept(errorsFound);
-            reloading = false;
-        });
+    public void reload(@NotNull Consumer<List<ConfigurationException>> errorCollector) throws PluginReloadInProgressException {
+        bootstrap.reload(errorCollector);
     }
 
     public List<Manager> getAllManagers() {
         List<Manager> managers = new ArrayList<>();
 
-        managers.add(optionsManager);
-        managers.add(languageManager);
-        managers.add(commandManager);
         managers.add(playerManager);
         managers.add(itemManager);
         managers.add(messageManager);
@@ -187,26 +103,9 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         return new PluginConfigurator(this);
     }
 
-    public void createHooks() {
-
-    }
-
-    @Override
-    public boolean isDebug() {
-        return debug;
-    }
-
     @Override
     public String getVersion() {
         return this.getDescription().getVersion();
-    }
-
-    public @Nullable UpdateChecker getUpdateChecker() {
-        return updateChecker;
-    }
-
-    public @Nullable PluginMetrics getMetrics() {
-        return metrics;
     }
 
     @Override
@@ -215,17 +114,13 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
-    public ManagerInitializer getInitializer() {
-        return managerInitializer;
+    public PluginBootstrap getBootstrap() {
+        return bootstrap;
     }
 
     @Override
     public @Nullable Database getDatabase() {
-        return database;
-    }
-
-    public @NotNull Settings getSettings() {
-        return settings;
+        return bootstrap.getDatabase();
     }
 
     @Override
@@ -244,28 +139,23 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
-    public @NotNull OptionsManager getOptions() {
-        return optionsManager;
+    public @NotNull LanguageDictionary getDictionary() {
+        return dictionary;
     }
 
     @Override
-    public @NotNull LanguageManager getLanguages() {
-        return languageManager;
+    public @NotNull String getTranslation(@NotNull String key) {
+        return dictionary.getTranslation(key);
     }
 
     @Override
-    public @NotNull String getLang(@NotNull String name) {
-        return languageManager.getLang(name);
+    public @NotNull String getTranslationOrDefault(@NotNull String key, @NotNull String defaultMessage) {
+        return dictionary.getTranslationOrDefault(key, defaultMessage);
     }
 
     @Override
-    public @NotNull String getLang(@NotNull String name, @NotNull String def) {
-        return languageManager.getLang(name, def);
-    }
-
-    @Override
-    public @NotNull CommandManager getCommands() {
-        return commandManager;
+    public @NotNull CommandRegistry getCommands() {
+        return commandRegistry;
     }
 
     @Override
@@ -276,11 +166,6 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public @NotNull PlayerState getPlayerState(@NotNull Player player) {
         return playerManager.getPlayerState(player);
-    }
-
-    @Override
-    public @Nullable PlayerState getPlayerState(@NotNull String playerName) {
-        return playerManager.getPlayerState(playerName);
     }
 
     @Override
@@ -360,49 +245,47 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     @Override
     public @NotNull Configurator getConfigurator() {
-        Preconditions.checkNotNull(configurator, "Configurator has not been instantiated.");
-        return configurator;
+        return bootstrap.getConfigurator();
     }
 
     @Override
     public @NotNull RootSection getConfiguration() {
-        Preconditions.checkNotNull(configurator, "Configuration has not been instantiated.");
-        return config;
+        return bootstrap.getConfiguration();
     }
 
     @Override
     public @Nullable EnhancedCommand getCustomCommand(String name) {
-        return commandManager.getCustomCommand(name);
+        return commandRegistry.getCustomCommand(name);
     }
 
     @Override
     public void sendMessage(@NotNull Player player, @NotNull String messageId) {
-        Chat.send(player, getLang(messageId));
+        Chat.send(player, getTranslation(messageId));
     }
 
     @Override
     public void sendMessage(@NotNull Player player, @NotNull String messageId, PlaceholderSupplier... placeholderSuppliers) {
-        Chat.send(player, getLang(messageId), placeholderSuppliers);
+        Chat.send(player, getTranslation(messageId), placeholderSuppliers);
     }
 
     @Override
     public void sendMessage(@NotNull CommandSender sender, @NotNull String messageId) {
-        Chat.send(sender, getLang(messageId));
+        Chat.send(sender, getTranslation(messageId));
     }
 
     @Override
     public void sendMessage(@NotNull CommandSender sender, @NotNull String messageId, PlaceholderSupplier... placeholderSuppliers) {
-        Chat.send(sender, getLang(messageId), placeholderSuppliers);
+        Chat.send(sender, getTranslation(messageId), placeholderSuppliers);
     }
 
     @Override
     public void registerCommand(@NotNull EnhancedCommand command) {
-        commandManager.registerCommand(command);
+        commandRegistry.registerCommand(command);
     }
 
     @Override
     public void unregisterCommand(@NotNull String name) {
-        commandManager.unregisterCommand(name);
+        commandRegistry.unregisterCommand(name);
     }
 
     @Override
@@ -455,6 +338,14 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         return getFiles(directory).stream()
                 .map(file -> file.getPath().replaceAll("plugins\\\\" + this.getName() + "\\\\" + directory + "\\\\", ""))
                 .toList();
+    }
+
+    public @Nullable UpdateChecker getUpdateChecker() {
+        return bootstrap.getUpdateChecker();
+    }
+
+    public @Nullable PluginMetrics getMetrics() {
+        return bootstrap.getMetrics();
     }
 
     private void collectYamlFiles(File directory, List<File> yamlFiles) {

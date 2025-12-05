@@ -12,7 +12,7 @@ public class ShowMeGroupParticleSubCommand extends SubCommand {
     public ShowMeGroupParticleSubCommand(@NotNull EnhancedPlugin plugin) {
         super("show-me-group", plugin);
         withPermission(plugin.getPermission("particle.show-me-group"));
-        withDescription(plugin.getLang("particle-show-me-group-command"));
+        withDescription(plugin.getTranslation("particle-show-me-group-command"));
         withParameter(CommandParameters.particleGroup(plugin));
         withParameter(CommandParameter.create("group-particle",
                 (sender, args) -> plugin.getParticles().getAllNames(args[0])));

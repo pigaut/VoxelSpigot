@@ -4,7 +4,7 @@ import org.bukkit.event.block.*;
 
 import java.util.function.*;
 
-public enum ClickAction {
+public enum InteractType {
 
     ANY(action -> true),
     RIGHT_CLICK(action -> action == Action.RIGHT_CLICK_BLOCK || action == Action.RIGHT_CLICK_AIR),
@@ -18,7 +18,7 @@ public enum ClickAction {
 
     private final Predicate<Action> actionPredicate;
 
-    ClickAction(Predicate<Action> actionPredicate) {
+    InteractType(Predicate<Action> actionPredicate) {
         this.actionPredicate = actionPredicate;
     }
 

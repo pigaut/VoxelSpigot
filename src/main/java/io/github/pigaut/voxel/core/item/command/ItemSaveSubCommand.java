@@ -16,7 +16,7 @@ public class ItemSaveSubCommand extends SubCommand {
     public ItemSaveSubCommand(@NotNull EnhancedPlugin plugin) {
         super("save", plugin);
         withPermission(plugin.getPermission("item.save"));
-        withDescription(plugin.getLang("item-save-command"));
+        withDescription(plugin.getTranslation("item-save-command"));
         withParameter(CommandParameters.filePath(plugin, "items"));
         withParameter(CommandParameters.itemName(plugin));
         withPlayerExecution((player, args, placeholders) -> {

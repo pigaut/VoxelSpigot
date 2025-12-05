@@ -15,7 +15,8 @@ public class SendChatToPlayer implements PlayerAction {
 
     @Override
     public void execute(@NotNull PlayerState player) {
-        player.sendMessage(StringPlaceholders.parseAll(message, player.getPlaceholders()));
+        String parsedMessage = StringPlaceholders.parseAll(player.asPlayer(), message, player.getPlaceholders());
+        player.sendMessage(parsedMessage);
     }
 
 }

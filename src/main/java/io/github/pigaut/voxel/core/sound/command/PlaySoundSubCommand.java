@@ -12,7 +12,7 @@ public class PlaySoundSubCommand extends SubCommand {
     public PlaySoundSubCommand(@NotNull EnhancedPlugin plugin) {
         super("play", plugin);
         withPermission(plugin.getPermission("sound.play"));
-        withDescription(plugin.getLang("sound-play-command"));
+        withDescription(plugin.getTranslation("sound-play-command"));
         withParameter(CommandParameters.soundName(plugin));
         withParameter(CommandParameters.WORLD_NAME);
         withParameter(CommandParameters.X_COORDINATE);
