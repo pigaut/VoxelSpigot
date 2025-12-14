@@ -45,7 +45,7 @@ public class PluginMetrics {
         Consumer<JsonObjectBuilder> var10007 = this::appendPlatformData;
         Consumer<JsonObjectBuilder> var10008 = this::appendServiceData;
         Consumer<Runnable> var10009 = (submitDataTask) -> {
-            Bukkit.getScheduler().runTask(plugin, submitDataTask);
+            plugin.getScheduler().runTask(submitDataTask);
         };
         Objects.requireNonNull(plugin);
 

@@ -1,8 +1,8 @@
 package io.github.pigaut.voxel.core.structure.config;
 
 import com.nexomc.nexo.api.*;
-import dev.lone.itemsadder.api.*;
 import io.github.pigaut.voxel.core.structure.*;
+import io.github.pigaut.voxel.hook.craftengine.*;
 import io.github.pigaut.voxel.hook.itemsadder.*;
 import io.github.pigaut.voxel.hook.nexo.*;
 import io.github.pigaut.voxel.server.*;
@@ -30,17 +30,33 @@ public class BlockChangeLoader implements ConfigLoader.Line<BlockChange> {
         int offsetY = line.getInteger("offsetY|offY").withDefault(0);
         int offsetZ = line.getInteger("offsetZ|offZ").withDefault(0);
 
-        if (SpigotServer.isPluginEnabled("ItemsAdder") && line.hasFlag("itemsadder")) {
-            CustomBlock customBlock = line.getRequired("itemsadder", CustomBlock.class);
+        if (line.hasFlag("itemsAdderBlock|iaBlock")) {
+            if (!SpigotServer.isPluginEnabled("ItemsAdder")) {
+                throw new InvalidConfigurationException(line, "itemsAdderBlock", "ItemsAdder is not loaded/enabled");
+            }
+            dev.lone.itemsadder.api.CustomBlock customBlock =
+                    line.getRequired("itemsAdderBlock|iaBlock", dev.lone.itemsadder.api.CustomBlock.class);
             return new ItemsAdderBlockChange(customBlock, offsetX, offsetY, offsetZ);
         }
 
-        if (SpigotServer.isPluginEnabled("Nexo") && line.hasFlag("nexo")) {
-            String blockId = line.getRequiredString("nexo");
+        if (line.hasFlag("nexoBlock|nxBlock")) {
+            if (!SpigotServer.isPluginEnabled("Nexo")) {
+                throw new InvalidConfigurationException(line, "nexoBlock", "Nexo is not loaded/enabled");
+            }
+            String blockId = line.getRequiredString("nexoBlock|nxBlock");
             if (!NexoBlocks.isCustomBlock(blockId)) {
-                throw new InvalidConfigurationException(line, "nexo", "Could not find nexo block with name: '" + blockId + "'");
+                throw new InvalidConfigurationException(line, "nexoBlock", "Could not find nexo block with name: '" + blockId + "'");
             }
             return new NexoBlockChange(blockId, offsetX, offsetY, offsetZ);
+        }
+
+        if (line.hasFlag("craftEngineBlock|ceBlock")) {
+            if (!SpigotServer.isPluginEnabled("CraftEngine")) {
+                throw new InvalidConfigurationException(line, "craftEngineBlock", "CraftEngine is not loaded/enabled");
+            }
+            net.momirealms.craftengine.core.block.CustomBlock customBlock =
+                    line.getRequired("craftEngineBlock|ceBlock", net.momirealms.craftengine.core.block.CustomBlock.class);
+            return new CraftEngineBlockChange(customBlock, offsetX, offsetY, offsetZ);
         }
 
         Material material = line.getRequired(0, Material.class);
@@ -66,23 +82,33 @@ public class BlockChangeLoader implements ConfigLoader.Line<BlockChange> {
         int offsetY = section.getInteger("offset.y").withDefault(0);
         int offsetZ = section.getInteger("offset.z").withDefault(0);
 
-        if (section.contains("itemsadder-block|ia-block")) {
+        if (section.contains("items-adder-block|itemsadder-block|ia-block")) {
             if (!SpigotServer.isPluginEnabled("ItemsAdder")) {
-                throw new InvalidConfigurationException(section, "itemsadder-block", "ItemsAdder is not loaded/enabled");
+                throw new InvalidConfigurationException(section, "items-adder-block", "ItemsAdder is not loaded/enabled");
             }
-            CustomBlock customBlock = section.getRequired("itemsadder-block|ia-block", CustomBlock.class);
+            dev.lone.itemsadder.api.CustomBlock customBlock =
+                    section.getRequired("items-adder-block|itemsadder-block|ia-block", dev.lone.itemsadder.api.CustomBlock.class);
             return new ItemsAdderBlockChange(customBlock, offsetX, offsetY, offsetZ);
         }
 
-        if (section.contains("nexo-block")) {
+        if (section.contains("nexo-block|nx-block")) {
             if (!SpigotServer.isPluginEnabled("Nexo")) {
                 throw new InvalidConfigurationException(section, "nexo-block", "Nexo is not loaded/enabled");
             }
-            String blockId = section.getRequiredString("nexo-block");
+            String blockId = section.getRequiredString("nexo-block|nx-block");
             if (!NexoBlocks.isCustomBlock(blockId)) {
                 throw new InvalidConfigurationException(section, "nexo-block", "Could not find nexo block with name: '" + blockId + "'");
             }
             return new NexoBlockChange(blockId, offsetX, offsetY, offsetZ);
+        }
+
+        if (section.contains("craft-engine-block|craftengine-block|ce-block")) {
+            if (!SpigotServer.isPluginEnabled("CraftEngine")) {
+                throw new InvalidConfigurationException(section, "craft-engine-block", "CraftEngine is not loaded/enabled");
+            }
+            net.momirealms.craftengine.core.block.CustomBlock customBlock =
+                    section.getRequired("craft-engine-block|craftengine-block|ce-block", net.momirealms.craftengine.core.block.CustomBlock.class);
+            return new CraftEngineBlockChange(customBlock, offsetX, offsetY, offsetZ);
         }
 
         Material material = section.getRequired("block", Material.class);
@@ -197,7 +223,7 @@ public class BlockChangeLoader implements ConfigLoader.Line<BlockChange> {
             throw new InvalidConfigurationException(field, "bamboo-leaves", "The current block is not bamboo, please remove the bamboo-leaves parameter");
         }
 
-        return new SimpleBlockChange(material, age, direction, facingDirections, orientation, open, half, stairShape, slabType,
+        return new GenericBlockChange(material, age, direction, facingDirections, orientation, open, half, stairShape, slabType,
                 doorHinge, bedPart, bambooLeaves, offsetX, offsetY, offsetZ);
     }
 

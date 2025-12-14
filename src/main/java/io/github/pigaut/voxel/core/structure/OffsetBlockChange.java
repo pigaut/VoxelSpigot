@@ -18,7 +18,7 @@ public abstract class OffsetBlockChange implements BlockChange {
     }
 
     @Override
-    public @NotNull Location getLocation(Location origin, io.github.pigaut.voxel.bukkit.Rotation rotation) {
+    public @NotNull Location getLocation(Location origin, Rotation rotation) {
         return rotation.apply(origin.clone(), offsetX, offsetY, offsetZ);
     }
 

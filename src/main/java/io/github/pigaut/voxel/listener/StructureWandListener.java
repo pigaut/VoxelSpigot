@@ -1,4 +1,4 @@
-package io.github.pigaut.voxel.core.structure;
+package io.github.pigaut.voxel.listener;
 
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;

@@ -1,12 +1,9 @@
 package io.github.pigaut.voxel.core.function;
 
-import io.github.pigaut.voxel.plugin.boot.*;
-import io.github.pigaut.voxel.plugin.boot.phase.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.yaml.*;
 import org.jetbrains.annotations.*;
-
-import java.util.*;
 
 public class FunctionManager extends ConfigBackedManager.SectionKey<Function> {
 

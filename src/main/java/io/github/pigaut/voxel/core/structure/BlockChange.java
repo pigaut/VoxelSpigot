@@ -7,16 +7,14 @@ import org.jetbrains.annotations.*;
 
 public interface BlockChange {
 
-    boolean matchBlock(Location origin, Rotation rotation);
+    @NotNull Location getLocation(Location origin, Rotation rotation);
 
-    @NotNull
-    Location getLocation(Location origin, Rotation rotation);
+    @NotNull Block getBlock(Location origin, Rotation rotation);
 
-    @NotNull
-    Block getBlock(Location origin, Rotation rotation);
+    boolean isPlaced(@NotNull Location origin, @NotNull Rotation rotation);
 
-    void removeBlock(Location origin, Rotation rotation);
+    void place(@NotNull Location origin, @NotNull Rotation rotation);
 
-    void updateBlock(Location origin, Rotation rotation);
+    void remove(@NotNull Location origin, @NotNull Rotation rotation);
 
 }

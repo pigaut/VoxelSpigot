@@ -5,7 +5,6 @@ import io.github.pigaut.voxel.*;
 import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.core.language.*;
-import io.github.pigaut.voxel.core.structure.*;
 import io.github.pigaut.voxel.hook.itemsadder.*;
 import io.github.pigaut.voxel.listener.*;
 import io.github.pigaut.voxel.plugin.*;
@@ -112,6 +111,9 @@ public class PluginBootstrap {
             missingStartupRequirements.add(bootPhase);
         }
 
+        if (missingStartupRequirements.isEmpty()) {
+            startup();
+        }
     }
 
     public void markReady(@NotNull BootPhase bootPhase) {

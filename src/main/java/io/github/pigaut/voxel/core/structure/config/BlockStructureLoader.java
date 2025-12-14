@@ -3,6 +3,7 @@ package io.github.pigaut.voxel.core.structure.config;
 import io.github.pigaut.voxel.core.structure.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
+import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.load.*;
 import io.github.pigaut.yaml.convert.format.*;
@@ -31,6 +32,10 @@ public class BlockStructureLoader implements ConfigLoader<BlockStructure> {
             return blockStructure;
         }
         List<BlockChange> blocks = List.of(scalar.loadRequired(BlockChange.class));
+
+        if (SpigotServer.isFolia()) {
+            return new FoliaBlockStructure(plugin, blocks);
+        }
         return new BlockStructure(blocks);
     }
 
@@ -38,12 +43,20 @@ public class BlockStructureLoader implements ConfigLoader<BlockStructure> {
     public @NotNull BlockStructure loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
         List<BlockChange> blocks = List.of(section.loadRequired(BlockChange.class));
 
+        BlockStructure structure;
+
         if (section instanceof ConfigRoot root) {
             String name = root.getName();
             String group = Group.byStructureFile(root.getFile());
+            if (SpigotServer.isFolia()) {
+                return new FoliaBlockStructure(plugin, name, group, blocks);
+            }
             return new BlockStructure(name, group, blocks);
         }
 
+        if (SpigotServer.isFolia()) {
+            return new FoliaBlockStructure(plugin, blocks);
+        }
         return new BlockStructure(blocks);
     }
 
@@ -54,9 +67,15 @@ public class BlockStructureLoader implements ConfigLoader<BlockStructure> {
         if (sequence instanceof ConfigRoot root) {
             String name = root.getName();
             String group = Group.byStructureFile(root.getFile());
+            if (SpigotServer.isFolia()) {
+                return new FoliaBlockStructure(plugin, name, group, blocks);
+            }
             return new BlockStructure(name, group, blocks);
         }
 
+        if (SpigotServer.isFolia()) {
+            return new FoliaBlockStructure(plugin, blocks);
+        }
         return new BlockStructure(blocks);
     }
 

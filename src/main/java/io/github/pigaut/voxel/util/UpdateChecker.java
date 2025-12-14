@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.util;
 
 import com.google.common.base.*;
-import io.github.pigaut.voxel.plugin.boot.*;
+import io.github.pigaut.voxel.plugin.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.*;
@@ -78,7 +78,7 @@ public class UpdateChecker implements Listener {
     }
 
     public void getVersion(Consumer<String> consumer) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        plugin.getScheduler().runTaskAsync(() -> {
             try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceId).openStream();
                  Scanner scanner = new Scanner(inputStream)) {
                 if (scanner.hasNext() && consumer != null) {

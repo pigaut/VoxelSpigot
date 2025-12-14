@@ -1,5 +1,6 @@
 package io.github.pigaut.voxel.listener;
 
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.boot.*;
 import io.github.pigaut.voxel.plugin.boot.phase.*;
 import org.bukkit.event.*;

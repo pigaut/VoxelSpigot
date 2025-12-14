@@ -22,12 +22,20 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
             <id>matteodev</id>
             <url>https://maven.devs.beer/</url>
         </repository>
         <repository>
             <id>nexo</id>
             <url>https://repo.nexomc.com/releases</url>
+        </repository>
+        <repository>
+            <id>momirealms</id>
+            <url>https://repo.momirealms.net/releases/</url>
         </repository>
     </repositories>
 
@@ -38,9 +46,15 @@
             <version>24.1.0</version>
         </dependency>
         <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>1.21.10-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
-            <version>1.21.8-R0.1-SNAPSHOT</version>
+            <version>1.21.10-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -108,6 +122,18 @@
                     <artifactId>triumph-gui</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>net.momirealms</groupId>
+            <artifactId>craft-engine-core</artifactId>
+            <version>0.0.65</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.momirealms</groupId>
+            <artifactId>craft-engine-bukkit</artifactId>
+            <version>0.0.65</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

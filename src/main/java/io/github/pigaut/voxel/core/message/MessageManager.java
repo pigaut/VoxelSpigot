@@ -1,6 +1,6 @@
 package io.github.pigaut.voxel.core.message;
 
-import io.github.pigaut.voxel.plugin.boot.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.yaml.*;
 

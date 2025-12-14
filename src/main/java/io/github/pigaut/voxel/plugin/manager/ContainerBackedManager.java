@@ -1,7 +1,7 @@
 package io.github.pigaut.voxel.plugin.manager;
 
 import com.google.common.collect.*;
-import io.github.pigaut.voxel.plugin.boot.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.yaml.convert.format.*;
 import org.jetbrains.annotations.*;
 

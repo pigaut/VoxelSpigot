@@ -10,7 +10,7 @@ import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-public class SimpleBlockChange implements BlockChange {
+public class GenericBlockChange implements BlockChange {
 
     private final Material type;
     private final @Nullable Integer age;
@@ -28,10 +28,10 @@ public class SimpleBlockChange implements BlockChange {
     private final int offsetY;
     private final int offsetZ;
 
-    public SimpleBlockChange(Material type, @Nullable Integer age, @Nullable BlockFace direction, @NotNull List<BlockFace> facingDirections,
-                             @Nullable Axis orientation, @Nullable Boolean open, @Nullable Bisected.Half half, @Nullable Stairs.Shape stairShape,
-                             @Nullable Slab.Type slabType, @Nullable Door.Hinge doorHinge, @Nullable Bed.Part bedPart,
-                             @Nullable Bamboo.Leaves bambooLeaves, int offsetX, int offsetY, int offsetZ) {
+    public GenericBlockChange(Material type, @Nullable Integer age, @Nullable BlockFace direction, @NotNull List<BlockFace> facingDirections,
+                              @Nullable Axis orientation, @Nullable Boolean open, @Nullable Bisected.Half half, @Nullable Stairs.Shape stairShape,
+                              @Nullable Slab.Type slabType, @Nullable Door.Hinge doorHinge, @Nullable Bed.Part bedPart,
+                              @Nullable Bamboo.Leaves bambooLeaves, int offsetX, int offsetY, int offsetZ) {
         this.type = type;
         this.age = age;
         this.direction = direction;
@@ -113,7 +113,7 @@ public class SimpleBlockChange implements BlockChange {
         return rotation.apply(origin.clone(), offsetX, offsetY, offsetZ);
     }
 
-    public boolean matchBlock(Location origin, Rotation rotation) {
+    public boolean isPlaced(@NotNull Location origin, @NotNull Rotation rotation) {
         final BlockData blockData = getLocation(origin, rotation).getBlock().getBlockData();
         if (blockData.getMaterial() != type) {
             return false;
@@ -173,15 +173,15 @@ public class SimpleBlockChange implements BlockChange {
         return getLocation(origin, rotation).getBlock();
     }
 
-    public void removeBlock(Location origin, Rotation rotation) {
-        final Block block = getLocation(origin, rotation).getBlock();
+    public void remove(@NotNull Location origin, @NotNull Rotation rotation) {
+        Block block = getLocation(origin, rotation).getBlock();
         if (block.getType() != Material.AIR) {
             block.setType(Material.AIR, false);
         }
     }
 
-    public void updateBlock(Location origin, Rotation rotation) {
-        final Block block = getLocation(origin, rotation).getBlock();
+    public void place(@NotNull Location origin, @NotNull Rotation rotation) {
+        Block block = getLocation(origin, rotation).getBlock();
         BlockData blockData = block.getBlockData();
 
         if (block.getType() != type) {
@@ -189,60 +189,112 @@ public class SimpleBlockChange implements BlockChange {
             blockData = block.getBlockData();
         }
 
-        updateBlockData(blockData, rotation);
-        block.setBlockData(blockData, false);
+        updateBlockData(block, blockData, rotation);
     }
 
-    private void updateBlockData(BlockData blockData, Rotation rotation) {
+    private void updateBlockData(Block block, BlockData blockData, Rotation rotation) {
+        boolean changed = false;
+
         if (age != null) {
-            ((Ageable) blockData).setAge(age);
+            Ageable ageable = (Ageable) blockData;
+            if (ageable.getAge() != age) {
+                ageable.setAge(age);
+                changed = true;
+            }
         }
 
         if (direction != null) {
-            if (blockData instanceof Directional) {
-                ((Directional) blockData).setFacing(rotation.translateBlockFace(direction));
-            } else {
-                ((Rotatable) blockData).setRotation(rotation.translateBlockFace(direction));
+            BlockFace translated = rotation.translateBlockFace(direction);
+            if (blockData instanceof Directional directional) {
+                if (directional.getFacing() != translated) {
+                    directional.setFacing(translated);
+                    changed = true;
+                }
+            } else if (blockData instanceof Rotatable rotatable) {
+                if (rotatable.getRotation() != translated) {
+                    rotatable.setRotation(translated);
+                    changed = true;
+                }
             }
         }
 
         if (facingDirections != null) {
-            final MultipleFacing multipleFacing = (MultipleFacing) blockData;
+            MultipleFacing multipleFacing = (MultipleFacing) blockData;
             for (BlockFace facing : rotation.translateBlockFaces(facingDirections)) {
-                multipleFacing.setFace(facing, true);
+                if (!multipleFacing.hasFace(facing)) {
+                    multipleFacing.setFace(facing, true);
+                    changed = true;
+                }
             }
         }
 
         if (orientation != null) {
-            ((Orientable) blockData).setAxis(rotation.translateAxis(orientation));
+            Orientable orientable = (Orientable) blockData;
+            Axis axis = rotation.translateAxis(orientation);
+            if (orientable.getAxis() != axis) {
+                orientable.setAxis(axis);
+                changed = true;
+            }
         }
 
         if (open != null) {
-            ((Openable) blockData).setOpen(open);
+            Openable openable = (Openable) blockData;
+            if (openable.isOpen() != open) {
+                openable.setOpen(open);
+                changed = true;
+            }
         }
 
         if (half != null) {
-            ((Bisected) blockData).setHalf(half);
+            Bisected bisected = (Bisected) blockData;
+            if (bisected.getHalf() != half) {
+                bisected.setHalf(half);
+                changed = true;
+            }
         }
 
         if (stairShape != null) {
-            ((Stairs) blockData).setShape(stairShape);
+            Stairs stairs = (Stairs) blockData;
+            if (stairs.getShape() != stairShape) {
+                stairs.setShape(stairShape);
+                changed = true;
+            }
         }
 
         if (slabType != null) {
-            ((Slab) blockData).setType(slabType);
+            Slab slab = (Slab) blockData;
+            if (slab.getType() != slabType) {
+                slab.setType(slabType);
+                changed = true;
+            }
         }
 
         if (doorHinge != null) {
-            ((Door) blockData).setHinge(doorHinge);
+            Door door = (Door) blockData;
+            if (door.getHinge() != doorHinge) {
+                door.setHinge(doorHinge);
+                changed = true;
+            }
         }
 
         if (bedPart != null) {
-            ((Bed) blockData).setPart(bedPart);
+            Bed bed = (Bed) blockData;
+            if (bed.getPart() != bedPart) {
+                bed.setPart(bedPart);
+                changed = true;
+            }
         }
 
         if (bambooLeaves != null) {
-            ((Bamboo) blockData).setLeaves(bambooLeaves);
+            Bamboo bamboo = (Bamboo) blockData;
+            if (bamboo.getLeaves() != bambooLeaves) {
+                bamboo.setLeaves(bambooLeaves);
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            block.setBlockData(blockData, false);
         }
     }
 

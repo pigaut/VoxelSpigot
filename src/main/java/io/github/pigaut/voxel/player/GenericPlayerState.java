@@ -18,7 +18,7 @@ import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-public class SimplePlayerState implements PlayerState {
+public class GenericPlayerState implements PlayerState {
 
     private final EnhancedPlugin plugin;
     private final UUID playerId;
@@ -33,7 +33,7 @@ public class SimplePlayerState implements PlayerState {
 
     private @Nullable InputCollector inputCollector = null;
 
-    public SimplePlayerState(@NotNull EnhancedPlugin plugin, @NotNull Player player) {
+    public GenericPlayerState(@NotNull EnhancedJavaPlugin plugin, @NotNull Player player) {
         this.plugin = plugin;
         this.playerId = player.getUniqueId();
         this.playerName = player.getName();
@@ -374,6 +374,17 @@ public class SimplePlayerState implements PlayerState {
         MenuSelection<T> menuSelection = new MenuSelection<>(this, parser);
         registerInputCollector(menuSelection);
         return menuSelection;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof GenericPlayerState that)) return false;
+        return Objects.equals(playerId, that.playerId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(playerId);
     }
 
 }

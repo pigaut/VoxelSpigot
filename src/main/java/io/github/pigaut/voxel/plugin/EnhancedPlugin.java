@@ -13,7 +13,7 @@ import io.github.pigaut.voxel.core.structure.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.boot.*;
-import io.github.pigaut.voxel.plugin.runnable.*;
+import io.github.pigaut.voxel.plugin.task.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.configurator.*;
 import io.github.pigaut.yaml.node.section.*;
@@ -43,7 +43,10 @@ public interface EnhancedPlugin extends Plugin {
     Database getDatabase();
 
     @NotNull
-    PluginScheduler getScheduler();
+    Scheduler getScheduler();
+
+    @NotNull
+    RegionScheduler getRegionScheduler(@NotNull Location location);
 
     @NotNull
     String getPermission(@NotNull String permission);
@@ -64,7 +67,7 @@ public interface EnhancedPlugin extends Plugin {
     CommandRegistry getCommands();
 
     @NotNull
-    PlayerStateManager<? extends @NotNull PlayerState> getPlayersState();
+    PlayerStateManager<? extends EnhancedJavaPlugin, ? extends @NotNull PlayerState> getPlayersState();
 
     @NotNull
     PlayerState getPlayerState(@NotNull Player player);

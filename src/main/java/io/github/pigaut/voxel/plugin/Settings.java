@@ -10,6 +10,7 @@ import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
 import org.jetbrains.annotations.*;
 
+import java.io.*;
 import java.util.*;
 
 public class Settings implements ConfigBacked {
@@ -22,7 +23,7 @@ public class Settings implements ConfigBacked {
     private boolean checkForUpdates;
     private boolean metrics;
     private boolean dumpLogo;
-    private Locale language;
+    private File languageFile;
     private Ticks autoSave;
     private Ticks worldLoadTimeout;
     private Ticks playerCacheDuration;
@@ -63,8 +64,10 @@ public class Settings implements ConfigBacked {
         dumpLogo = config.getBoolean("dump-logo")
                 .withDefault(true, errors::add);
 
-        language = config.get("language", Locale.class)
-                .withDefault(Locale.ENGLISH, errors::add);
+        languageFile = config.getString("language")
+                .or("en")
+                .map(fileName -> plugin.getFile("languages/" + fileName + ".yml"))
+                .value();
 
         autoSave = config.get("auto-save", Ticks.class)
                 .withDefault(Ticks.fromSeconds(0), errors::add);
@@ -119,8 +122,8 @@ public class Settings implements ConfigBacked {
         return dumpLogo;
     }
 
-    public Locale getLanguage() {
-        return language;
+    public File getLanguageFile() {
+        return languageFile;
     }
 
     public Ticks getAutoSave() {

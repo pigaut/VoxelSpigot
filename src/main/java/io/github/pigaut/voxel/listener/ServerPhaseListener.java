@@ -1,10 +1,10 @@
 package io.github.pigaut.voxel.listener;
 
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.boot.*;
 import io.github.pigaut.voxel.plugin.boot.phase.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
-import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.util.*;
 import org.bukkit.event.*;
 import org.bukkit.event.server.*;

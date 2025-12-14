@@ -4,7 +4,6 @@ import dev.lone.itemsadder.api.*;
 import io.github.pigaut.voxel.bukkit.Rotation;
 import io.github.pigaut.voxel.core.structure.*;
 import org.bukkit.*;
-import org.bukkit.block.*;
 import org.jetbrains.annotations.*;
 
 public class ItemsAdderBlockChange extends OffsetBlockChange {
@@ -17,7 +16,7 @@ public class ItemsAdderBlockChange extends OffsetBlockChange {
     }
 
     @Override
-    public boolean matchBlock(Location origin, Rotation rotation) {
+    public boolean isPlaced(@NotNull Location origin, @NotNull Rotation rotation) {
         CustomBlock placedBlock = CustomBlock.byAlreadyPlaced(getBlock(origin, rotation));
         if (placedBlock == null) {
             return false;
@@ -26,12 +25,12 @@ public class ItemsAdderBlockChange extends OffsetBlockChange {
     }
 
     @Override
-    public void removeBlock(Location origin, Rotation rotation) {
+    public void remove(@NotNull Location origin, @NotNull Rotation rotation) {
         CustomBlock.remove(getLocation(origin, rotation));
     }
 
     @Override
-    public void updateBlock(Location origin, Rotation rotation) {
+    public void place(@NotNull Location origin, @NotNull Rotation rotation) {
         customBlock.place(getLocation(origin, rotation));
     }
 

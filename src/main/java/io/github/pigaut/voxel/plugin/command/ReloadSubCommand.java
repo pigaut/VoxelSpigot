@@ -3,9 +3,7 @@ package io.github.pigaut.voxel.plugin.command;
 import io.github.pigaut.voxel.*;
 import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.config.*;
-import io.github.pigaut.voxel.placeholder.*;
-import io.github.pigaut.voxel.plugin.boot.*;
-import io.github.pigaut.voxel.util.*;
+import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.entity.*;
 import org.jetbrains.annotations.*;
 

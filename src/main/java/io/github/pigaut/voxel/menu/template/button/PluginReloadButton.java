@@ -5,10 +5,9 @@ import io.github.pigaut.voxel.config.*;
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.plugin.boot.*;
+import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
-import org.bukkit.event.inventory.*;
 
 public class PluginReloadButton extends Button {
 

@@ -1,4 +1,4 @@
-package io.github.pigaut.voxel.plugin.boot;
+package io.github.pigaut.voxel.plugin;
 
 import io.github.pigaut.sql.*;
 import io.github.pigaut.voxel.*;
@@ -16,9 +16,9 @@ import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.core.structure.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
-import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.plugin.boot.*;
 import io.github.pigaut.voxel.plugin.manager.*;
-import io.github.pigaut.voxel.plugin.runnable.*;
+import io.github.pigaut.voxel.plugin.task.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.util.reflection.*;
@@ -50,13 +50,15 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final LanguageDictionary dictionary = new LanguageDictionary(this);
     private final CommandRegistry commandRegistry = new CommandRegistry(this);
 
-    private final PlayerStateManager<SimplePlayerState> playerManager = new PlayerStateManager<>(this, SimplePlayerState::new);
+    private final GenericPlayerStateManager playerStateManager = new GenericPlayerStateManager(this);
     private final ItemManager itemManager = new ItemManager(this);
     private final MessageManager messageManager = new MessageManager(this);
     private final ParticleManager particleManager = new ParticleManager(this);
     private final SoundManager soundManager = new SoundManager(this);
     private final FunctionManager functionManager = new FunctionManager(this);
     private final StructureManager structureManager = new StructureManager(this);
+
+    private final Settings settings = new Settings(this);
 
     private final PluginBootstrap bootstrap = new PluginBootstrap(this);
 
@@ -81,7 +83,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     public List<Manager> getAllManagers() {
         List<Manager> managers = new ArrayList<>();
 
-        managers.add(playerManager);
+        managers.add(playerStateManager);
         managers.add(itemManager);
         managers.add(messageManager);
         managers.add(particleManager);
@@ -97,6 +99,11 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
         }
 
         return managers;
+    }
+
+    @Override
+    public @NotNull Settings getSettings() {
+        return settings;
     }
 
     public @NotNull Configurator createConfigurator() {
@@ -126,6 +133,11 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     @Override
     public @NotNull PluginScheduler getScheduler() {
         return scheduler;
+    }
+
+    @Override
+    public @NotNull RegionScheduler getRegionScheduler(@NotNull Location location) {
+        return new PluginRegionScheduler(this, location);
     }
 
     @Override
@@ -159,18 +171,18 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
-    public @NotNull PlayerStateManager<? extends PlayerState> getPlayersState() {
-        return playerManager;
+    public @NotNull PlayerStateManager<? extends EnhancedJavaPlugin, ? extends PlayerState> getPlayersState() {
+        return playerStateManager;
     }
 
     @Override
     public @NotNull PlayerState getPlayerState(@NotNull Player player) {
-        return playerManager.getPlayerState(player);
+        return playerStateManager.getPlayerState(player);
     }
 
     @Override
     public @Nullable PlayerState getPlayerState(@NotNull UUID playerId) {
-        return playerManager.getPlayerState(playerId);
+        return playerStateManager.getPlayerState(playerId);
     }
 
     @Override

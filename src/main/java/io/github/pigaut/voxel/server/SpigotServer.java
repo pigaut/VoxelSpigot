@@ -17,12 +17,21 @@ public class SpigotServer {
     private static SpigotServer server;
 
     private final SpigotVersion version;
+    private boolean folia;
 
     private SpigotServer() {
         {
             final String version = "V" + Bukkit.getBukkitVersion().split("-")[0].replaceAll("\\.", "_");
             SpigotVersion foundVersion = ParseUtil.parseEnumOrNull(SpigotVersion.class, version);
             this.version = foundVersion != null ? foundVersion : SpigotVersion.UNKNOWN;
+        }
+
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            folia = true;
+        }
+        catch (ClassNotFoundException e) {
+            folia = false;
         }
     }
 
@@ -40,6 +49,10 @@ public class SpigotServer {
     @NotNull
     public static NMSVersion getNMSVersion() {
         return getVersion().getNMSVersion();
+    }
+
+    public static boolean isFolia() {
+        return getServer().folia;
     }
 
     public static World getDefaultWorld() {

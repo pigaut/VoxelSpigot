@@ -1,10 +1,7 @@
 package io.github.pigaut.voxel.plugin.manager;
 
-import io.github.pigaut.voxel.plugin.boot.*;
-import io.github.pigaut.voxel.plugin.boot.phase.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.util.*;
-
-import java.util.*;
 
 public abstract class Manager {
 

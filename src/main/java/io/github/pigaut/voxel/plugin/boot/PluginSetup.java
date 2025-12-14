@@ -3,6 +3,7 @@ package io.github.pigaut.voxel.plugin.boot;
 import io.github.pigaut.sql.*;
 import io.github.pigaut.sql.database.*;
 import io.github.pigaut.voxel.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.voxel.util.UpdateChecker;

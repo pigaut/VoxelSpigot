@@ -1,6 +1,6 @@
 package io.github.pigaut.voxel.player;
 
-import io.github.pigaut.voxel.plugin.boot.*;
+import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -8,38 +8,40 @@ import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-public class PlayerStateManager<P extends PlayerState> extends Manager {
+public class PlayerStateManager<TPlugin extends EnhancedJavaPlugin, TPlayer extends GenericPlayerState> extends Manager {
 
-    private final PlayerStateFactory<P> playerStateFactory;
-    private final Map<UUID, P> playersByUUID = new HashMap<>();
-    private final Map<UUID, P> playersCache = new HashMap<>();
+    private final TPlugin plugin;
+    private final PlayerStateFactory<TPlugin, TPlayer> playerStateFactory;
+    private final Map<UUID, TPlayer> playersByUUID = new HashMap<>();
+    private final Map<UUID, TPlayer> playersCache = new HashMap<>();
 
-    public PlayerStateManager(@NotNull EnhancedJavaPlugin plugin, @NotNull PlayerStateFactory<P> playerStateFactory) {
+    public PlayerStateManager(@NotNull TPlugin plugin, @NotNull PlayerStateFactory<TPlugin, TPlayer> playerStateFactory) {
         super(plugin);
+        this.plugin = plugin;
         this.playerStateFactory = playerStateFactory;
     }
 
-    public @Nullable P getPlayerState(@NotNull String name) {
+    public @Nullable TPlayer getPlayerState(@NotNull String name) {
         Player player = Bukkit.getPlayer(name);
         return player != null ? getPlayerState(player) : null;
     }
 
-    public @Nullable P getPlayerState(@NotNull UUID playerId) {
+    public @Nullable TPlayer getPlayerState(@NotNull UUID playerId) {
         return playersByUUID.get(playerId);
     }
 
-    public @NotNull P getPlayerState(@NotNull Player player) {
+    public @NotNull TPlayer getPlayerState(@NotNull Player player) {
         UUID playerId = player.getUniqueId();
         if (playersByUUID.containsKey(playerId)) {
             return playersByUUID.get(playerId);
         }
 
-        P playerState = playerStateFactory.create(plugin, player);
+        TPlayer playerState = playerStateFactory.create(plugin, player);
         playersByUUID.put(playerState.getUniqueId(), playerState);
         return playerState;
     }
 
-    public List<P> getAllPlayerStates() {
+    public List<TPlayer> getAllPlayerStates() {
         return new ArrayList<>(playersByUUID.values());
     }
 
@@ -59,7 +61,7 @@ public class PlayerStateManager<P extends PlayerState> extends Manager {
 
     public void registerPlayer(@NotNull Player player) {
         UUID playerId = player.getUniqueId();
-        P playerState = playersCache.get(playerId);
+        TPlayer playerState = playersCache.get(playerId);
         if (playerState != null) {
             playersCache.remove(playerId);
         }
@@ -72,7 +74,7 @@ public class PlayerStateManager<P extends PlayerState> extends Manager {
 
     public void unregisterPlayer(@NotNull Player player) {
         UUID playerId = player.getUniqueId();
-        P playerState = playersByUUID.remove(playerId);
+        TPlayer playerState = playersByUUID.remove(playerId);
         if (playerState != null) {
             playersCache.put(playerId, playerState);
 

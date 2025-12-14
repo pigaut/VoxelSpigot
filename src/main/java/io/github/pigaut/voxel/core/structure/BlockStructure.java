@@ -1,16 +1,16 @@
 package io.github.pigaut.voxel.core.structure;
 
+import io.github.pigaut.voxel.bukkit.Rotation;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.plugin.manager.*;
-import io.github.pigaut.voxel.bukkit.Rotation;
 import io.github.pigaut.yaml.convert.format.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
-import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 public class BlockStructure implements Identifiable {
 
@@ -48,6 +48,54 @@ public class BlockStructure implements Identifiable {
                 .buildIcon();
     }
 
+    public boolean hasMultipleBlocks() {
+        return blockChanges.size() > 1;
+    }
+
+    public boolean isPlaced(@NotNull Location origin, @NotNull Rotation rotation) {
+        for (BlockChange block : blockChanges) {
+            if (!block.isPlaced(origin, rotation)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void place(@NotNull Location origin, @NotNull Rotation rotation) {
+        for (BlockChange block : blockChanges) {
+            block.place(origin, rotation);
+        }
+    }
+
+    public void remove(@NotNull Location origin, @NotNull Rotation rotation) {
+        for (BlockChange block : blockChanges) {
+            block.remove(origin, rotation);
+        }
+    }
+
+    public void subtract(@NotNull BlockStructure structure, @NotNull Location origin, @NotNull Rotation rotation) {
+        Set<Location> newBlockLocations = structure.getBlockChanges().stream()
+                .map(block -> block.getLocation(origin, rotation))
+                .collect(Collectors.toSet());
+
+        for (Block oldBlock : getOccupiedBlocks(origin, rotation)) {
+            Location oldBlockLocation = oldBlock.getLocation();
+            if (!newBlockLocations.contains(oldBlockLocation)) {
+                oldBlock.setType(Material.AIR, false);
+            }
+        }
+    }
+
+    public List<BlockChange> getBlockChanges() {
+        return new ArrayList<>(blockChanges);
+    }
+
+    public List<Block> getOccupiedBlocks(Location origin, Rotation rotation) {
+        return blockChanges.stream()
+                .map(component -> component.getBlock(origin, rotation))
+                .toList();
+    }
+
     public synchronized Material getMostCommonMaterial() {
         if (mostCommonMaterial != null) {
             return mostCommonMaterial;
@@ -55,7 +103,7 @@ public class BlockStructure implements Identifiable {
 
         final Map<Material, Integer> materialFrequency = new HashMap<>();
         for (BlockChange blockChange : blockChanges) {
-            if (blockChange instanceof SimpleBlockChange simpleBlock) {
+            if (blockChange instanceof GenericBlockChange simpleBlock) {
                 Material material = simpleBlock.getType();
                 materialFrequency.put(material, materialFrequency.getOrDefault(material, 0) + 1);
             }
@@ -71,51 +119,6 @@ public class BlockStructure implements Identifiable {
         }
 
         return mostCommonMaterial != null ? mostCommonMaterial : Material.TERRACOTTA;
-    }
-
-    public boolean hasMultipleBlocks() {
-        return blockChanges.size() > 1;
-    }
-
-    public List<BlockChange> getBlockChanges() {
-        return new ArrayList<>(blockChanges);
-    }
-
-    public boolean matchBlocks(Location origin, Rotation rotation) {
-        for (BlockChange blockChange : blockChanges) {
-            if (!blockChange.matchBlock(origin, rotation)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public @Nullable Block getBlockAt(Location origin, Rotation rotation, Location location) {
-        for (BlockChange blockChange : blockChanges) {
-            final Block block = blockChange.getBlock(origin, rotation);
-            if (block.getLocation().equals(location)) {
-                return block;
-            }
-        }
-        return null;
-    }
-
-    public List<Block> getBlocks(Location origin, Rotation rotation) {
-        return blockChanges.stream()
-                .map(component -> component.getBlock(origin, rotation))
-                .toList();
-    }
-
-    public void updateBlocks(Location origin, Rotation rotation) {
-        for (BlockChange blockChange : blockChanges) {
-            blockChange.updateBlock(origin, rotation);
-        }
-    }
-
-    public void removeBlocks(Location origin, Rotation rotation) {
-        for (BlockChange blockChange : blockChanges) {
-            blockChange.removeBlock(origin, rotation);
-        }
     }
 
 }

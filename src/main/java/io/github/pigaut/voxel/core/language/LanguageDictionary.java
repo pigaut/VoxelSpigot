@@ -14,8 +14,6 @@ import java.util.*;
 public class LanguageDictionary implements ConfigBacked {
 
     private final EnhancedPlugin plugin;
-
-    private Locale defaultLanguage = Locale.ENGLISH;
     private final Map<String, String> dictionary = new HashMap<>();
 
     public LanguageDictionary(EnhancedPlugin plugin) {
@@ -23,19 +21,10 @@ public class LanguageDictionary implements ConfigBacked {
     }
 
     @NotNull
-    public Locale getDefaultLanguage() {
-        return defaultLanguage;
-    }
-
-    public void setDefaultLanguage(@NotNull Locale defaultLanguage) {
-        this.defaultLanguage = defaultLanguage;
-    }
-
-    @NotNull
     public String getTranslation(@NotNull String name) throws TranslationNotFoundException {
         final String lang = dictionary.get(name);
         if (lang == null) {
-            throw new TranslationNotFoundException(defaultLanguage, name);
+            throw new TranslationNotFoundException(name);
         }
         return lang;
     }
@@ -45,11 +34,11 @@ public class LanguageDictionary implements ConfigBacked {
         return dictionary.getOrDefault(name, def);
     }
 
-    public void addMessage(@NotNull String name, @NotNull String message) {
+    public void addTranslation(@NotNull String name, @NotNull String message) {
         dictionary.put(name, message);
     }
 
-    public void removeMessage(@NotNull String name) {
+    public void removeTranslation(@NotNull String name) {
         dictionary.remove(name);
     }
 
@@ -61,20 +50,10 @@ public class LanguageDictionary implements ConfigBacked {
     public @NotNull List<ConfigurationException> loadConfigurationData() {
         List<ConfigurationException> errors = new ArrayList<>();
 
-        Locale languageLocale = plugin.getSettings().getLanguage();
-        setDefaultLanguage(languageLocale);
-
-        String languageFilePath = "languages/" + languageLocale.getLanguage() + ".yml";
-        File file = plugin.getFile(languageFilePath);
-
-        RootSection languageConfig;
-        try {
-            languageConfig = YamlConfig.loadSection(file, "Language");
-        }
-        catch (ConfigurationLoadException e) {
-            languageConfig = YamlConfig.createEmptySection(file);
-            errors.add(e);
-        }
+        File file = plugin.getSettings().getLanguageFile();
+        RootSection languageConfig = YamlConfig.createEmptySection(file);
+        languageConfig.setPrefix("Language");
+        languageConfig.load(errors::add);
 
         RootSection languageDefaults = YamlConfig.createEmptySection(null);
         try (InputStream inputStream = plugin.getClass().getClassLoader().getResourceAsStream("languages/" + languageConfig.getFile().getName())) {
@@ -82,20 +61,21 @@ public class LanguageDictionary implements ConfigBacked {
                 languageDefaults.load(inputStream);
             }
         }
-        catch (IOException ignored) {}
+        catch (IOException ignored) {
+        }
 
-        Set<String> languageIds = languageConfig.getKeys();
-        for (String langId : languageDefaults.getKeys()) {
-            if (!languageIds.contains(langId)) {
-                String value = languageDefaults.getRequiredString(langId, StringColor.FORMATTER);
-                addMessage(CaseFormatter.toKebabCase(langId), value);
-                errors.add(new InvalidConfigurationException(languageConfig, langId, "Message not found (Fix or regenerate the language file)"));
+        Set<String> translationKeys = languageConfig.getKeys();
+        for (String key : languageDefaults.getKeys()) {
+            if (!translationKeys.contains(key)) {
+                String translation = languageDefaults.getRequiredString(key, StringColor.FORMATTER);
+                addTranslation(CaseFormatter.toKebabCase(key), translation);
+                errors.add(new InvalidConfigurationException(languageConfig, key, "Message not found (Fix or regenerate the language file)"));
             }
         }
 
         for (String key : languageConfig.getKeys()) {
-            String value = languageConfig.getRequiredString(key, StringColor.FORMATTER);
-            addMessage(CaseFormatter.toKebabCase(key), value);
+            String translation = languageConfig.getRequiredString(key, StringColor.FORMATTER);
+            addTranslation(CaseFormatter.toKebabCase(key), translation);
         }
 
         return errors;

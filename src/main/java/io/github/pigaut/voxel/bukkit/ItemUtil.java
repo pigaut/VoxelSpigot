@@ -9,22 +9,20 @@ import org.bukkit.inventory.meta.*;
 import org.bukkit.inventory.meta.Damageable;
 import org.jetbrains.annotations.*;
 
+import java.util.*;
 import java.util.concurrent.*;
 
 public class ItemUtil {
 
-    @NotNull
-    public static Item dropItem(@NotNull Location location, @NotNull ItemStack item) {
-        return dropItem(location, item, 1, 0);
+    public static void dropItem(@NotNull Location location, @NotNull ItemStack item) {
+        dropItem(location, item, 1, 0);
     }
 
-    @NotNull
-    public static Item dropItem(@NotNull Location location, @NotNull ItemStack item, int amount) {
-        return dropItem(location, item, amount, 0);
+    public static void dropItem(@NotNull Location location, @NotNull ItemStack item, int amount) {
+        dropItem(location, item, amount, 0);
     }
 
-    @NotNull
-    public static Item dropItem(@NotNull Location location, @NotNull ItemStack item, int amount, int fortuneLevel) {
+    public static void dropItem(@NotNull Location location, @NotNull ItemStack item, int amount, int fortuneLevel) {
         World world = location.getWorld();
         if (world == null) {
             world = SpigotServer.getDefaultWorld();
@@ -32,7 +30,22 @@ public class ItemUtil {
 
         ItemStack drop = item.clone();
         drop.setAmount(Fortune.getDropAmount(amount, fortuneLevel));
-        return world.dropItemNaturally(location, drop);
+        world.dropItemNaturally(location, drop);
+    }
+
+    public static void dropItems(@NotNull Location location, @NotNull Collection<ItemStack> items) {
+        World world = location.getWorld();
+        if (world == null) {
+            world = SpigotServer.getDefaultWorld();
+        }
+
+        for (ItemStack drop : items) {
+            world.dropItemNaturally(location, drop);
+        }
+    }
+
+    public static void damagePlayerTool(@NotNull Player player, int amount) {
+        damageItem(player.getInventory().getItemInMainHand(), player, amount);
     }
 
     public static void damageItem(@NotNull ItemStack item, @NotNull Player player, int amount) {

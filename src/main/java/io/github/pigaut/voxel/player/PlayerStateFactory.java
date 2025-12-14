@@ -5,9 +5,9 @@ import org.bukkit.entity.*;
 import org.jetbrains.annotations.*;
 
 @FunctionalInterface
-public interface PlayerStateFactory<P extends PlayerState> {
+public interface PlayerStateFactory<TPlugin extends EnhancedJavaPlugin, TPlayer extends GenericPlayerState> {
 
     @NotNull
-    P create(EnhancedPlugin plugin, Player player);
+    TPlayer create(TPlugin plugin, Player player);
 
 }

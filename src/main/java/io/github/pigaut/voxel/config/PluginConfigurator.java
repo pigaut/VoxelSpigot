@@ -1,6 +1,5 @@
 package io.github.pigaut.voxel.config;
 
-import dev.lone.itemsadder.api.*;
 import io.github.pigaut.voxel.config.misc.*;
 import io.github.pigaut.voxel.core.function.*;
 import io.github.pigaut.voxel.core.function.action.*;
@@ -17,6 +16,7 @@ import io.github.pigaut.voxel.core.sound.*;
 import io.github.pigaut.voxel.core.sound.config.*;
 import io.github.pigaut.voxel.core.structure.*;
 import io.github.pigaut.voxel.core.structure.config.*;
+import io.github.pigaut.voxel.hook.craftengine.*;
 import io.github.pigaut.voxel.hook.itemsadder.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
@@ -56,7 +56,11 @@ public class PluginConfigurator extends SpigotConfigurator {
         addLoader(Function.class, new FunctionLoader(plugin));
 
         if (SpigotServer.isPluginEnabled("ItemsAdder")) {
-            addLoader(CustomBlock.class, new ItemsAdderBlockLoader());
+            addLoader(dev.lone.itemsadder.api.CustomBlock.class, new ItemsAdderBlockLoader());
+        }
+
+        if (SpigotServer.isPluginEnabled("CraftEngine")) {
+            addLoader(net.momirealms.craftengine.core.block.CustomBlock.class, new CraftEngineBlockLoader());
         }
 
     }
