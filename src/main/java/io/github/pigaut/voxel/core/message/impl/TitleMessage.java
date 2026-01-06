@@ -3,6 +3,7 @@ package io.github.pigaut.voxel.core.message.impl;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.yaml.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -35,8 +36,9 @@ public class TitleMessage extends GenericMessage {
     }
 
     @Override
-    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
-        title.send(player, placeholderSuppliers);
+    public void send(@NotNull PlayerState playerState) {
+        Player player = playerState.asPlayer();
+        title.send(player, playerState.getPlaceholderSuppliers());
     }
 
 }

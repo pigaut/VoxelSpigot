@@ -7,7 +7,7 @@ import org.jetbrains.annotations.*;
 import java.util.*;
 import java.util.regex.*;
 
-public class Placeholder implements StringFormatter {
+public class Placeholder implements StringFormatter, PlaceholderSupplier {
 
     private final String id;
     private final Map<String, StringFormatter> formatIds = new HashMap<>();
@@ -21,6 +21,11 @@ public class Placeholder implements StringFormatter {
             final String styleId = StringUtil.buildString(id.charAt(0), idName, "_", style.getTagName(), id.charAt(id.length() - 1));
             formatIds.put(styleId, style);
         }
+    }
+
+    @Override
+    public @NotNull Placeholder[] getPlaceholders() {
+        return new Placeholder[] { this };
     }
 
     @NotNull

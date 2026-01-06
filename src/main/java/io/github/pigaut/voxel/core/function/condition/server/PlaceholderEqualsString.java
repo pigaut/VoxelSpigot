@@ -24,7 +24,7 @@ public class PlaceholderEqualsString implements Condition {
     public Boolean evaluate(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         final String parsedValue;
         if (player != null) {
-            parsedValue = StringPlaceholders.parseAll(player.asPlayer(), id, player.getPlaceholders());
+            parsedValue = StringPlaceholders.parseAll(player.asPlayer(), id, player.getPlaceholderSuppliers());
         }
         else {
             parsedValue = StringPlaceholders.parseAll(id);

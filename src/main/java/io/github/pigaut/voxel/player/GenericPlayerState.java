@@ -1,7 +1,6 @@
 package io.github.pigaut.voxel.player;
 
 import io.github.pigaut.voxel.bukkit.*;
-import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.menu.*;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.input.*;
@@ -25,7 +24,10 @@ public class GenericPlayerState implements PlayerState {
     private final String playerName;
     private final Set<String> flags = new HashSet<>();
     private final TypeMap<String, Object> playerCache = new TypeMap<>();
-    private @NotNull PlaceholderSupplier[] placeholders = PlaceholderSupplier.EMPTY;
+
+    private @NotNull List<PlaceholderSupplier> placeholderSuppliers = new ArrayList<>();
+    private final PlaceholderSupplier internalPlaceholders;
+
     private @Nullable MenuView openMenu = null;
 
     private @Nullable Location firstSelection = null;
@@ -37,6 +39,10 @@ public class GenericPlayerState implements PlayerState {
         this.plugin = plugin;
         this.playerId = player.getUniqueId();
         this.playerName = player.getName();
+        this.internalPlaceholders = PlaceholderSupplier.of(
+                Placeholder.of("{player_id}", playerId),
+                Placeholder.of("{player}", playerName)
+        );
     }
 
     @Override
@@ -76,22 +82,7 @@ public class GenericPlayerState implements PlayerState {
 
     @Override
     public void sendMessage(String message) {
-        Chat.send(asPlayer(), message);
-    }
-
-    @Override
-    public void sendMessage(String message, PlaceholderSupplier... placeholderSuppliers) {
         Chat.send(asPlayer(), message, placeholderSuppliers);
-    }
-
-    @Override
-    public void sendMessage(Message message) {
-        if (placeholders != null) {
-            message.send(asPlayer(), placeholders);
-        }
-        else {
-            message.send(asPlayer());
-        }
     }
 
     @Override
@@ -195,7 +186,7 @@ public class GenericPlayerState implements PlayerState {
     @Override
     public void performCommand(String command) {
         final Player player = asPlayer();
-        player.performCommand(StringPlaceholders.parseAll(player, command, placeholders));
+        player.performCommand(StringPlaceholders.parseAll(player, command, placeholderSuppliers));
     }
 
     @Override
@@ -263,18 +254,20 @@ public class GenericPlayerState implements PlayerState {
     }
 
     @Override
-    public @NotNull PlaceholderSupplier[] getPlaceholders() {
-        return placeholders;
+    public @NotNull Collection<PlaceholderSupplier> getPlaceholderSuppliers() {
+        return placeholderSuppliers;
     }
 
     @Override
-    public void updatePlaceholders(@NotNull PlaceholderSupplier... placeholderSuppliers) {
-        this.placeholders = placeholderSuppliers;
+    public void updatePlaceholders(@NotNull PlaceholderSupplier externalPlaceholders) {
+        placeholderSuppliers = new ArrayList<>();
+        placeholderSuppliers.add(internalPlaceholders);
+        placeholderSuppliers.add(externalPlaceholders);
     }
 
     @Override
     public void clearPlaceholders() {
-        placeholders = PlaceholderSupplier.EMPTY;
+        placeholderSuppliers.clear();
     }
 
     @Override

@@ -12,18 +12,13 @@ public class HelpSubCommand extends SubCommand {
         withPermission(plugin.getPermission("help"));
         withDescription(plugin.getTranslation("help-command"));
         withCommandExecution((sender, args, placeholders) -> {
-            final String header = plugin.getTranslationOrDefault("help-header", "------------     {command_name_tc} Help     ------------");
-            final String line = plugin.getTranslationOrDefault("help-line", "/{command}: {command_description}");
-            final String footer = plugin.getTranslationOrDefault("help-footer", "---------------------------------------------");
-
-            Chat.send(sender, header, placeholders);
+            plugin.sendMessage(sender, "help-header", placeholders);
             for (SubCommand subCommand : getParent()) {
-                if (!subCommand.isExecutable()) {
-                    continue;
+                if (subCommand.isExecutable()) {
+                    plugin.sendMessage(sender, "help-line", subCommand);
                 }
-                Chat.send(sender, line, subCommand);
             }
-            Chat.send(sender, footer, placeholders);
+            plugin.sendMessage(sender, "help-footer", placeholders);
         });
     }
 

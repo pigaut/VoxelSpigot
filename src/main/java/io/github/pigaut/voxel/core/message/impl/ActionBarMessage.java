@@ -3,6 +3,7 @@ package io.github.pigaut.voxel.core.message.impl;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.yaml.*;
 import net.md_5.bungee.api.*;
 import net.md_5.bungee.api.chat.*;
@@ -38,9 +39,10 @@ public class ActionBarMessage extends GenericMessage {
     }
 
     @Override
-    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
-        final String formattedMessage = StringPlaceholders.parseAll(player, message, placeholderSuppliers);
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(formattedMessage));
+    public void send(@NotNull PlayerState playerState) {
+        Player player = playerState.asPlayer();
+        String parsedMessage = StringPlaceholders.parseAll(player, message, playerState.getPlaceholderSuppliers());
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(parsedMessage));
     }
 
 }

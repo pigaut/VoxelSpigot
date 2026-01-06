@@ -15,7 +15,7 @@ public class SendTitleToPlayer implements PlayerAction {
 
     @Override
     public void execute(@NotNull PlayerState player) {
-        player.sendMessage(title);
+        title.send(player);
     }
 
 }

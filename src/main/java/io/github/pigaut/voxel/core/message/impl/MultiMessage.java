@@ -3,6 +3,7 @@ package io.github.pigaut.voxel.core.message.impl;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.yaml.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -46,9 +47,9 @@ public class MultiMessage implements Message {
     }
 
     @Override
-    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
+    public void send(@NotNull PlayerState playerState) {
         for (Message message : messages) {
-            message.send(player, placeholderSuppliers);
+            message.send(playerState);
         }
     }
 

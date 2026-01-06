@@ -17,17 +17,17 @@ public class PlayerToolNameEquals implements PlayerCondition {
 
     @Override
     public Boolean evaluate(@NotNull PlayerState player) {
-        final ItemStack tool = player.getInventory().getItemInMainHand();
+        ItemStack tool = player.getInventory().getItemInMainHand();
         if (!tool.hasItemMeta()) {
             return false;
         }
 
-        final ItemMeta toolMeta = tool.getItemMeta();
+        ItemMeta toolMeta = tool.getItemMeta();
         if (!toolMeta.hasDisplayName()) {
             return false;
         }
 
-        final String toolName = ChatColor.stripColor(toolMeta.getDisplayName());
+        String toolName = ChatColor.stripColor(toolMeta.getDisplayName());
         return toolName.equals(name);
     }
 

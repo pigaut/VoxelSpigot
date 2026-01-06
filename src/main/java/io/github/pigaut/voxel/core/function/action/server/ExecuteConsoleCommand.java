@@ -22,7 +22,7 @@ public class ExecuteConsoleCommand implements Action {
     public void execute(@Nullable PlayerState player, @Nullable Event event, @Nullable Block block, @Nullable Entity target) {
         ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
         if (player != null) {
-            Bukkit.dispatchCommand(console, StringPlaceholders.parseAll(player.asPlayer(), command, player.getPlaceholders()));
+            Bukkit.dispatchCommand(console, StringPlaceholders.parseAll(player.asPlayer(), command, player.getPlaceholderSuppliers()));
             return;
         }
         Bukkit.dispatchCommand(console, StringPlaceholders.parseAll(command));

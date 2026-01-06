@@ -4,6 +4,7 @@ import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.yaml.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -30,8 +31,9 @@ public class ChatMessage extends GenericMessage {
     }
 
     @Override
-    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
-        Chat.send(player, message, placeholderSuppliers);
+    public void send(@NotNull PlayerState playerState) {
+        Player player = playerState.asPlayer();
+        Chat.send(player, message, playerState.getPlaceholderSuppliers());
     }
 
 }

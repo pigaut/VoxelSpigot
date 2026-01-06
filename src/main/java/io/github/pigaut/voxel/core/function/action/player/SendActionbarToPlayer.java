@@ -15,7 +15,7 @@ public class SendActionbarToPlayer implements PlayerAction {
 
     @Override
     public void execute(@NotNull PlayerState player) {
-        player.sendMessage(actionbar);
+        actionbar.send(player);
     }
 
 }

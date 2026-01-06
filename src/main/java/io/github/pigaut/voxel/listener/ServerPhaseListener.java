@@ -4,7 +4,6 @@ import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.boot.*;
 import io.github.pigaut.voxel.plugin.boot.phase.*;
 import io.github.pigaut.voxel.server.*;
-import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.util.*;
 import org.bukkit.event.*;
 import org.bukkit.event.server.*;
@@ -15,7 +14,7 @@ import java.util.*;
 public class ServerPhaseListener implements Listener {
 
     private final EnhancedJavaPlugin plugin;
-    private final ColoredLogger logger;
+    private final PluginLogger logger;
 
     private final List<String> worldsToBeLoaded = SpigotServer.getWorldFolderNames();
 

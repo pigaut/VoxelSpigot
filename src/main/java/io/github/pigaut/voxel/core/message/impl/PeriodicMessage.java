@@ -2,6 +2,7 @@ package io.github.pigaut.voxel.core.message.impl;
 
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
@@ -42,11 +43,11 @@ public class PeriodicMessage implements Message {
     }
 
     @Override
-    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
-        message.send(player, placeholderSuppliers);
+    public void send(@NotNull PlayerState playerState) {
+        message.send(playerState);
         for (int i = 1; i < repetitions; i++) {
             final long delay = (long) interval * i;
-            plugin.getScheduler().runTaskLater(delay, () -> message.send(player, placeholderSuppliers));
+            plugin.getScheduler().runTaskLater(delay, () -> message.send(playerState));
         }
     }
 

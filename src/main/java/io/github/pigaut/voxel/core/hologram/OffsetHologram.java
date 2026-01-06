@@ -3,6 +3,9 @@ package io.github.pigaut.voxel.core.hologram;
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.bukkit.Rotation;
 import org.bukkit.*;
+import org.jetbrains.annotations.*;
+
+import java.util.*;
 
 public class OffsetHologram implements Hologram {
 
@@ -17,8 +20,8 @@ public class OffsetHologram implements Hologram {
     }
 
     @Override
-    public HologramDisplay spawn(Location location, Rotation rotation, PlaceholderSupplier... placeholders) {
-        final Location offsetLocation = rotation.apply(location.clone(), offsetX, offsetY, offsetZ);
+    public @Nullable HologramDisplay spawn(Location location, Rotation rotation, Collection<PlaceholderSupplier> placeholders) {
+        Location offsetLocation = rotation.apply(location.clone(), offsetX, offsetY, offsetZ);
         return hologram.spawn(offsetLocation, placeholders);
     }
 

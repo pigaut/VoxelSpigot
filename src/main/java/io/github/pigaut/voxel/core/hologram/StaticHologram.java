@@ -10,6 +10,8 @@ import org.bukkit.block.*;
 import org.bukkit.scheduler.*;
 import org.jetbrains.annotations.*;
 
+import java.util.*;
+
 public class StaticHologram implements Hologram {
 
     private final EnhancedPlugin plugin;
@@ -27,14 +29,14 @@ public class StaticHologram implements Hologram {
     }
 
     @Override
-    public @Nullable HologramDisplay spawn(Location location, Rotation rotation, PlaceholderSupplier... placeholders) {
-        final World world = SpigotLibs.getWorldOrDefault(location);
-        final Block block = world.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    public @Nullable HologramDisplay spawn(Location location, Rotation rotation, Collection<PlaceholderSupplier> placeholders) {
+        World world = SpigotLibs.getWorldOrDefault(location);
+        Block block = world.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         if (block.getType() != Material.AIR) {
             return null;
         }
 
-        final HologramDisplay hologram = new DecentHologramDisplay(plugin, new Location(world, location.getX(), location.getY(), location.getZ())) {
+        HologramDisplay hologram = new DecentHologramDisplay(plugin, new Location(world, location.getX(), location.getY(), location.getZ())) {
             {
                 final String parsedText = StringPlaceholders.parseAll(text, placeholders);
                 DHAPI.addHologramLine(display, parsedText);

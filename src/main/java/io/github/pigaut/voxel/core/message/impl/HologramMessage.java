@@ -4,6 +4,7 @@ import io.github.pigaut.voxel.core.hologram.*;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -48,7 +49,8 @@ public class HologramMessage extends GenericMessage {
     }
 
     @Override
-    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
+    public void send(@NotNull PlayerState playerState) {
+        Player player = playerState.asPlayer();
         if (hologram == null) {
             player.sendMessage(ChatColor.RED + "DecentHolograms needs to be installed to use holograms.");
             return;
@@ -69,7 +71,7 @@ public class HologramMessage extends GenericMessage {
             location.add(0, 0, ThreadLocalRandom.current().nextDouble(-radiusZ, radiusZ));
         }
 
-        final HologramDisplay display = hologram.spawn(location, placeholderSuppliers);
+        HologramDisplay display = hologram.spawn(location, playerState.getPlaceholderSuppliers());
 
         if (display != null) {
             plugin.getScheduler().runTaskLater(duration, display::destroy);

@@ -14,7 +14,6 @@ import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.boot.*;
 import io.github.pigaut.voxel.plugin.task.*;
-import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.configurator.*;
 import io.github.pigaut.yaml.node.section.*;
 import org.bukkit.*;
@@ -32,7 +31,7 @@ public interface EnhancedPlugin extends Plugin {
 
     String getVersion();
 
-    ColoredLogger getColoredLogger();
+    PluginLogger getColoredLogger();
 
     PluginBootstrap getBootstrap();
 

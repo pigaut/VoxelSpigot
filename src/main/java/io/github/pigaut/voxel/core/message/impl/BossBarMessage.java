@@ -3,6 +3,7 @@ package io.github.pigaut.voxel.core.message.impl;
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.menu.button.*;
 import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import io.github.pigaut.voxel.plugin.task.*;
 import org.bukkit.*;
@@ -48,35 +49,37 @@ public class BossBarMessage extends GenericMessage {
 		return IconBuilder.of(Material.DRAGON_HEAD).buildIcon();
 	}
 
-	@Override
-	public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
-		final String parsedTitle = StringPlaceholders.parseAll(player, title, placeholderSuppliers);
-		BossBar bossBar = Bukkit.getServer().createBossBar(parsedTitle, color, style);
+    @Override
+    public void send(@NotNull PlayerState playerState) {
+        Player player = playerState.asPlayer();
 
-		if (frequency != -1) {
-			new PluginRunnable(plugin) {
-				int interval = 0;
+        String parsedTitle = StringPlaceholders.parseAll(player, title, playerState.getPlaceholderSuppliers());
+        BossBar bossBar = Bukkit.getServer().createBossBar(parsedTitle, color, style);
 
-				@Override
-				public void run() {
-					if (interval >= intervals) {
-						bossBar.removePlayer(player);
-						cancel();
-						return;
-					}
+        if (frequency != -1) {
+            new PluginRunnable(plugin) {
+                int interval = 0;
 
-					bossBar.setProgress(progress.get(interval));
-					interval++;
-				}
-			}.runTaskTimer(0, frequency);
-		}
-		else {
-			plugin.getScheduler().runTaskLater(duration, () -> {
-				bossBar.removePlayer(player);
-			});
-		}
+                @Override
+                public void run() {
+                    if (interval >= intervals) {
+                        bossBar.removePlayer(player);
+                        cancel();
+                        return;
+                    }
 
-		bossBar.addPlayer(player);
-	}
+                    bossBar.setProgress(progress.get(interval));
+                    interval++;
+                }
+            }.runTaskTimer(0, frequency);
+        }
+        else {
+            plugin.getScheduler().runTaskLater(duration, () -> {
+                bossBar.removePlayer(player);
+            });
+        }
+
+        bossBar.addPlayer(player);
+    }
 
 }

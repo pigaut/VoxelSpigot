@@ -19,6 +19,8 @@ public class Settings implements ConfigBacked {
 
     // Generic Settings
     private boolean debug;
+    private boolean showReloadErrors;
+    private boolean coloredConsole;
     private boolean generateExamples;
     private boolean checkForUpdates;
     private boolean metrics;
@@ -50,6 +52,12 @@ public class Settings implements ConfigBacked {
         ConfigSection config = plugin.getConfiguration();
 
         debug = config.getBoolean("debug")
+                .withDefault(false, errors::add);
+
+        showReloadErrors = config.getBoolean("show-reload-errors")
+                .withDefault(true, errors::add);
+
+        coloredConsole = config.getBoolean("colored-console")
                 .withDefault(true, errors::add);
 
         generateExamples = config.getBoolean("generate-examples")
@@ -104,6 +112,14 @@ public class Settings implements ConfigBacked {
 
     public boolean isDebug() {
         return debug;
+    }
+
+    public boolean isShowReloadErrors() {
+        return showReloadErrors;
+    }
+
+    public boolean isColoredConsole() {
+        return coloredConsole;
     }
 
     public boolean isGenerateExamples() {

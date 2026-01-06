@@ -16,8 +16,8 @@ public class MultiLineHologram implements Hologram {
     }
 
     @Override
-    public HologramDisplay spawn(Location location, Rotation rotation, PlaceholderSupplier... placeholders) {
-        final HologramDisplay hologram = new MultiLineHologramDisplay(location, rotation, placeholders);
+    public @Nullable HologramDisplay spawn(Location location, Rotation rotation, Collection<PlaceholderSupplier> placeholders) {
+        HologramDisplay hologram = new MultiLineHologramDisplay(location, rotation, placeholders);
         return hologram;
     }
 
@@ -25,7 +25,7 @@ public class MultiLineHologram implements Hologram {
 
         private final List<HologramDisplay> displays;
 
-        protected MultiLineHologramDisplay(Location location, Rotation rotation, PlaceholderSupplier[] placeholderSuppliers) {
+        protected MultiLineHologramDisplay(Location location, Rotation rotation, Collection<PlaceholderSupplier> placeholderSuppliers) {
             displays = holograms.stream()
                     .map(hologram -> hologram.spawn(location, rotation, placeholderSuppliers))
                     .filter(Objects::nonNull)

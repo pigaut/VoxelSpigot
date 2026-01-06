@@ -1,4 +1,4 @@
-package io.github.pigaut.voxel.config.persistent.data;
+package io.github.pigaut.voxel.config.persistence;
 
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.*;

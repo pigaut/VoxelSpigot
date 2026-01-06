@@ -45,7 +45,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     private final static Pattern VERSION_PATTERN = Pattern.compile("(^[\\.\\d]*).+");
 
     protected final PluginScheduler scheduler = new PluginScheduler(this);
-    protected final ColoredLogger coloredLogger = new ColoredLogger(this);
+    protected final PluginLogger coloredLogger = new PluginLogger(this);
 
     private final LanguageDictionary dictionary = new LanguageDictionary(this);
     private final CommandRegistry commandRegistry = new CommandRegistry(this);
@@ -116,7 +116,7 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
     }
 
     @Override
-    public ColoredLogger getColoredLogger() {
+    public PluginLogger getColoredLogger() {
         return coloredLogger;
     }
 
@@ -277,17 +277,18 @@ public abstract class EnhancedJavaPlugin extends JavaPlugin implements EnhancedP
 
     @Override
     public void sendMessage(@NotNull Player player, @NotNull String messageId, PlaceholderSupplier... placeholderSuppliers) {
-        Chat.send(player, getTranslation(messageId), placeholderSuppliers);
+        Chat.send(player, getTranslation(messageId), List.of(placeholderSuppliers));
     }
 
     @Override
     public void sendMessage(@NotNull CommandSender sender, @NotNull String messageId) {
-        Chat.send(sender, getTranslation(messageId));
+        String message = getTranslation(messageId);
+        sender.sendMessage(message);
     }
 
     @Override
     public void sendMessage(@NotNull CommandSender sender, @NotNull String messageId, PlaceholderSupplier... placeholderSuppliers) {
-        Chat.send(sender, getTranslation(messageId), placeholderSuppliers);
+        Chat.send(sender, getTranslation(messageId), List.of(placeholderSuppliers));
     }
 
     @Override

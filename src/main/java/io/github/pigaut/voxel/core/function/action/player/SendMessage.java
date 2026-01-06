@@ -14,7 +14,7 @@ public class SendMessage implements PlayerAction {
 
     @Override
     public void execute(@NotNull PlayerState player) {
-        player.sendMessage(message);
+        message.send(player);
     }
 
 }

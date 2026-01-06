@@ -1,12 +1,11 @@
 package io.github.pigaut.voxel.plugin.manager;
 
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.util.*;
 
 public abstract class Manager {
 
     protected final EnhancedJavaPlugin plugin;
-    protected final ColoredLogger logger;
+    protected final PluginLogger logger;
 
     protected Manager(EnhancedJavaPlugin plugin) {
         this.plugin = plugin;

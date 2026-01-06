@@ -52,7 +52,7 @@ public class PluginSetup {
     }
 
     public static void checkServerVersion(EnhancedJavaPlugin plugin) {
-        ColoredLogger logger = plugin.getColoredLogger();
+        PluginLogger logger = plugin.getColoredLogger();
         SpigotVersion serverVersion = SpigotServer.getVersion();
 
         if (serverVersion == SpigotVersion.UNKNOWN) {
@@ -112,7 +112,7 @@ public class PluginSetup {
     }
 
     public static void checkCompatiblePlugins(EnhancedJavaPlugin plugin) {
-        ColoredLogger logger = plugin.getColoredLogger();
+        PluginLogger logger = plugin.getColoredLogger();
         logger.info("Looking for compatible plugins...");
 
         List<String> plugins = plugin.getCompatiblePlugins();
@@ -146,7 +146,7 @@ public class PluginSetup {
     }
 
     public static void generateExampleFiles(EnhancedJavaPlugin plugin) {
-        ColoredLogger logger = plugin.getColoredLogger();
+        PluginLogger logger = plugin.getColoredLogger();
 
         if (!plugin.getSettings().isGenerateExamples()) {
             logger.warning("Skipping example file generation (disabled in config)");

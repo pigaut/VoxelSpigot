@@ -2,6 +2,7 @@ package io.github.pigaut.voxel.core.message.impl;
 
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
@@ -40,9 +41,9 @@ public class DelayedMessage implements Message {
     }
 
     @Override
-    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
+    public void send(@NotNull PlayerState playerState) {
         plugin.getScheduler().runTaskLater(delay, () -> {
-            message.send(player, placeholderSuppliers);
+            message.send(playerState);
         });
     }
 

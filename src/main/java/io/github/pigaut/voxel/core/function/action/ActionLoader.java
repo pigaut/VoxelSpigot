@@ -30,7 +30,7 @@ public class ActionLoader extends AbstractLoader<FunctionAction> {
 
         //server
         addLoader("BROADCAST", (Line<Action>) line ->
-                new ServerBroadcast(line.getRequiredString(1)));
+                new ServerBroadcast(plugin, line.getRequiredString(1)));
 
         addLoader("LIGHTNING", (Line<Action>) line ->
                 new StrikeLightning(

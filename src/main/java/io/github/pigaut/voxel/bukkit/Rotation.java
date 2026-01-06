@@ -5,6 +5,7 @@ import org.bukkit.block.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.*;
 
 public enum Rotation {
@@ -84,13 +85,6 @@ public enum Rotation {
 
     public abstract Axis translateAxis(Axis axis);
 
-    public Rotation next() {
-        if (this == RIGHT) return BACK;
-        if (this == BACK) return LEFT;
-        if (this == LEFT) return NONE;
-        return RIGHT;
-    }
-
     private static final BlockFace[] ORDER = {
             BlockFace.NORTH, BlockFace.NORTH_NORTH_EAST, BlockFace.NORTH_EAST, BlockFace.EAST_NORTH_EAST,
             BlockFace.EAST, BlockFace.EAST_SOUTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_SOUTH_EAST,
@@ -119,6 +113,11 @@ public enum Rotation {
         };
 
         return ORDER[(index + stepOffset) % ORDER.length];
+    }
+
+    public static Rotation random() {
+        Rotation[] values = values();
+        return values[ThreadLocalRandom.current().nextInt(values.length)];
     }
 
 }

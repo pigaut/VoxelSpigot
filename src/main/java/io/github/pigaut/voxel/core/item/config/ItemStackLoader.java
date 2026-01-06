@@ -3,6 +3,8 @@ package io.github.pigaut.voxel.core.item.config;
 import com.cryptomorin.xseries.*;
 import io.github.pigaut.voxel.bukkit.*;
 import io.github.pigaut.voxel.config.deserializer.*;
+import io.github.pigaut.voxel.server.*;
+import io.github.pigaut.voxel.version.*;
 import io.github.pigaut.yaml.*;
 import io.github.pigaut.yaml.configurator.load.*;
 import io.github.pigaut.yaml.convert.format.*;
@@ -27,9 +29,9 @@ public class ItemStackLoader implements ConfigLoader.Section<ItemStack> {
 
     @Override
     public @NotNull ItemStack loadFromSection(@NotNull ConfigSection section) throws InvalidConfigurationException {
-        final Material type = section.getRequired("type|material", Material.class);
-        final int amount = section.getInteger("amount").withDefault(1);
-        final ItemStack item = new ItemStack(type, amount);
+        Material type = section.getRequired("type|material", Material.class);
+        int amount = section.getInteger("amount").withDefault(1);
+        ItemStack item = new ItemStack(type, amount);
 
         {
             ItemMeta meta = item.getItemMeta();
@@ -45,7 +47,7 @@ public class ItemStackLoader implements ConfigLoader.Section<ItemStack> {
             List<ItemFlag> itemFlags = section.getAll("flags", ItemFlag.class);
             meta.addItemFlags(itemFlags.toArray(new ItemFlag[0]));
 
-            final boolean shouldGlow = section.getBoolean("glow").withDefault(false);
+            boolean shouldGlow = section.getBoolean("glow").withDefault(false);
             if (shouldGlow) {
                 meta.addEnchant(XEnchantment.LUCK_OF_THE_SEA.get(), 1, true);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -68,25 +70,39 @@ public class ItemStackLoader implements ConfigLoader.Section<ItemStack> {
                 if (!(meta instanceof Damageable damageable)) {
                     throw new InvalidConfigurationException(section, "damage", "Current item type cannot be damaged");
                 }
-                damageable.setDamage(10);
+                damageable.setDamage(damage);
             });
 
-            final ConfigSection enchantsSection = section.getSectionOrCreate("enchantments|enchants");
+
+
+            section.getInteger("max-damage|max-durability").ifPresent(maxDamage -> {
+                if (!(meta instanceof Damageable damageable)) {
+                    throw new InvalidConfigurationException(section, "damage", "Current item type cannot be damaged");
+                }
+
+                if (SpigotServer.getVersion().isOlderThan(SpigotVersion.V1_20_5)) {
+                    throw new InvalidConfigurationException(section, "max-damage", "Max durability is only available in version 1.20.5+");
+                }
+
+                damageable.setMaxDamage(maxDamage);
+            });
+
+            ConfigSection enchantsSection = section.getSectionOrCreate("enchantments|enchants");
             for (String key : enchantsSection.getKeys()) {
                 Enchantment enchantment = enchantDeserializer.loadFromKey(enchantsSection, key);
                 int level = enchantsSection.getRequiredInteger(key);
                 meta.addEnchant(enchantment, level, true);
             }
 
-            final PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
+            PersistentDataContainer dataContainer = meta.getPersistentDataContainer();
             for (ConfigSection dataConfig : section.getNestedSections("persistent-data")) {
-                final String key = dataConfig.getRequiredString("key");
-                final NamespacedKey namespacedKey = NamespacedKey.fromString(key);
+                String key = dataConfig.getRequiredString("key");
+                NamespacedKey namespacedKey = NamespacedKey.fromString(key);
                 if (namespacedKey == null) {
                     throw new InvalidConfigurationException(dataConfig, "Could not create namespaced key from: '" + key + "'");
                 }
 
-                final String dataType = dataConfig.getRequiredString("type", CaseStyle.SNAKE);
+                String dataType = dataConfig.getRequiredString("type", CaseStyle.SNAKE);
                 switch (dataType) {
                     case "byte" -> dataContainer.set(namespacedKey, PersistentDataType.BYTE, dataConfig.getRequiredInteger("value").byteValue());
                     case "short" -> dataContainer.set(namespacedKey, PersistentDataType.SHORT, dataConfig.getRequiredInteger("value").shortValue());
@@ -118,6 +134,8 @@ public class ItemStackLoader implements ConfigLoader.Section<ItemStack> {
             for (ItemAttribute itemAttribute : section.getAll("attributes", ItemAttribute.class)) {
                 meta.addAttributeModifier(itemAttribute.attribute(), itemAttribute.modifier());
             }
+
+
 
             item.setItemMeta(meta);
         }

@@ -26,7 +26,7 @@ public class SendHologramToPlayer implements PlayerAction {
 
     @Override
     public void execute(@NotNull PlayerState player) {
-        player.sendMessage(hologram);
+        hologram.send(player);
     }
 
     public static class NotEnabled implements PlayerAction {

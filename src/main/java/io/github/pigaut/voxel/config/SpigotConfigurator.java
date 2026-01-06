@@ -7,7 +7,7 @@ import io.github.pigaut.voxel.config.block.*;
 import io.github.pigaut.voxel.config.color.*;
 import io.github.pigaut.voxel.config.deserializer.*;
 import io.github.pigaut.voxel.config.location.*;
-import io.github.pigaut.voxel.config.persistent.data.*;
+import io.github.pigaut.voxel.config.persistence.*;
 import io.github.pigaut.voxel.core.item.config.*;
 import io.github.pigaut.voxel.server.*;
 import io.github.pigaut.voxel.util.reflection.*;

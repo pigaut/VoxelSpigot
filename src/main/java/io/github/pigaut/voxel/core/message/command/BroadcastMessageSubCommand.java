@@ -3,6 +3,7 @@ package io.github.pigaut.voxel.core.message.command;
 import io.github.pigaut.voxel.command.*;
 import io.github.pigaut.voxel.command.node.*;
 import io.github.pigaut.voxel.core.message.*;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.voxel.plugin.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -16,13 +17,14 @@ public class BroadcastMessageSubCommand extends SubCommand {
         withDescription(plugin.getTranslation("message-broadcast-command"));
         withParameter(CommandParameters.messageName(plugin));
         withCommandExecution((sender, args, placeholders) -> {
-            final Message message = plugin.getMessage(args[0]);
+            Message message = plugin.getMessage(args[0]);
             if (message == null) {
                 plugin.sendMessage(sender, "message-not-found", placeholders);
                 return;
             }
             for (Player player : Bukkit.getOnlinePlayers()) {
-                message.send(player);
+                PlayerState playerState = plugin.getPlayerState(player);
+                message.send(playerState);
             }
             plugin.sendMessage(sender, "sent-message-to-all", placeholders);
         });

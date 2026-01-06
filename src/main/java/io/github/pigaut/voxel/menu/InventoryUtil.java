@@ -3,6 +3,7 @@ package io.github.pigaut.voxel.menu;
 import org.bukkit.*;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.*;
+import org.jetbrains.annotations.*;
 
 public class InventoryUtil {
 
@@ -58,6 +59,18 @@ public class InventoryUtil {
             return Bukkit.createInventory(null, size, title);
         }
         return Bukkit.createInventory(null, storage, title);
+    }
+
+    public static boolean isHotbarSlot(int slot) {
+        return slot >= 0 && slot <= 8;
+    }
+
+    public static int getFirstEmptyHotbarSlot(@NotNull PlayerInventory inventory) {
+        for (int i = 0; i <= 8; i++) {
+            ItemStack item = inventory.getItem(i);
+            if (item == null || item.getType() == Material.AIR) return i;
+        }
+        return -1;
     }
 
 }

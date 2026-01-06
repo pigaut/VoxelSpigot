@@ -8,6 +8,7 @@ import io.github.pigaut.voxel.core.language.*;
 import io.github.pigaut.voxel.hook.itemsadder.*;
 import io.github.pigaut.voxel.listener.*;
 import io.github.pigaut.voxel.plugin.*;
+import io.github.pigaut.voxel.plugin.PluginLogger;
 import io.github.pigaut.voxel.plugin.boot.phase.*;
 import io.github.pigaut.voxel.plugin.manager.*;
 import io.github.pigaut.voxel.server.*;
@@ -25,7 +26,7 @@ import java.util.function.*;
 public class PluginBootstrap {
 
     private final EnhancedJavaPlugin plugin;
-    private final ColoredLogger logger;
+    private final PluginLogger logger;
 
     private final Set<BootPhase> missingStartupRequirements = new HashSet<>();
     private final List<StartupTask> startupTasks = new ArrayList<>();

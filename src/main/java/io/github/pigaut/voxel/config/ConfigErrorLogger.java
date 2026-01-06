@@ -2,7 +2,6 @@ package io.github.pigaut.voxel.config;
 
 import io.github.pigaut.voxel.placeholder.*;
 import io.github.pigaut.voxel.plugin.*;
-import io.github.pigaut.voxel.util.*;
 import io.github.pigaut.yaml.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -13,7 +12,7 @@ import java.util.logging.*;
 public class ConfigErrorLogger {
 
     public static void logAll(EnhancedPlugin plugin, List<ConfigurationException> errors) {
-        ColoredLogger logger = plugin.getColoredLogger();
+        PluginLogger logger = plugin.getColoredLogger();
         for (ConfigurationException exception : errors) {
             logger.log(Level.SEVERE, createErrorMessage(plugin, exception));
         }
@@ -25,7 +24,7 @@ public class ConfigErrorLogger {
         }
 
         final PlaceholderSupplier errorCount = PlaceholderSupplier.of("{error_count}", errors.size());
-        if (!plugin.getSettings().isDebug()) {
+        if (!plugin.getSettings().isShowReloadErrors()) {
             plugin.sendMessage(player, "configuration-errors", errorCount);
             logAll(plugin, errors);
             return;

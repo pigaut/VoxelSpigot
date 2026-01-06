@@ -14,7 +14,7 @@ public interface PlaceholderSupplier {
     }
 
     static PlaceholderSupplier of(String id, Object value) {
-        return () -> new Placeholder[]{ Placeholder.of(id, value) };
+        return () -> new Placeholder[] { Placeholder.of(id, value) };
     }
 
 }

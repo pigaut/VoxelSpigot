@@ -58,10 +58,6 @@ public interface PlayerState {
 
     void sendMessage(String message);
 
-    void sendMessage(String message, PlaceholderSupplier... placeholderSuppliers);
-
-    void sendMessage(Message message);
-
     void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut);
 
     /**
@@ -218,9 +214,9 @@ public interface PlayerState {
 
     void flushCache(String id, Class<?> type);
 
-    @NotNull PlaceholderSupplier[] getPlaceholders();
+    @NotNull Collection<PlaceholderSupplier> getPlaceholderSuppliers();
 
-    void updatePlaceholders(@NotNull PlaceholderSupplier... placeholderSuppliers);
+    void updatePlaceholders(@NotNull PlaceholderSupplier placeholderSupplier);
 
     void clearPlaceholders();
 

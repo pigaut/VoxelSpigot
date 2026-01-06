@@ -2,6 +2,7 @@ package io.github.pigaut.voxel.core.message.impl;
 
 import io.github.pigaut.voxel.core.message.*;
 import io.github.pigaut.voxel.placeholder.*;
+import io.github.pigaut.voxel.player.*;
 import io.github.pigaut.yaml.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.*;
@@ -38,9 +39,9 @@ public class RepeatedMessage implements Message {
     }
 
     @Override
-    public void send(@NotNull Player player, PlaceholderSupplier... placeholderSuppliers) {
+    public void send(@NotNull PlayerState playerState) {
         for (int i = 0; i < repetitions; i++) {
-            message.send(player, placeholderSuppliers);
+            message.send(playerState);
         }
     }
 

@@ -5,24 +5,33 @@ import io.github.pigaut.voxel.server.*;
 import org.bukkit.*;
 import org.jetbrains.annotations.*;
 
+import java.util.*;
+
 public class StringPlaceholders {
 
-    public static String parseAll(@NotNull String text, @NotNull PlaceholderSupplier... placeholderSuppliers) {
-        return parseAll(null, text, placeholderSuppliers);
+    public static String parseAll(@NotNull String text, @NotNull PlaceholderSupplier... suppliers) {
+        return parseAll(null, text, Arrays.asList(suppliers));
     }
 
     public static String parseAll(@Nullable OfflinePlayer player, @NotNull String text) {
-        return parseAll(player, text, PlaceholderSupplier.EMPTY);
+        return parseAll(player, text, List.of(PlaceholderSupplier.EMPTY));
     }
 
-    public static String parseAll(@Nullable OfflinePlayer player, @NotNull String text,
-                                  @NotNull PlaceholderSupplier... placeholderSuppliers) {
-        final PlaceholdersHook placeholderAPI = SpigotServer.getPlaceholderAPIHook();
+    public static String parseAll(@Nullable OfflinePlayer player, @NotNull String text, @NotNull PlaceholderSupplier... suppliers) {
+        return parseAll(player, text, Arrays.asList(suppliers));
+    }
+
+    public static String parseAll(@NotNull String text, @NotNull Collection<? extends PlaceholderSupplier> suppliers) {
+        return parseAll(null, text, suppliers);
+    }
+
+    public static String parseAll(@Nullable OfflinePlayer player, @NotNull String text, @NotNull Collection<? extends PlaceholderSupplier> suppliers) {
+        PlaceholdersHook placeholderAPI = SpigotServer.getPlaceholderAPIHook();
         if (placeholderAPI != null) {
             text = placeholderAPI.setPlaceholders(player, text);
         }
 
-        for (PlaceholderSupplier supplier : placeholderSuppliers) {
+        for (PlaceholderSupplier supplier : suppliers) {
             for (Placeholder placeholder : supplier.getPlaceholders()) {
                 text = placeholder.format(text);
             }
